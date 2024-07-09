@@ -106,18 +106,21 @@ The Sketch should compile and upload automatically to the Pico. If the upload fa
 
 ## Connections
 
-The pinout of the various Synthesiser modules tends to vary so it is difficult to give exact wiring diagrams. The RP2040 modules also have different pinouts. 
+The pinout of the various Synthesiser modules tends to vary so it is difficult to give exact wiring diagrams. The RP2040 modules also have different pinouts.
+The LMX2595 takes a lot of current so is best supplied from the USB 5V line using its own 3V3 regulator. The other chips can be powered from the 3V3 output of the RP2040. Power arrangements may need additional attention to minimise phase noise. 
+
 The generic wiring instructions are as follows:-
 
-RP2040      ADF4351      MAX2870      LMX2595
-5V            N/C         N/C            5V
-3V3           3V3         3V3            N/C
-GND           GND         GND            GND
-GPO3          CE          CE             CE  
-GPO4          MUX         MUX            MUX
-GPO5          LE          LE             LE
-GPO6          CLK         CLK            CLK
-GPO7          DAT         DATA           DAT
+| RP2040 | ADF4351 | MAX2870 | LMX2595 |
+| :---:  |  :---:  |  :---:  |   :---: |
+|5V      |   N/C   |   N/C   |    5V   |
+|3V3     |   3V3   |   3V3   |   N/C   |
+|GND     |   GND   |   GND   |   GND   |
+|GPO3    |   CE    |   CE    |   CE    |
+|GPO4    |   MUX   |   MUX   |   MUX   |
+|GPO5    |   LE    |   LE    |   LE    |
+|GPO6    |   CLK   |   CLK   |   CLK   |
+|GPO7    |   DAT   |   DATA  |   DAT   |
 
 
 ## Firmware description

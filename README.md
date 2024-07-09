@@ -116,7 +116,7 @@ To enter programming mode  (which you will need to do at least once) you need to
 ![Screenshot (106)](https://github.com/g4eml/RP2040_Synth/assets/1881884/8ec6a252-c24e-4df1-89dc-52bb52c28a04)
 
 ### Commands
-Commands are entered by a single key press. Text and numbers require a cariage return to enter. Pressing Question Mark will ususlly give more detailed help. 
+Commands are entered by a single key press. Text and numbers require a carriage return to enter. Pressing Question Mark will usually give more detailed help. 
 Changes to registers and parameters will be applied immediatey so you should be able to observe the result of the change in real time. 
 
 T = Select Chip Type. Allows the Synthesiser chip type to be selected. Normally only needed the first time you configure the firmware. 

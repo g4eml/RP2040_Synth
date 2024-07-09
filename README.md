@@ -120,15 +120,25 @@ Commands are entered by a single key press. Text and numbers require a carriage 
 Changes to registers and parameters will be applied immediatey so you should be able to observe the result of the change in real time. 
 
 T = Select Chip Type. Allows the Synthesiser chip type to be selected. Normally only needed the first time you configure the firmware. 
+
 D = Set Default Register Values for chip. Sets default values to all registers. Tries to program a 10Mhz PFD and requests a frequency. After this your Synthesiser should start to output RF. 
+
 O = Set Reference Oscillator Frequency. Sets the Reference Oscillator Frequency. Enter the actual frequency of your reference including any frequency error. The firmware will attempt to adjust for this. 
+
 P = Enter PFD Frequency. Set the required PFD frequency. The firmware will attempt to get as close as possible to the requested value but not all values can be achieved. 
+
 F = Enter Output Frequency. Set the required output frequency. The firmware will attempt to calculate the closest register values to achieve this. Changing the PFD may improve the result. 
+
 C = Calculate and display frequency from current settings. The firmware will calculte the expected output frequency from the current register settings. Useful to check after youy make manual changes.
+
 V = View / Enter Variables for Registers. Allows viewing or entry of parameters using the same names as defined in the chip datasheet. Press ? for a full list of the available parameter names. 
+
 R = View / Enter Registers Directly in Hex. Allws direct entry of regiser values in Hexadecimal. Useful when transfering values calculated by another program. 
+
 I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. 
+
 S = Save Registers to EEPROM. Saves the current Synthesiser settings to EEPROM. They will then be automatically loaded on the next power cycle. You must do this at least once. 
+
 X = Exit Menu. Exits from the menu, re-initialises the Synthesiser and starts the CW Ident. 
 
 ## 

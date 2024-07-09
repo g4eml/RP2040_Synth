@@ -1,4 +1,4 @@
-# Rp2040Synth
+# RP2040Synth
 
 ## Description
 
@@ -34,7 +34,7 @@ Suitable Synthesiser boards are available from Ebay, Amazon, Ali Express etc.
 
 This can be done either before or after the Pico has been connected, it makes no difference. Updating to a new firmware version is done the same way.   
 
-1. Locate the latest compiled firmware file 'RP2040Synth.uf2' which will be found here https://github.com/g4eml/RP2040Synth/releases and save it to your desktop. 
+1. Locate the latest compiled firmware file 'RP2040_Synth.uf2' which will be found here https://github.com/g4eml/RP2040_Synth/releases and save it to your desktop. 
 
 2. Hold down the BOOTSEL button on the RP2040 module while connecting it to your PC using its USB port. The RP2040 should appear as a USB disk drive on your PC.
 
@@ -62,7 +62,7 @@ The RP2040 is programmed using the Arduino IDE with the Earl F. Philhower, III  
 
 #### Downloading the Software.
 
-1. Download the latest released source code .zip file from https://github.com/g4eml/RP2040Synth/releases
+1. Download the latest released source code .zip file from https://github.com/g4eml/RP2040_Synth/releases
 
 2. Save it to a convenient location and then unzip it. 
 

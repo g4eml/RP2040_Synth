@@ -104,6 +104,22 @@ The RP2040 is programmed using the Arduino IDE with the Earl F. Philhower, III  
 
 The Sketch should compile and upload automatically to the Pico. If the upload fails you may need to disconnect the board and then hold down the BOOTSEL button while reconnecting. 
 
+## Connections
+
+The pinout of the various Synthesiser modules tends to vary so it is difficult to give exact wiring diagrams. The RP2040 modules also have different pinouts. 
+The generic wiring instructions are as follows:-
+
+RP2040      ADF4351      MAX2870      LMX2595
+5V            N/C         N/C            5V
+3V3           3V3         3V3            N/C
+GND           GND         GND            GND
+GPO3          CE          CE             CE  
+GPO4          MUX         MUX            MUX
+GPO5          LE          LE             LE
+GPO6          CLK         CLK            CLK
+GPO7          DAT         DATA           DAT
+
+
 ## Firmware description
 
 By default on power up the firmware will immediately send the EEPROM saved register values to the sunthesiser chip.  If the CW ident feature is enabled the ident will begin. 

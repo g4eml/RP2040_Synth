@@ -117,10 +117,10 @@ The generic wiring instructions are as follows:-
 |3V3     |   3V3   |   3V3   |   N/C   |
 |GND     |   GND   |   GND   |   GND   |
 |GPO3    |   CE    |   CE    |   CE    |
-|GPO4    |   MUX   |   MUX   |   MUX   |
-|GPO5    |   LE    |   LE    |   LE    |
-|GPO6    |   CLK   |   CLK   |   CLK   |
-|GPO7    |   DAT   |   DATA  |   DAT   |
+|GPO4    |   MUX   |   MUX   |  MUXout |
+|GPO5    |   LE    |   LE    |   CSB   |
+|GPO6    |   CLK   |   CLK   |   SCK   |
+|GPO7    |   DAT   |   DATA  |   SDI   |
 
 
 ## Firmware description

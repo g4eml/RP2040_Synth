@@ -28,7 +28,16 @@ Direct register entry for loading a configuration from another program.
 
 This code should work on any RP2040 based board. Recommended is the RP2040 Zero which is very small. The original Raspberry Pi Pico can also be used but this board is physically larger.
 
-Suitable Synthesiser boards are available from Ebay, Amazon, Ali Express etc. 
+![zero](https://github.com/g4eml/RP2040_Synth/assets/1881884/6ed413e0-6a1d-4815-857c-6fc8db470f17)  ![pico](https://github.com/g4eml/RP2040_Synth/assets/1881884/b280b334-cf92-4c51-b37b-627b331f48d3)
+
+
+Suitable Synthesiser boards are available from Ebay, Amazon, Ali Express, SV1AFN etc. 
+
+
+![ADF4351](https://github.com/g4eml/RP2040_Synth/assets/1881884/3eacdbbf-ae51-43bd-9b6d-3b69f2eebe77)  ![max2870](https://github.com/g4eml/RP2040_Synth/assets/1881884/94cc4c3b-1bc7-4b79-8cc2-5abb77e51a20)
+
+![lmx2595](https://github.com/g4eml/RP2040_Synth/assets/1881884/57675dc3-57eb-4d40-87e9-84847eca80ed) ![SV1AFN](https://github.com/g4eml/RP2040_Synth/assets/1881884/6c4bbb31-debc-4be2-bb3c-899d4c1da64c)
+
 
 ## Programming or updating the RP2040 (quick method)
 

@@ -1,9 +1,11 @@
 //Chip specific functions for MAX2780 device
 
-#define MAX2870LEPin 5
-#define MAX2870RXPin 4         //Not Used 
-#define MAX2870TXPin 7
-#define MAX2870CKPin 6
+#define MAX2870CEPin 3         //GPO 3 Connect to Max2870  CE Pin
+#define MAX2870MUXPin 4         //GPO 4 Connect to Max2870  MUX_OUT Pin         
+#define MAX2870LEPin 5         //GPO 5 Connect to Max2870  LE Pin
+#define MAX2870CKPin 6         //GPO 6 Connect to Max2870  CLK Pin 
+#define MAX2870DATPin 7         //GPO 7 Connect to Max2870  DATA Pin
+
 
 
 //MAX2870 Register bits. Default settings give output at 435.100 MHz with 100MHz reference clock 4MHz PFD.
@@ -229,10 +231,12 @@ void Max2870Init(void)
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 105.0;                      //maximum PFD frequency
+  pinMode(MAX2870CEPin,OUTPUT);
+  digitalWrite(MAX2870CEPin,HIGH); 
   pinMode(MAX2870LEPin,OUTPUT);
   digitalWrite(MAX2870LEPin,HIGH);
-  SPI.setRX(MAX2870RXPin);
-  SPI.setTX(MAX2870TXPin);
+  SPI.setRX(MAX2870MUXPin);
+  SPI.setTX(MAX2870DATPin);
   SPI.setSCK(MAX2870CKPin);
   SPI.beginTransaction(SPISettings(400000,MSBFIRST,SPI_MODE0));
   SPI.begin();

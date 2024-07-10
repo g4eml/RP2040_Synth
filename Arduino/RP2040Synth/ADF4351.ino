@@ -1,9 +1,11 @@
 //Chip specific functions for ADF4351 device
 
-#define ADF4351LEPin 5
-#define ADF4351RXPin 4         //Not Used 
-#define ADF4351TXPin 7
-#define ADF4351CKPin 6
+#define ADF4351CEPin 3         //GPO 3 Connect to ADf4351 CE Pin
+#define ADF4351MUXPin 4         //GPO 4 Connect to ADF4351 MUX Pin
+#define ADF4351LEPin 5         //GPO 5 Connect to ADF4351 LE Pin
+#define ADF4351CKPin 6         //GPO 6 Connect to ADF4351 CLK Pin
+#define ADF4351DATPin 7         //GPO 7 Connect to ADF4351 DAT Pin
+
 
 
 //ADF4351 Register bits.
@@ -221,10 +223,12 @@ void ADF4351Init(void)
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 35.0;
+  pinMode(ADF4351CEPin,OUTPUT);
+  digitalWrite(ADF4351CEPin,HIGH); 
   pinMode(ADF4351LEPin,OUTPUT);
   digitalWrite(ADF4351LEPin,HIGH);
-  SPI.setRX(ADF4351RXPin);
-  SPI.setTX(ADF4351TXPin);
+  SPI.setRX(ADF4351MUXPin);
+  SPI.setTX(ADF4351DATPin);
   SPI.setSCK(ADF4351CKPin);
   SPI.beginTransaction(SPISettings(40000,MSBFIRST,SPI_MODE0));
   SPI.begin();

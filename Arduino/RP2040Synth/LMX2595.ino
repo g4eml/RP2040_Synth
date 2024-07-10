@@ -1,9 +1,10 @@
 //Chip specific functions for LMX2595 device
 
-#define LMX2595LEPin 5
-#define LMX2595RXPin 4         //Not Used 
-#define LMX2595TXPin 7
-#define LMX2595CKPin 6
+#define LMX2595CEPin 3         //GPO 3 Connect to LMX2595  CE Pin
+#define LMX2595MUXPin 4         //GPO 4 Connect to LMX2595  MUXout Pin
+#define LMX2595CSBPin 5         //GPO 5 Connect to LMX2595  CSB Pin
+#define LMX2595SCKPin 6         //GPO 6 Connect to LMX2595  SCK Pin 
+#define LMX2595SDIPin 7         //GPO 7 Connect to LMX2595  SDI Pin
 
 
 //LMX2595 Register Parameters.
@@ -460,11 +461,13 @@ void LMX2595Init(void)
   numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
   numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
   maxPfd = 250.0;
-  pinMode(LMX2595LEPin,OUTPUT);
-  digitalWrite(LMX2595LEPin,HIGH);
-  SPI.setRX(LMX2595RXPin);
-  SPI.setTX(LMX2595TXPin);
-  SPI.setSCK(LMX2595CKPin);
+  pinMode(LMX2595CEPin,OUTPUT);
+  digitalWrite(LMX2595CEPin,HIGH); 
+  pinMode(LMX2595CSBPin,OUTPUT);
+  digitalWrite(LMX2595CSBPin,HIGH);
+  SPI.setRX(LMX2595MUXPin);
+  SPI.setTX(LMX2595SDIPin);
+  SPI.setSCK(LMX2595SCKPin);
   SPI.beginTransaction(SPISettings(400000,MSBFIRST,SPI_MODE0));
   SPI.begin();
 }
@@ -475,13 +478,13 @@ void LMX2595Send(int32_t val)
   int b=(val >> 8) & 0xFF;
   int c=val & 0xFF;
   
-  digitalWrite(LMX2595LEPin,LOW);
+  digitalWrite(LMX2595CSBPin,LOW);
   delayMicroseconds(10);
   SPI.transfer((byte)a);
   SPI.transfer((byte)b);
   SPI.transfer((byte)c);
   delayMicroseconds(10);
-  digitalWrite(LMX2595LEPin,HIGH);
+  digitalWrite(LMX2595CSBPin,HIGH);
   delayMicroseconds(10);  
 }
 

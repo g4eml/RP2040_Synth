@@ -26,7 +26,7 @@ Direct register entry for loading a configuration from another program.
 
 ## Requirements
 
-This code should work on any RP2040 based board. Recommended is the RP2040 Zero which is very small. The original Raspberry Pi Pico can also be used but this board is physically larger.
+This code should work on any RP2040 based board. Recommended is the RP2040 Zero which is very small and uses a USB-C connector. The original Raspberry Pi Pico can also be used but this board is physically larger.
 
 ![zero](https://github.com/g4eml/RP2040_Synth/assets/1881884/6ed413e0-6a1d-4815-857c-6fc8db470f17)  ![pico](https://github.com/g4eml/RP2040_Synth/assets/1881884/b280b334-cf92-4c51-b37b-627b331f48d3)
 

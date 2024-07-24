@@ -72,6 +72,8 @@ void loop()
   Serial.println(" Synthesiser programmed, Sleeping");
 
   chipUpdate();
+  delay(100);
+  chipUpdate();
   
   unsigned long loopTimer = millis();
   while(1)

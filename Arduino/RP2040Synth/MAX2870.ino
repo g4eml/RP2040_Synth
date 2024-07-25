@@ -1,4 +1,4 @@
-//Chip specific functions for MAX2780 device
+//Chip specific functions for MAX2870 device
 
 #define MAX2870CEPin 3         //GPO 3 Connect to Max2870  CE Pin
 #define MAX2870MUXPin 4         //GPO 4 Connect to Max2870  MUX_OUT Pin         
@@ -227,7 +227,7 @@ void Max2870SetParameters(void)
 
 void Max2870Init(void)
 {
-  int chip = MAX2780;                  //index to the current chip type
+  int chip = MAX2870;                  //index to the current chip type
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 105.0;                      //maximum PFD frequency

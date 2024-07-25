@@ -4,7 +4,7 @@ void chipUpdate(void)
 {
   switch(chip)
   {
-    case MAX2780:
+    case MAX2870:
     Max2870Update();
     break;
 
@@ -22,7 +22,7 @@ void chipSetParameters(void)
 {
   switch(chip)
   {
-    case MAX2780:
+    case MAX2870:
     Max2870SetParameters();
     break;
 
@@ -40,7 +40,7 @@ void chipInit(void)
 {
   switch(chip)
   {
-    case MAX2780:
+    case MAX2870:
     Max2870Init();
     break;
 
@@ -58,7 +58,7 @@ void chipSetFrequency(double f)
 {
   switch(chip)
   {
-    case MAX2780:
+    case MAX2870:
     Max2870SetFrequency(f);
     break;
 
@@ -77,7 +77,7 @@ double chipGetFrequency(void)
   double freq;
   switch(chip)
   {
-    case MAX2780:
+    case MAX2870:
     freq = Max2870GetFrequency();
     break;
 
@@ -97,7 +97,7 @@ void chipCalcFreq(void)
 {
         switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870CalcFreq();
           break;
 
@@ -114,7 +114,7 @@ void chipCalcFreq(void)
   {
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870DecodeRegs();
           break;
 
@@ -132,7 +132,7 @@ void chipCalcFreq(void)
   {
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870SetDefault();
           break;
 
@@ -151,7 +151,7 @@ void chipCalcFreq(void)
 
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870FskKey(key);
           break;
 
@@ -170,7 +170,7 @@ void chipCalcFreq(void)
 
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870SaveFskShift();
           break;
 
@@ -189,7 +189,7 @@ void chipCalcFreq(void)
 
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           Max2870SetPfd();
           break;
 
@@ -208,7 +208,7 @@ void chipCalcFreq(void)
      double pfd;
       switch(chip)
         {
-          case MAX2780:
+          case MAX2870:
           pfd = Max2870GetPfd();
           break;
 

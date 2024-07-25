@@ -3,10 +3,10 @@
 
 //Global values...
 
-enum chipType { NONE, MAX2780 , ADF4351 , LMX2595 };
-String chipName[] = {"None","MAX2780", "ADF4351" , "LMX2595"};
+enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 };
+String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595"};
 
-uint8_t chip = MAX2780;                  //index to the current chip type
+uint8_t chip = MAX2870;                  //index to the current chip type
 uint32_t reg[128];                    // allow for up to 128 32 bit registers. 
 int numberOfRegs = 6;                  //number of registers in the current chip type
 int numberOfBits = 32;                 //number of bits in each register
@@ -100,8 +100,6 @@ void loop()
       }
 
    }
-  
-          
   
 
 }

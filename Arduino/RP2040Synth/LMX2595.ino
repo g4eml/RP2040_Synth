@@ -1223,3 +1223,10 @@ void LMX2595SaveFskShift(void)
   cwidKeyUpDen = LMX2595_PLL_DEN;
   cwidKeyUpNum = LMX2595_PLL_NUM;
 }
+
+void LMX2595SaveJt(uint8_t index)
+{
+  jtN[index] = LMX2595_PLL_N;
+  jtDen[index] = LMX2595_PLL_DEN;
+  jtNum[index] = LMX2595_PLL_NUM;
+}

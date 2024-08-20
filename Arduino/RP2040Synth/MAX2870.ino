@@ -670,3 +670,10 @@ void Max2870SaveFskShift(void)
   cwidKeyUpDen = Max2870_M;
   cwidKeyUpNum = Max2870_FRAC;
 }
+
+void Max2870SaveJt(uint8_t index)
+{
+  jtN[index] = Max2870_N;
+  jtDen[index] = Max2870_M;
+  jtNum[index] = Max2870_FRAC;
+}

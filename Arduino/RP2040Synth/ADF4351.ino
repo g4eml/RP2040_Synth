@@ -629,3 +629,10 @@ void ADF4351SaveFskShift(void)
   cwidKeyUpDen = ADF4351_M;
   cwidKeyUpNum = ADF4351_FRAC;
 }
+
+void ADF4351SaveJt(uint8_t index)
+{
+  jtN[index] = ADF4351_INT;
+  jtDen[index] = ADF4351_M;
+  jtNum[index] = ADF4351_FRAC;
+}

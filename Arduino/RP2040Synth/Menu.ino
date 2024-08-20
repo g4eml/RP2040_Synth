@@ -297,11 +297,89 @@ void setCwIdent(void)
 
 }
 
+void setJTMode(void)
+{
+  String jtmodes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "$$$"};
+  char resp;
+  String jts;
+  showMenu(jtmodes);
+  resp = getSelection("Select JT Mode --->");
+
+  switch(resp)
+    {
+      case '0':
+      jtMode = 0;
+      return;
+      break;
+
+      case '1':
+      jtMode = 4;
+      jtToneDelay = JT4_DELAY;
+      jtNumberOfTones = 4;
+      jtToneSpacing = JT4_TONE_SPACING;
+      jtSymbolCount = JT4_SYMBOL_COUNT;
+      break;
+
+      case '2':
+      jtMode = 6;
+      jtToneDelay = JT65_DELAY;
+      jtNumberOfTones = 65;
+      jtToneSpacing = JT65_TONE_SPACING;
+      jtSymbolCount = JT65_SYMBOL_COUNT;
+      break;    
+    }
+
+  Serial.print("Enter JT Message (16 characters) --->");
+  jts = inputString(true);
+  jts.toCharArray(&jtid[0], 16 );
+  jtIdLen = 16;
+
+
+  switch(jtMode)
+  {
+    case 4:
+      jtEncode.jt4_encode(jtid , jtBuffer);
+      break;
+    
+    case 6:
+      jtEncode.jt65_encode(jtid , jtBuffer);
+      break;
+  }
+
+  double nominal = chipGetFrequency();
+  double nomf = 0;
+  double thisf = 0;
+  double worsterr = 0;
+
+  for(int i = 0;i < jtNumberOfTones;i++)
+   {
+    nomf = nominal + i * (jtToneSpacing/1000000.0);
+     chipSetFrequency(nomf);
+     chipSaveJt(i);
+     thisf = chipGetFrequency();
+     if(abs(thisf - nomf) > worsterr )
+     {
+       worsterr = abs(thisf - nomf);   
+     } 
+   }
+
+   if((worsterr * 1000000.0)> 0.009)
+   {
+    Serial.print("The current chip settings can produce the required tones with a maximum error of ");
+    Serial.print(worsterr * 1000000.0);
+    Serial.println(" Hz");
+   }
+
+  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
+  Serial.println("JT Encoding will only run when not in the menu. Type X to exit menu.");
+
+}
+
 void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" , "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -380,6 +458,11 @@ void mainMenu(void)
         case 'I':
         case 'i':
         setCwIdent();
+        break;
+
+        case 'J':
+        case 'j':
+        setJTMode();
         break;
 
         case 'P':

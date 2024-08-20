@@ -184,6 +184,25 @@ void chipCalcFreq(void)
         }
   }
 
+    void chipSaveJt(uint8_t index)
+  {
+
+      switch(chip)
+        {
+          case MAX2870:
+          Max2870SaveJt(index);
+          break;
+
+          case ADF4351:
+          ADF4351SaveJt(index);
+          break;
+
+          case LMX2595:
+          LMX2595SaveJt(index);
+          break;
+        }
+  }
+
     void chipSetPfd(void)
   {
 

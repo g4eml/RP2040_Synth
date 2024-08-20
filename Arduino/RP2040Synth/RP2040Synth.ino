@@ -18,6 +18,9 @@ uint8_t cwidSpeed = 10;                  //CWID speed in words per minute
 uint8_t cwidInterval = 60;               //CWID Inteval in seconds.
 double cwidShift = 0;                       //CW ID FSK Shift in MHz  
 char cwid[257] = " ";                      //CWID characters
+uint8_t jtMode = 0;                        //JT mode
+char jtid[16] = " ";                       //JT Message
+
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency. Calculated by cwidInit()
 uint32_t cwidKeyUpNum = 1;                //Key up value for the PLL numerator used to shift the frequency. Calculated by cwidInit()
@@ -27,6 +30,28 @@ void saveSettings(void);
 
 #include <EEPROM.h>
 #include <SPI.h>
+#include <JTEncode.h>
+
+#define JT65_TONE_SPACING       5.4          // ~2 * 2.69 Hz
+#define JT4_TONE_SPACING        315          // ~ 72 * 4.37 Hz
+#define JT65_DELAY              371          // Delay in ms for JT65A
+#define JT4_DELAY               229          // Delay value for JT4A
+
+
+uint8_t jtBuffer[256];
+uint8_t jtSymbolCount;
+uint16_t jtToneDelay;
+double jtToneSpacing;
+uint8_t jtNumberOfTones;
+uint8_t jtIdLen = 16;                      //JT Length
+
+uint32_t jtN[65];
+uint32_t jtNum[65];
+uint32_t jtDen[65];
+
+
+JTEncode jtEncode;
+
 
 
 void setup() 

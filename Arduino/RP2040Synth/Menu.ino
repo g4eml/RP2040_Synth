@@ -300,11 +300,13 @@ void setCwIdent(void)
 
 void setJTMode(void)
 {
-  String jtmodes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "$$$"};
+  String jtmodes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
   char resp;
   String jts;
   showMenu(jtmodes);
   jtMode = getSelection("Select JT Mode --->") - '0';
+  if(jtMode < 0) jtMode = 0;
+  if(jtMode > 3) jtMode = 3;
 
   Serial.print("Enter JT Message (Max 13 characters) --->");
   jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available

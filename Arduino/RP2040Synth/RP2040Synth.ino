@@ -39,10 +39,11 @@ void saveSettings(void);
 #include <SPI.h>
 #include <JTEncode.h>
 
-#define JT65B_TONE_SPACING       5.4          // 2 * 2.69 Hz
-#define JT4G_TONE_SPACING        315          // 72 * 4.37 Hz
-#define JT65B_DELAY              372          // Delay in ms for JT65A
-#define JT4G_DELAY               229          // Delay value for JT4G
+#define JT65B_TONE_SPACING       5.4         // 2 * 2.69 Hz
+#define JT65C_TONE_SPACING       10.8        // 4 * 2.69 Hz
+#define JT4G_TONE_SPACING        315         // 72 * 4.37 Hz
+#define JT65_DELAY               372         // Delay in ms for JT65
+#define JT4_DELAY                229         // Delay value for JT4
 
 
 uint8_t jtBuffer[256];

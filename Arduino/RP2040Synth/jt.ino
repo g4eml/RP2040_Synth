@@ -18,7 +18,7 @@ double jtInit(void)
 
       case 1:
       jtEncode.jt4_encode(jtid , jtBuffer);
-      jtToneDelay = JT4G_DELAY;
+      jtToneDelay = JT4_DELAY;
       jtNumberOfTones = 4;
       jtToneSpacing = JT4G_TONE_SPACING;
       jtSymbolCount = JT4_SYMBOL_COUNT;
@@ -29,7 +29,7 @@ double jtInit(void)
 
       case 2:
       jtEncode.jt65_encode(jtid , jtBuffer);
-      jtToneDelay = JT65B_DELAY;
+      jtToneDelay = JT65_DELAY;
       jtNumberOfTones = 65;
       jtToneSpacing = JT65B_TONE_SPACING;
       jtSymbolCount = JT65_SYMBOL_COUNT;
@@ -37,6 +37,17 @@ double jtInit(void)
       cwidInterval = 120;                   //override CW interval when Jt mode is active
       nextcwidTime = 60;                    //CW ID every Odd minute
       break;    
+
+      case 3:
+      jtEncode.jt65_encode(jtid , jtBuffer);
+      jtToneDelay = JT65_DELAY;
+      jtNumberOfTones = 65;
+      jtToneSpacing = JT65C_TONE_SPACING;
+      jtSymbolCount = JT65_SYMBOL_COUNT;
+      jtTime = 1;                           //JT message every even minute
+      cwidInterval = 120;                   //override CW interval when Jt mode is active
+      nextcwidTime = 60;                    //CW ID every Odd minute
+      break; 
     }
 
   for(int i = 0;i < jtNumberOfTones;i++)

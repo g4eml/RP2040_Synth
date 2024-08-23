@@ -629,6 +629,17 @@ double Max2870GetFrequency(void)
   return vco / diva;
 }
 
+ void Max2870jtShift(uint8_t val)
+{
+  static uint8_t lastval;
+  
+  if(val == lastval) return;
+  lastval = val;
+
+   Max2870Send((reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
+   Max2870Send((reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
+
+}
 
   void Max2870FskKey(bool key)
 {
@@ -639,27 +650,13 @@ double Max2870GetFrequency(void)
 
   if(key)
     {
-      if(cwidKeyUpDen != Max2870_M)
-      {
-        Max2870Send(reg[1]);
-      }
-
-      if((cwidKeyUpN != Max2870_N) || (cwidKeyUpNum != Max2870_FRAC))
-      {
-         Max2870Send(reg[0]);
-      }
-
+      Max2870Send(reg[1]);
+      Max2870Send(reg[0]);
     }
   else
     {
-      if(cwidKeyUpDen != Max2870_M)
-        {
-          Max2870Send((reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
-        }
-      if((cwidKeyUpN != Max2870_N) || (cwidKeyUpNum != Max2870_FRAC))
-      {
-          Max2870Send((reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
-      }
+      Max2870Send((reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
+      Max2870Send((reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
     }
 }
 

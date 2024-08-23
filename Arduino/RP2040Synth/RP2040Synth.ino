@@ -6,6 +6,9 @@
 enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 };
 String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595"};
 
+
+//These values are saved to the EEPROM for recall on statup. 
+
 uint8_t chip = MAX2870;                  //index to the current chip type
 uint32_t reg[128];                    // allow for up to 128 32 bit registers. 
 int numberOfRegs = 6;                  //number of registers in the current chip type
@@ -19,7 +22,11 @@ uint8_t cwidInterval = 60;               //CWID Inteval in seconds.
 double cwidShift = 0;                       //CW ID FSK Shift in MHz  
 char cwid[257] = " ";                      //CWID characters
 uint8_t jtMode = 0;                        //JT mode
-char jtid[16] = " ";                       //JT Message
+char jtid[13] = " ";                       //JT Message
+
+
+//End of saved values
+
 
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency. Calculated by cwidInit()
@@ -32,10 +39,10 @@ void saveSettings(void);
 #include <SPI.h>
 #include <JTEncode.h>
 
-#define JT65_TONE_SPACING       5.4          // ~2 * 2.69 Hz
-#define JT4_TONE_SPACING        315          // ~ 72 * 4.37 Hz
-#define JT65_DELAY              371          // Delay in ms for JT65A
-#define JT4_DELAY               229          // Delay value for JT4A
+#define JT65B_TONE_SPACING       5.4          // 2 * 2.69 Hz
+#define JT4G_TONE_SPACING        315          // 72 * 4.37 Hz
+#define JT65B_DELAY              372          // Delay in ms for JT65A
+#define JT4G_DELAY               229          // Delay value for JT4G
 
 
 uint8_t jtBuffer[256];
@@ -43,7 +50,6 @@ uint8_t jtSymbolCount;
 uint16_t jtToneDelay;
 double jtToneSpacing;
 uint8_t jtNumberOfTones;
-uint8_t jtIdLen = 16;                      //JT Length
 
 uint32_t jtN[65];
 uint32_t jtNum[65];
@@ -52,7 +58,14 @@ uint32_t jtDen[65];
 
 JTEncode jtEncode;
 
+int seconds =0;                         //seconds counter.  counts up to 120 seconds.  0-60 is even minute. 60-120 is odd minute. 
+int milliseconds = 0;                   //millisecond counter used to increment seconds counter. 
 
+bool cwidActive = false;                //flag to start sending CW ID
+int nextcwidTime = 60;                   //trigger time for next CWID
+
+bool jtActive = false;                  //flag to start Jt Sending
+int  jtTime = 1;                       //trigger time for next JT sequence
 
 void setup() 
 {
@@ -69,7 +82,7 @@ void setup()
       }
 
       EEPROM.get(0x230,cwidEn);       //test if CWID is enabled (magic number is 0x73)
-      if(cwidEn == 0x73)
+      if(cwidEn)
           {
             EEPROM.get(0x231,cwidLen);        //number of characters in CWID
             EEPROM.get(0x232,cwidSpeed);       //speed in words per minute 
@@ -80,14 +93,30 @@ void setup()
                 EEPROM.get(0x240 + i , cwid[i+1]);    //read in the characters
               }
           }
+       EEPROM.get(0x350,jtMode);                //test if Jt mode is enabled
+       if(jtMode)
+         {
+          for(int i = 0 ; i< 13 ; i++)
+              {
+                EEPROM.get(0x360 + i , jtid[i]);    //read in the characters
+              }
+         }
+
       chipDecodeRegs();
     }
 
   chipInit();
-  if(cwidEn == 0x73)
+  if(cwidEn)
     {
       cwidInit();
     }
+   
+   if(jtMode)
+     {
+       jtInit();
+     }
+
+    seconds = -1;
 }
 
 void loop() 
@@ -105,24 +134,56 @@ void loop()
    {
      while(loopTimer == millis());          //hang waiting for the next 1mS timeslot
      loopTimer = millis();
+     milliseconds++;
+     if(milliseconds == 1000)
+      {
+        seconds++;
+        milliseconds = 0;
+        if(seconds == 120)
+          {
+            seconds = 0;
+          }
+      }
+
+     if((cwidEn) & (seconds == nextcwidTime))
+       {
+        cwidActive = true;                                        //start this CW ID
+        nextcwidTime = (seconds + cwidInterval) % 120;            //schedule the next CW ID
+       }
+
+     if((jtMode != 0) & (seconds == jtTime))
+       {
+        jtActive = true;                                        //start the JT Sequence
+       }
+
+    if(cwidEn)
+      {
+        cwidTick();
+      }
+
+    if(jtMode != 0)
+      {
+        jtTick();
+      }
 
       if(Serial.available() > 0 )          //test for USB command connected
      {
-       mainMenu();
+       mainMenu();                         //timing loop stops while the menu system is running.
        chipUpdate();
-       if(cwidEn == 0x73)
+       if(cwidEn)
          {
            cwidInit();
          }
+       if(jtMode != 0)
+         {
+           jtInit();
+         }      
        Serial.print("\nSynthesiser programmed. Press any key for menu");
        delay(1000);
        flushInput();
      }
     
-    if(cwidEn == 0x73)
-      {
-        cwidTick();
-      }
+
 
    }
   
@@ -138,8 +199,8 @@ void saveSettings(void)
       {
         EEPROM.put(0x20 + i*4,reg[i]);
       }
-    EEPROM.put(0x230,cwidEn);       //test if CWID is enabled (magic number is 0x73)
-      if(cwidEn == 0x73)
+    EEPROM.put(0x230,cwidEn);       //CWID 
+      if(cwidEn)
           {
             EEPROM.put(0x231,cwidLen);        //number of characters in CWID
             EEPROM.put(0x232,cwidSpeed);       //speed in words per minute 
@@ -150,5 +211,13 @@ void saveSettings(void)
                 EEPROM.put(0x240 + i , cwid[i + 1]);    //save the characters
               }
           }
+    EEPROM.put(0x350,jtMode);
+      if(jtMode)
+         {
+            for(int i = 0 ; i< 13 ; i++)
+              {
+                EEPROM.put(0x360 + i , jtid[i]);    //save the characters
+              }
+         }
     EEPROM.commit();
 }

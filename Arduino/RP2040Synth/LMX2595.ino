@@ -1170,6 +1170,22 @@ double LMX2595GetFrequency(void)
   return vco / diva;
 }
 
+void LMX2595jtShift(uint8_t val)
+{
+  static uint8_t lastval;
+
+  if(val == lastval) return;
+  lastval = val;
+  
+        LMX2595Send((34 << 16) | ((jtN[val] >> 16) & 0xFFFF));
+        LMX2595Send((36 << 16) | (jtN[val] & 0xFFFF));     
+
+        LMX2595Send((38 << 16) | ((jtDen[val] >> 16) & 0xFFFF));
+        LMX2595Send((39 << 16) | (jtDen[val] & 0xFFFF));
+
+        LMX2595Send((42 << 16) | ((jtNum[val] >> 16) & 0xFFFF));
+        LMX2595Send((43 << 16) | (jtNum[val] & 0xFFFF));
+}
 
 void LMX2595FskKey(bool key)
 {
@@ -1180,40 +1196,28 @@ void LMX2595FskKey(bool key)
 
   if(key)
     {
-      if(cwidKeyUpN != LMX2595_PLL_N)
-      {
+
        LMX2595Send(reg[34]);
        LMX2595Send(reg[36]);       
-      }
-      if(cwidKeyUpDen != LMX2595_PLL_DEN)
-      {
+
         LMX2595Send(reg[38]);
         LMX2595Send(reg[39]);
-      }
-      if(cwidKeyUpNum != LMX2595_PLL_NUM)
-      {
+
        LMX2595Send(reg[42]);
        LMX2595Send(reg[43]);
-      }
 
     }
   else
     {
-      if(cwidKeyUpN != LMX2595_PLL_N)
-      {
+
         LMX2595Send((34 << 16) | ((cwidKeyUpN >> 16) & 0xFFFF));
         LMX2595Send((36 << 16) | (cwidKeyUpN & 0xFFFF));     
-      }
-      if(cwidKeyUpDen != LMX2595_PLL_DEN)
-      {
+
         LMX2595Send((38 << 16) | ((cwidKeyUpDen >> 16) & 0xFFFF));
         LMX2595Send((39 << 16) | (cwidKeyUpDen & 0xFFFF));
-      }
-      if(cwidKeyUpNum != LMX2595_PLL_NUM)
-      {
+
         LMX2595Send((42 << 16) | ((cwidKeyUpNum >> 16) & 0xFFFF));
         LMX2595Send((43 << 16) | (cwidKeyUpNum & 0xFFFF));
-      }
     }
 }
 

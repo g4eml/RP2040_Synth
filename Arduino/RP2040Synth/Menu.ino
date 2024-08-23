@@ -268,10 +268,11 @@ void setCwIdent(void)
   if(cwidSpeed < 5) cwidSpeed = 5;
   if(cwidSpeed > 30) cwidSpeed = 30;
 
-  Serial.print("Enter ident interval (Seconds) ---> ");
+  Serial.println("Enter ident interval (Seconds)");
+  Serial.print("Note:- This value will not be used if JT Modes are also active. ---> ");
   cwidInterval = inputNumber();
   if(cwidInterval < 10) cwidInterval = 5;
-  if(cwidInterval > 255) cwidInterval = 255;
+  if(cwidInterval > 120) cwidInterval = 120;
 
   Serial.print("Enter FSK Shift in Hz ---> ");
   cwidShift = inputNumber();
@@ -303,65 +304,14 @@ void setJTMode(void)
   char resp;
   String jts;
   showMenu(jtmodes);
-  resp = getSelection("Select JT Mode --->");
+  jtMode = getSelection("Select JT Mode --->") - '0';
 
-  switch(resp)
-    {
-      case '0':
-      jtMode = 0;
-      return;
-      break;
-
-      case '1':
-      jtMode = 4;
-      jtToneDelay = JT4_DELAY;
-      jtNumberOfTones = 4;
-      jtToneSpacing = JT4_TONE_SPACING;
-      jtSymbolCount = JT4_SYMBOL_COUNT;
-      break;
-
-      case '2':
-      jtMode = 6;
-      jtToneDelay = JT65_DELAY;
-      jtNumberOfTones = 65;
-      jtToneSpacing = JT65_TONE_SPACING;
-      jtSymbolCount = JT65_SYMBOL_COUNT;
-      break;    
-    }
-
-  Serial.print("Enter JT Message (16 characters) --->");
-  jts = inputString(true);
-  jts.toCharArray(&jtid[0], 16 );
-  jtIdLen = 16;
+  Serial.print("Enter JT Message (Max 13 characters) --->");
+  jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
+  jts.toCharArray(&jtid[0], 13 );
 
 
-  switch(jtMode)
-  {
-    case 4:
-      jtEncode.jt4_encode(jtid , jtBuffer);
-      break;
-    
-    case 6:
-      jtEncode.jt65_encode(jtid , jtBuffer);
-      break;
-  }
-
-  double nominal = chipGetFrequency();
-  double nomf = 0;
-  double thisf = 0;
-  double worsterr = 0;
-
-  for(int i = 0;i < jtNumberOfTones;i++)
-   {
-    nomf = nominal + i * (jtToneSpacing/1000000.0);
-     chipSetFrequency(nomf);
-     chipSaveJt(i);
-     thisf = chipGetFrequency();
-     if(abs(thisf - nomf) > worsterr )
-     {
-       worsterr = abs(thisf - nomf);   
-     } 
-   }
+  double worsterr = jtInit();
 
    if((worsterr * 1000000.0)> 0.009)
    {

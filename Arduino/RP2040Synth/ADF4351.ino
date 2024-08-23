@@ -589,6 +589,18 @@ double ADF4351GetFrequency(void)
   return vco / diva;
 }
 
+  void ADF4351jtShift(uint8_t val)
+{
+  static uint8_t lastval;
+  
+  if(val == lastval) return;
+  lastval = val;
+
+  ADF4351Send((reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
+  ADF4351Send((reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
+}
+
+
   void ADF4351FskKey(bool key)
 {
   static bool lastkey;
@@ -596,30 +608,15 @@ double ADF4351GetFrequency(void)
   if(key == lastkey) return;
   lastkey = key;
 
-
   if(key)
     {
-      if(cwidKeyUpDen != ADF4351_M)
-        {
-          ADF4351Send(reg[1]);
-        }
-      if((cwidKeyUpN != ADF4351_INT) || (cwidKeyUpNum != ADF4351_FRAC))
-        {
-          ADF4351Send(reg[0]);
-        }
-
+      ADF4351Send(reg[1]);
+      ADF4351Send(reg[0]);
     }
   else
     {
-      if(cwidKeyUpDen != ADF4351_M)
-      {
-         ADF4351Send((reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
-      }
-      if((cwidKeyUpN != ADF4351_INT) || (cwidKeyUpNum != ADF4351_FRAC))
-      {
-         ADF4351Send((reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
-      }
-
+     ADF4351Send((reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
+     ADF4351Send((reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
     }
 }
 

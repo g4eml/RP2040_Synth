@@ -165,6 +165,26 @@ void chipCalcFreq(void)
         }
   }
 
+    void chipJtShift(uint8_t val)
+  {
+
+      switch(chip)
+        {
+          case MAX2870:
+          Max2870jtShift(val);
+          break;
+
+          case ADF4351:
+          ADF4351jtShift(val);
+          break;
+
+          case LMX2595:
+          LMX2595jtShift(val);
+          break;
+        }
+  }
+
+
     void chipSaveFskShift(void)
   {
 

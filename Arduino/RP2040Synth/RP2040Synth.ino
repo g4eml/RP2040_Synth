@@ -75,6 +75,7 @@ int  jtTime = 1;                       //trigger time for next JT sequence
 char gpsBuffer[256];                     //GPS data buffer
 int gpsPointer;                          //GPS buffer pointer. 
 char gpsCh;
+float gpsTime = -1;                      // -1 indicates GPS time is not valid
 
 
 void setup() 
@@ -206,6 +207,7 @@ void loop()
             if(gpsCh > 31) gpsBuffer[gpsPointer++] = gpsCh;
             if((gpsCh == 13) || (gpsPointer > 255))
               {
+                gpsBuffer[gpsPointer] = 0;
                 processNMEA();
                 gpsPointer = 0;
               }
@@ -221,14 +223,22 @@ void loop()
 
 void processNMEA(void)
 {
- if((gpsBuffer[3] == 'R') && (gpsBuffer[4] == 'M') && (gpsBuffer[5] == 'C'))
+ if(strstr(gpsBuffer , "RMC") != NULL)                         //is this the RMC sentence?
   {
-    for(int i = 0; i < gpsPointer; i++)
+    if(strstr(gpsBuffer , "A") != NULL)                       // is the data valid?
+      {
+       int p=strcspn(gpsBuffer , "'");                         // find the first comma
+       gpsTime = strtof(gpsBuffer+p+1 , NULL);                 //copy the time to a floating point number
+      }
+    else
      {
-      Serial.write(gpsBuffer[i]);
+       gpsTime = -1;                                            //GPS time not valid
      }
-    Serial.println();
+
+     
+      Serial.println(gpsTime); 
   }
+
 
 }
 

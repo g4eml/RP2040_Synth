@@ -68,9 +68,22 @@ int nextcwidTime = 60;                   //trigger time for next CWID
 bool jtActive = false;                  //flag to start Jt Sending
 int  jtTime = 1;                       //trigger time for next JT sequence
 
+
+#define GPSTXPin 0                      //Serial data to GPS module 
+#define GPSRXPin 1                      //SeriaL data from GPS module
+
+char gpsBuffer[256];                     //GPS data buffer
+int gpsPointer;                          //GPS buffer pointer. 
+char gpsCh;
+
+
 void setup() 
 {
-  Serial.begin();
+  Serial.begin();                       //USB serial port
+  Serial1.setRX(GPSRXPin);              //Configure the GPIO pins for the GPS module
+  Serial1.setTX(GPSTXPin);
+  Serial1.begin(9600);                  //start GPS port comms
+  gpsPointer = 0;
   delay(1000);
   EEPROM.begin(1024);
   if(EEPROM.read(0) == 0x55)        //magic number to indcate EEPROM is valid
@@ -133,6 +146,7 @@ void loop()
   unsigned long loopTimer = millis();
   while(1)
    {
+     if(loopTimer != millis()) Serial.println("OverRun");
      while(loopTimer == millis());          //hang waiting for the next 1mS timeslot
      loopTimer = millis();
      milliseconds++;
@@ -184,12 +198,40 @@ void loop()
        flushInput();
      }
     
+    if(Serial1.available() > 0)           //data received from GPS module
+      {
+        while(Serial1.available() >0)
+          {
+            gpsCh=Serial1.read();
+            if(gpsCh > 31) gpsBuffer[gpsPointer++] = gpsCh;
+            if((gpsCh == 13) || (gpsPointer > 255))
+              {
+                processNMEA();
+                gpsPointer = 0;
+              }
+          }
+
+      }
 
 
    }
   
 
 }
+
+void processNMEA(void)
+{
+ if((gpsBuffer[3] == 'R') && (gpsBuffer[4] == 'M') && (gpsBuffer[5] == 'C'))
+  {
+    for(int i = 0; i < gpsPointer; i++)
+     {
+      Serial.write(gpsBuffer[i]);
+     }
+    Serial.println();
+  }
+
+}
+
 
 void saveSettings(void)
 {

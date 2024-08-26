@@ -59,7 +59,7 @@ uint32_t jtDen[65];
 
 JTEncode jtEncode;
 
-int seconds =0;                         //seconds counter.  counts up to 120 seconds.  0-60 is even minute. 60-120 is odd minute. 
+int seconds = 0;                         //seconds counter.  counts up to 120 seconds.  0-60 is even minute. 60-120 is odd minute. 
 int milliseconds = 0;                   //millisecond counter used to increment seconds counter. 
 
 bool cwidActive = false;                //flag to start sending CW ID
@@ -75,7 +75,8 @@ int  jtTime = 1;                       //trigger time for next JT sequence
 char gpsBuffer[256];                     //GPS data buffer
 int gpsPointer;                          //GPS buffer pointer. 
 char gpsCh;
-float gpsTime = -1;                      // -1 indicates GPS time is not valid
+int gpsSec = -1;                         //gps Seconds counter 0-59 is even minute, 60-119 is odd minute. -1 is GPS Invalid 
+bool gpsActive = false;                    
 
 
 void setup() 
@@ -161,6 +162,15 @@ void loop()
           }
       }
 
+//synchronise the local clock to the GPS clock if available
+
+      if((milliseconds == 500) && (gpsSec != -1) && (gpsActive))
+         {
+          seconds = gpsSec;
+          gpsActive = false;
+         }
+
+
      if((cwidEn) & (seconds == nextcwidTime))
        {
         cwidActive = true;                                        //start this CW ID
@@ -223,20 +233,22 @@ void loop()
 
 void processNMEA(void)
 {
+  float gpsTime;
+
+ gpsActive = true;
  if(strstr(gpsBuffer , "RMC") != NULL)                         //is this the RMC sentence?
   {
     if(strstr(gpsBuffer , "A") != NULL)                       // is the data valid?
       {
-       int p=strcspn(gpsBuffer , "'");                         // find the first comma
+       int p=strcspn(gpsBuffer , ",");                         // find the first comma
        gpsTime = strtof(gpsBuffer+p+1 , NULL);                 //copy the time to a floating point number
+       gpsSec = 60 * ((int(gpsTime) / 100) % 2);                 // count odd and even minutes
+       gpsSec = gpsSec + (int(gpsTime) % 100);  
       }
     else
      {
-       gpsTime = -1;                                            //GPS time not valid
+       gpsSec = -1;                                            //GPS time not valid
      }
-
-     
-      Serial.println(gpsTime); 
   }
 
 

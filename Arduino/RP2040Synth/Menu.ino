@@ -327,11 +327,27 @@ void setJTMode(void)
 
 }
 
+void viewNMEA(void)
+{
+  Serial.println("Looking for NMEA Data. Press any key to exit.");
+  flushInput();
+  while(Serial.available() == 0)
+    {
+      if(Serial1.available() > 0)           //data received from GPS module
+      {
+        while(Serial1.available() >0)
+          {
+            Serial.write(Serial1.read());
+          }
+      }
+    }
+}
+
 void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "N = View GPS NMEA data", "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -416,6 +432,12 @@ void mainMenu(void)
         case 'j':
         setJTMode();
         break;
+
+        case 'N':
+        case 'n':
+        viewNMEA();
+        break;
+
 
         case 'P':
         case 'p':

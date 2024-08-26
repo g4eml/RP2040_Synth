@@ -268,10 +268,11 @@ void setCwIdent(void)
   if(cwidSpeed < 5) cwidSpeed = 5;
   if(cwidSpeed > 30) cwidSpeed = 30;
 
-  Serial.print("Enter ident interval (Seconds) ---> ");
+  Serial.println("Enter ident interval (Seconds)");
+  Serial.print("Note:- This value will not be used if JT Modes are also active. ---> ");
   cwidInterval = inputNumber();
   if(cwidInterval < 10) cwidInterval = 5;
-  if(cwidInterval > 255) cwidInterval = 255;
+  if(cwidInterval > 120) cwidInterval = 120;
 
   Serial.print("Enter FSK Shift in Hz ---> ");
   cwidShift = inputNumber();
@@ -297,11 +298,56 @@ void setCwIdent(void)
 
 }
 
+void setJTMode(void)
+{
+  String jtmodes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
+  char resp;
+  String jts;
+  showMenu(jtmodes);
+  jtMode = getSelection("Select JT Mode --->") - '0';
+  if(jtMode < 0) jtMode = 0;
+  if(jtMode > 3) jtMode = 3;
+
+  Serial.print("Enter JT Message (Max 13 characters) --->");
+  jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
+  jts.toCharArray(&jtid[0], 13 );
+
+
+  double worsterr = jtInit();
+
+   if((worsterr * 1000000.0)> 0.009)
+   {
+    Serial.print("The current chip settings can produce the required tones with a maximum error of ");
+    Serial.print(worsterr * 1000000.0);
+    Serial.println(" Hz");
+   }
+
+  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
+  Serial.println("JT Encoding will only run when not in the menu. Type X to exit menu.");
+
+}
+
+void viewNMEA(void)
+{
+  Serial.println("Looking for NMEA Data. Press any key to exit.");
+  flushInput();
+  while(Serial.available() == 0)
+    {
+      if(Serial1.available() > 0)           //data received from GPS module
+      {
+        while(Serial1.available() >0)
+          {
+            Serial.write(Serial1.read());
+          }
+      }
+    }
+}
+
 void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" , "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "N = View GPS NMEA data", "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -381,6 +427,17 @@ void mainMenu(void)
         case 'i':
         setCwIdent();
         break;
+
+        case 'J':
+        case 'j':
+        setJTMode();
+        break;
+
+        case 'N':
+        case 'n':
+        viewNMEA();
+        break;
+
 
         case 'P':
         case 'p':

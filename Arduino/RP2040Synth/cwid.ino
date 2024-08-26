@@ -2,20 +2,20 @@
 
 unsigned int cwidTicks;
 unsigned int cwidBitInterval;
-uint32_t cwidCycleTimer;
 uint8_t cwidBitCount;
 int cwidByteIndex;
 bool cwidKey;
 uint32_t cwidPattern;
-bool cwidSending = false;
 
 void cwidInit(void)
 {
   cwidBitCount = 0;
   cwidByteIndex = 0;
+  cwidPattern=0;
   cwidTicks = 0;
   cwidBitInterval = 1200 / cwidSpeed;
-  cwidCycleTimer = 10000;
+  cwidActive = false;
+  nextcwidTime = 0;           //CW ID always starts at the beginning of each even minute
   cwid[0] = 255;             // add an initial 1 second of silence. 
   cwid[cwidLen + 1] = 255;    // and also at the end if the ident
   cwidEncode(0);
@@ -29,16 +29,9 @@ void cwidInit(void)
 
 void cwidTick(void)
 {
-  cwidCycleTimer--;
-  if(cwidCycleTimer == 0)   //trigger the next ident 
-    {
-      cwidCycleTimer = cwidInterval * 1000;
-      cwidSending = true;
-      cwidByteIndex = 0;                     //get ready to send the ident 
-      cwidPattern = 0;                        //set up 1 second of key up before sending the ident
-    }
 
-  if(cwidSending)
+  if(cwidActive)
+    
     {
       cwidTicks++;
       if(cwidTicks == cwidBitInterval)       //ready for the next bit
@@ -52,7 +45,8 @@ void cwidTick(void)
               cwidByteIndex++;
               if(cwidByteIndex == cwidLen + 2)
                 {
-                  cwidSending = false;
+                  cwidActive= false;
+                  cwidByteIndex = 0;
                 }
                   cwidEncode(cwidByteIndex);
             }

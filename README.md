@@ -2,7 +2,8 @@
 
 ## Description
 
-A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 3 different type of synthesiser chip, the ADF4351, the Max2870 and the LMX2595. 
+A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 3 different type of synthesiser chip, the ADF4351, the Max2870 and the LMX2595.
+Support for CW ident and JT digital modes. 
 
 
 

@@ -14,6 +14,10 @@ Settings can be saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
+Supports JT4G, JT65B and JT65C data modes for Beacon Identification.
+
+Supports GPS connection for the accurate timing required for JT data modes 
+
 Default register settings can be loaded for all synthesiser types to produce some initial RF output. This is often the hardest thing to do with a new chip type. 
 
 Direct output frequency and phase detector frequency entry. Register values are calculated automatically.  
@@ -68,6 +72,12 @@ The RP2040 is programmed using the Arduino IDE with the Earl F. Philhower, III  
 6. Type “RP2040” in the search box.
 
 7. Locate the entry for 'Raspberry Pi Pico/RP2040 by Earle F. Philhower, III' and click 'Install'
+
+### Installing the required library
+
+1. From the Arduino IDE select (Tools > Manage Libraries)
+2. Search for 'JTEncode' Scroll down to find the Etherkit JTEncode library by Jason Milldrum.
+3. Click Install
 
 #### Downloading the Software.
 
@@ -131,14 +141,18 @@ The generic wiring instructions are as follows:-
 |GPO6    |   CLK   |   CLK   |   SCK   |
 |GPO7    |   DAT   |   DATA  |   SDI   |
 
+The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the JT modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
+
+| RP2040 | GPS Module |
+| :---:  |    :---:   |
+|GP0     |Rx          |
+|GP1     |Tx          |
 
 ## Firmware description
 
-By default on power up the firmware will immediately send the EEPROM saved register values to the sunthesiser chip.  If the CW ident feature is enabled the ident will begin. 
+By default on power up the firmware will immediately send the EEPROM saved register values to the sunthesiser chip.  If the CW ident feature is enabled the ident will begin. If the JT mode is enabled the JT sequence will begin. Note that this will initially not be correctly timed. Once the GPS aquires its satellites the timing will synchronise. 
 
 In normal use, for example as a Local oscillator or Beacon, that is all that is needed! 
-
-
 
 To enter programming mode  (which you will need to do at least once) you need to connect to the USB serial port using a terminal program such as Putty or Terraterm. Pressing any key should result in the menu being displayed.
 ![Screenshot (106)](https://github.com/g4eml/RP2040_Synth/assets/1881884/8ec6a252-c24e-4df1-89dc-52bb52c28a04)
@@ -163,7 +177,11 @@ V = View / Enter Variables for Registers. Allows viewing or entry of parameters 
 
 R = View / Enter Registers Directly in Hex. Allws direct entry of regiser values in Hexadecimal. Useful when transfering values calculated by another program. 
 
-I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. 
+I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. Ident period is only valid for a CW only configuration. If a JT mode is also enbled then the CW ident will be sent every odd minute. 
+
+J = Configure JT modes. Allows entry of a 13 character message. This would normally be the Callsign and Maidenhead locator. The JT ident will be sent every Even minute. Accurate timing requires a GPS module to be connected. 
+
+N = View GPS NMEA data. This is used to test the GPS connection. when selected it will echo all GPS data to the screen. Press any key to exit this mode. 
 
 S = Save Registers to EEPROM. Saves the current Synthesiser settings to EEPROM. They will then be automatically loaded on the next power cycle. You must do this at least once. 
 

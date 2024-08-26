@@ -44,6 +44,10 @@ Suitable Synthesiser boards are available from Ebay, Amazon, Ali Express, SV1AFN
 
 ![lmx2595](https://github.com/g4eml/RP2040_Synth/assets/1881884/57675dc3-57eb-4d40-87e9-84847eca80ed) ![SV1AFN](https://github.com/g4eml/RP2040_Synth/assets/1881884/6c4bbb31-debc-4be2-bb3c-899d4c1da64c)
 
+If you wish to use the JT data modes you will also need a GPS module to provide the necessary accurate timing.  
+
+![GPS](https://github.com/user-attachments/assets/53ceb650-0525-4138-a7ff-bff1f450c409)
+
 
 ## Programming or updating the RP2040 (quick method)
 

@@ -155,7 +155,8 @@ By default on power up the firmware will immediately send the EEPROM saved regis
 In normal use, for example as a Local oscillator or Beacon, that is all that is needed! 
 
 To enter programming mode  (which you will need to do at least once) you need to connect to the USB serial port using a terminal program such as Putty or Terraterm. Pressing any key should result in the menu being displayed.
-![Screenshot (106)](https://github.com/g4eml/RP2040_Synth/assets/1881884/8ec6a252-c24e-4df1-89dc-52bb52c28a04)
+![Screenshot (107)](https://github.com/user-attachments/assets/b3ee984a-904e-44e2-97f2-e83ef55f8ae6)
+
 
 ### Commands
 Commands are entered by a single key press. Text and numbers require a carriage return to enter. Pressing Question Mark will usually give more detailed help. 

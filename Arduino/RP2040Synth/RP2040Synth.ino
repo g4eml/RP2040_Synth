@@ -23,6 +23,8 @@ double cwidShift = 0;                       //CW ID FSK Shift in MHz
 char cwid[257] = " ";                      //CWID characters
 uint8_t jtMode = 0;                        //JT mode
 char jtid[13] = " ";                       //JT Message
+uint8_t extMult = 1;                       //Multiplcation factor for external frequency multiplier. (used to calculate the correct FSK Shifts.)
+
 
 
 //End of saved values
@@ -96,8 +98,8 @@ void setup()
       {
         EEPROM.get(0x20 + i*4,reg[i]);
       }
-
-      EEPROM.get(0x230,cwidEn);       //test if CWID is enabled (magic number is 0x73)
+      EEPROM.get(0x22F,extMult);         //external multiplication factor (used to calculate FSk shifts)
+      EEPROM.get(0x230,cwidEn);       //test if CWID is enabled 
       if(cwidEn)
           {
             EEPROM.get(0x231,cwidLen);        //number of characters in CWID
@@ -264,6 +266,7 @@ void saveSettings(void)
       {
         EEPROM.put(0x20 + i*4,reg[i]);
       }
+    EEPROM.put(0x22F,extMult);      //external multiplcation factor. 
     EEPROM.put(0x230,cwidEn);       //CWID 
       if(cwidEn)
           {

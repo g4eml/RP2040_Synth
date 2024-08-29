@@ -406,6 +406,7 @@ double ADF4351GetPfd(void)
 void ADF4351SetFrequency(double direct)
 {
   bool freqOK = false;
+  char resp;
 
   double freq;
   double pfd;
@@ -422,17 +423,27 @@ void ADF4351SetFrequency(double direct)
   freqOK = false;
   if(direct ==0)
    {
+   resp = getSelection("Is there an external Multiplier chain? Y or N --->");
+   if((resp == 'Y') || (resp == 'y'))
+     {
+        Serial.print("Enter External Multiplication Factor ---> ");
+        extMult = inputNumber();
+     }
+   else
+     {
+       extMult = 1;
+     }
     while(!freqOK)
     {
-      Serial.print("\nEnter required Frequency in MHz -->");
-      freq = inputFloat();
+      Serial.print("\nEnter required Final Frequency in MHz -->");
+      freq = inputFloat() / (double) extMult;
       if((freq > 34.375) && (freq <= 4400.000))
         {
           freqOK = true;
         }
       else
         {
-          Serial.println("Frequency must be between 34.375 and 4400 MHz");
+          Serial.println("Synthesiser Frequency must be between 34.375 and 4400 MHz");
         }
     }
    }
@@ -554,6 +565,13 @@ void ADF4351CalcFreq(void)
   Serial.print("Output Frequency = ");
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
+
+  if(extMult > 1)
+    {
+      Serial.print("Final Multiplied Frequency = ");
+      Serial.print((vco / diva) * (double) extMult, 10);
+      Serial.println(" MHz"); 
+    }
 }
   
 double ADF4351GetFrequency(void)

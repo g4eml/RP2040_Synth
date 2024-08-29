@@ -848,8 +848,9 @@ void LMX2595SetFrequency(double direct)
   int divide[] = {1,2,4,6,8,12,16,24,32,48,64,72,96,128,192,256,384,512,768};
   bool dub = 0;
   bool maxDivisor;
+  char resp;
 
-  if(cwidEn = 0x73)           //if we are using FSK keying then we must keep the divisor to the same value to avoid glitches
+  if((cwidEn) || (jtMode))           //if we are using FSK keying then we must keep the divisor to the same value to avoid glitches
   {
     maxDivisor = true;
   }
@@ -863,17 +864,27 @@ void LMX2595SetFrequency(double direct)
   freqOK = false;
   if(direct == 0)
    {
+   resp = getSelection("Is there an external Multiplier chain? Y or N --->");
+   if((resp == 'Y') || (resp == 'y'))
+     {
+        Serial.print("Enter External Multiplication Factor ---> ");
+        extMult = inputNumber();
+     }
+   else
+     {
+       extMult = 1;
+     }
     while(!freqOK)
     {
-      Serial.print("\nEnter required Frequency in MHz -->");
-      freq = inputFloat();
+      Serial.print("\nEnter required Final Frequency in MHz -->");
+      freq = inputFloat() / (double) extMult;
       if((freq > 9.766) && (freq <= 20000.000))
         {
           freqOK = true;
         }
       else
         {
-          Serial.println("Frequency must be between 9.766 and 20000 MHz");
+          Serial.println("Synthesiser Frequency must be between 9.766 and 20000 MHz");
         }
     }
    }
@@ -1130,6 +1141,13 @@ void LMX2595CalcFreq(void)
   Serial.print("Output Frequency = ");
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
+
+  if(extMult > 1)
+    {
+      Serial.print("Final Multiplied Frequency = ");
+      Serial.print((vco / diva) * (double) extMult, 10);
+      Serial.println(" MHz"); 
+    }
 }
 
 double LMX2595GetFrequency(void)

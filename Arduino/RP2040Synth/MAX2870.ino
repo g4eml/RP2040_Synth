@@ -427,23 +427,35 @@ void Max2870SetFrequency(double direct)
   int den;
   int bestnom;
   int bestden;
+  char resp;
 
   pfd = Max2870GetPfd();
 
   freqOK = false;
   if(direct ==0)
   {
+  resp = getSelection("Is there an external Multiplier chain? Y or N --->");
+   if((resp == 'Y') || (resp == 'y'))
+     {
+        Serial.print("Enter External Multiplication Factor ---> ");
+        extMult = inputNumber();
+     }
+   else
+     {
+       extMult = 1;
+     }
+  
    while(!freqOK)
     {
-      Serial.print("\nEnter required Frequency in MHz -->");
-      freq = inputFloat();
+      Serial.print("\nEnter required Final Frequency in MHz -->");
+      freq = inputFloat() / (double) extMult;
       if((freq > 23.500) && (freq <= 6000.000))
         {
           freqOK = true;
         }
       else
         {
-          Serial.println("Frequency must be between 23.5 and 6000 MHz");
+          Serial.println("Synthesiser Frequency must be between 23.5 and 6000 MHz");
         }
     }
   }
@@ -579,6 +591,13 @@ void Max2870CalcFreq(void)
   Serial.print("Output Frequency = ");
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
+
+  if(extMult > 1)
+    {
+      Serial.print("Final Multiplied Frequency = ");
+      Serial.print((vco / diva) * (double) extMult, 10);
+      Serial.println(" MHz"); 
+    }
 }
 
 double Max2870GetFrequency(void)

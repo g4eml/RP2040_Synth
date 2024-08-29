@@ -273,21 +273,28 @@ void setCwIdent(void)
   cwidInterval = inputNumber();
   if(cwidInterval < 10) cwidInterval = 5;
   if(cwidInterval > 120) cwidInterval = 120;
+  if(extMult > 1)
+     {
+        Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
+     }
+  else
+     {
+       Serial.print("Enter FSK Shift in Hz ---> ");
+     }
 
-  Serial.print("Enter FSK Shift in Hz ---> ");
-  cwidShift = inputNumber();
+  cwidShift = inputNumber() / (double) extMult ;
   cwidShift = cwidShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
   chipSetFrequency(nominal + cwidShift);
   chipSaveFskShift();
-  Serial.println("Actual frequencies achievable with the current PFD will be :-");
+  Serial.println("Actual final frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");
-  double up = chipGetFrequency();
+  double up = chipGetFrequency() * (double) extMult;
   Serial.print(up,10);
   Serial.println(" MHz");
   chipSetFrequency(nominal); 
   Serial.print("Key Down Frequency = ");
-  double down = chipGetFrequency();
+  double down = chipGetFrequency() * (double) extMult;
   Serial.print(down,10);
   Serial.println(" MHz");
   Serial.print("FSK Shift = ");
@@ -311,7 +318,6 @@ void setJTMode(void)
   Serial.print("Enter JT Message (Max 13 characters) --->");
   jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
   jts.toCharArray(&jtid[0], 13 );
-
 
   double worsterr = jtInit();
 
@@ -369,8 +375,15 @@ void mainMenu(void)
         case 'F':
         case 'f':
         Serial.print("Current Frequency is ");
-        Serial.print(chipGetFrequency(),10);
+        Serial.print(chipGetFrequency(),10);        
         Serial.println(" MHz");
+        if(extMult >1)
+          {
+            Serial.print("Current Final Frequency is ");
+            Serial.print(chipGetFrequency() * (double) extMult,10);        
+            Serial.println(" MHz");
+          }
+
         chipSetFrequency(0);
         chipUpdate();
         Serial.println("\nFrequency Updated");

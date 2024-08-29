@@ -52,7 +52,7 @@ double jtInit(void)
 
   for(int i = 0;i < jtNumberOfTones;i++)
    {
-    nomf = nominal + i * (jtToneSpacing/1000000.0);
+    nomf = nominal + i * ((jtToneSpacing/1000000.0) / (double) extMult);
      chipSetFrequency(nomf);
      chipSaveJt(i);
      thisf = chipGetFrequency();
@@ -68,7 +68,7 @@ double jtInit(void)
   jtPointer = 0;
   jtTicks = 0;
 
-  return worsterr;
+  return worsterr * (double) extMult;
 }
 
 void jtTick(void)

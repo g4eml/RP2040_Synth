@@ -22,7 +22,7 @@ void cwidInit(void)
 
 // calculate the required f/d value for the CWID FSK Offset
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + cwidShift);
+  chipSetFrequency(nominal + cwidShift / (double) extMult);
   chipSaveFskShift();
   chipSetFrequency(nominal); 
 }

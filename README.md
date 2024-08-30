@@ -10,9 +10,11 @@ Support for CW ident and JT digital modes.
 
 ## Features
 
-Serial programming using the RP2040s built in USB serial port. 
+No special programming hardware or software required. 
 
-Settings can be saved to EEPROM for automatic load on power on.
+Serial programming using the RP2040s built in USB serial port and standard boot loader. 
+
+Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
@@ -20,7 +22,9 @@ Supports JT4G, JT65B and JT65C data modes for Beacon Identification.
 
 Supports GPS connection for the accurate timing required for JT data modes 
 
-Default register settings can be loaded for all synthesiser types to produce some initial RF output. This is often the hardest thing to do with a new chip type. 
+Default register settings can be loaded for all synthesiser types to produce some initial RF output. This is often the hardest thing to do with a new chip type.
+
+Supports use with an external frequency multiplier for the higher microwave bands. Allows frequency entry and display of the final output frequency. Adjusts FSK shifts to compensate for multiplication factor.  
 
 Direct output frequency and phase detector frequency entry. Register values are calculated automatically.  
 

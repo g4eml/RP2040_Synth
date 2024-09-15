@@ -420,6 +420,7 @@ void mainMenu(void)
         }
         Serial.print("Chip type is now ");
         Serial.println(chipName[eeprom.chip]);
+        chipInit();
         break;
 
         case 'R':
@@ -446,6 +447,7 @@ void mainMenu(void)
         case 'D':
         case 'd':
         Serial.println("Default register values loaded.");
+        chipInit();
         chipSetDefault();
         chipCalcFreq();
         break;

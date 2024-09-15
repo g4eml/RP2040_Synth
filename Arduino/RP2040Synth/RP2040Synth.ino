@@ -150,7 +150,6 @@ void loop()
   unsigned long loopTimer = millis();
   while(1)
    {
-     if(loopTimer != millis()) Serial.println("OverRun");
      while(loopTimer == millis());          //hang waiting for the next 1mS timeslot
      loopTimer = millis();
      milliseconds++;
@@ -198,6 +197,8 @@ void loop()
      {
        mainMenu();                         //timing loop stops while the menu system is running.
        chipUpdate();
+       seconds = -1;                       //reset the timing after using the menu.
+       milliseconds = 0;
        if(cwidEn)
          {
            cwidInit();
@@ -207,7 +208,7 @@ void loop()
            jtInit();
          }      
        Serial.print("\nSynthesiser programmed. Press any key for menu");
-       delay(1000);
+       delay(500);
        flushInput();
      }
     

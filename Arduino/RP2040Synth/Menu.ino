@@ -226,8 +226,10 @@ void enterRegs(void)
                }
              Serial.print("\nR");
              Serial.print(regno);
-             Serial.print(" = 0x");
-             Serial.println(reg[regno],HEX);
+             Serial.print(" = ");
+             printHex(reg[regno],8);
+             Serial.println("");
+
            }
         }
       if(param[0] == '*')
@@ -237,11 +239,21 @@ void enterRegs(void)
           {
              Serial.print("R");
              Serial.print(i);
-             Serial.print("\t0x");
-             Serial.println(reg[i],HEX);
+             Serial.print("\t");
+             printHex(reg[i],8);
+             Serial.println("");
           }
         }
   }
+}
+
+void printHex(uint32_t num, int precision)
+{
+  char tmp[16];
+  char format[128];
+  sprintf(format, "0x%%0%dlX", precision);
+  sprintf(tmp, format, num);
+  Serial.print(tmp);
 }
 
 void setCwIdent(void)
@@ -315,19 +327,21 @@ void setJTMode(void)
   if(jtMode < 0) jtMode = 0;
   if(jtMode > 3) jtMode = 3;
 
-  Serial.print("Enter JT Message (Max 13 characters) --->");
-  jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
-  jts.toCharArray(&jtid[0], 13 );
+  if(jtMode != 0)
+    {
+      Serial.print("Enter JT Message (Max 13 characters) --->");
+      jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
+      jts.toCharArray(&jtid[0], 13 );
 
-  double worsterr = jtInit();
+      double worsterr = jtInit();
 
-   if((worsterr * 1000000.0)> 0.009)
-   {
-    Serial.print("The current chip settings can produce the required tones with a maximum error of ");
-    Serial.print(worsterr * 1000000.0);
-    Serial.println(" Hz");
-   }
-
+      if((worsterr * 1000000.0)> 0.009)
+      {
+        Serial.print("The current chip settings can produce the required tones with a maximum error of ");
+        Serial.print(worsterr * 1000000.0);
+        Serial.println(" Hz");
+      }
+    }
   Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
   Serial.println("JT Encoding will only run when not in the menu. Type X to exit menu.");
 

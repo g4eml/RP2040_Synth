@@ -270,9 +270,9 @@ void setcwidEnt(void)
    }
 
   eeprom.cwidEn = 0x73;
-  Serial.print("Enter CW Ident (max 255 characters) --->");
+  Serial.print("Enter CW Ident (max 32 characters) --->");
   cws = inputString(true);
-  cws.toCharArray(&eeprom.cwid[1], 255 );
+  cws.toCharArray(&eeprom.cwid[1], 32 );
   eeprom.cwidLen = cws.length();
 
   Serial.print("Enter CW speed (5 - 30 Words per Minute) ---> ");

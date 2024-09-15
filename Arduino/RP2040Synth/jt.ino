@@ -45,7 +45,7 @@ double jtInit(void)
       jtToneSpacing = JT65C_TONE_SPACING;
       jtSymbolCount = JT65_SYMBOL_COUNT;
       jtTime = 1;                           //JT message every even minute
-      eeprom.cwidInterval = 120;                   //override CW interval when Jt mode is active
+      eeprom.cwidInterval = 120;            //override CW interval when Jt mode is active
       nextcwidTime = 60;                    //CW ID every Odd minute
       break; 
     }

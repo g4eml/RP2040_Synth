@@ -127,7 +127,7 @@ void showMenu(String *list)
 
  Serial.print("\n");
  Serial.print("Chip type is ");
- Serial.println(chipName[chip]);
+ Serial.println(chipName[eeprom.chip]);
  Serial.println();
 
   while(list[i] != "$$$")
@@ -154,12 +154,12 @@ void enterOsc(void)
 {
   double oscFreq = 0;
   Serial.print("\nCurrent Reference Oscillator is ");
-  Serial.print(refOsc , 10);
+  Serial.print(eeprom.refOsc , 10);
   Serial.print(" MHz\nEnter New Reference Oscillator Frequency in MHz --> ");
   oscFreq = inputFloat();
   if (oscFreq > 0 )
     {
-      refOsc = oscFreq;
+      eeprom.refOsc = oscFreq;
     }
 }
 
@@ -191,7 +191,7 @@ void enterRegs(void)
         Serial.println("Enter blank line to exit");
         Serial.println("Valid Register Numbers (See Chip Data Sheet) are:-");
         Serial.print("R0 to R");
-        Serial.println(numberOfRegs -1);
+        Serial.println(eeprom.numberOfRegs -1);
         Serial.println();
       }
     
@@ -216,18 +216,18 @@ void enterRegs(void)
            param = param.substring(1);   //remove the R character
            param.trim();
            regno = param.toInt();
-           if(regno < numberOfRegs)
+           if(regno < eeprom.numberOfRegs)
              {
              if(value.length() >0)
                {
                   char buf[16];
                   value.toCharArray(buf,16);
-                  reg[regno] = (uint32_t) strtol(buf,0,16);
+                  eeprom.reg[regno] = (uint32_t) strtol(buf,0,16);
                }
              Serial.print("\nR");
              Serial.print(regno);
              Serial.print(" = ");
-             printHex(reg[regno],8);
+             printHex(eeprom.reg[regno],8);
              Serial.println("");
 
            }
@@ -235,12 +235,12 @@ void enterRegs(void)
       if(param[0] == '*')
         {
           Serial.println();
-          for(int i = numberOfRegs -1; i>=0; i--)
+          for(int i = eeprom.numberOfRegs -1; i>=0; i--)
           {
              Serial.print("R");
              Serial.print(i);
              Serial.print("\t");
-             printHex(reg[i],8);
+             printHex(eeprom.reg[i],8);
              Serial.println("");
           }
         }
@@ -256,7 +256,7 @@ void printHex(uint32_t num, int precision)
   Serial.print(tmp);
 }
 
-void setCwIdent(void)
+void setcwidEnt(void)
 {
   char resp;
   String cws;
@@ -264,28 +264,28 @@ void setCwIdent(void)
   resp = getSelection("Enable CW Ident? Y or N --->");
   if((resp == 'N') || (resp == 'n'))
    {
-     cwidEn = 0;
+     eeprom.cwidEn = 0;
      Serial.println();
      return;
    }
 
-  cwidEn = 0x73;
+  eeprom.cwidEn = 0x73;
   Serial.print("Enter CW Ident (max 255 characters) --->");
   cws = inputString(true);
-  cws.toCharArray(&cwid[1], 255 );
-  cwidLen = cws.length();
+  cws.toCharArray(&eeprom.cwid[1], 255 );
+  eeprom.cwidLen = cws.length();
 
   Serial.print("Enter CW speed (5 - 30 Words per Minute) ---> ");
-  cwidSpeed = inputNumber();
-  if(cwidSpeed < 5) cwidSpeed = 5;
-  if(cwidSpeed > 30) cwidSpeed = 30;
+  eeprom.cwidSpeed = inputNumber();
+  if(eeprom.cwidSpeed < 5) eeprom.cwidSpeed = 5;
+  if(eeprom.cwidSpeed > 30) eeprom.cwidSpeed = 30;
 
   Serial.println("Enter ident interval (Seconds)");
   Serial.print("Note:- This value will not be used if JT Modes are also active. ---> ");
-  cwidInterval = inputNumber();
-  if(cwidInterval < 10) cwidInterval = 5;
-  if(cwidInterval > 120) cwidInterval = 120;
-  if(extMult > 1)
+  eeprom.cwidInterval = inputNumber();
+  if(eeprom.cwidInterval < 10) eeprom.cwidInterval = 5;
+  if(eeprom.cwidInterval > 120) eeprom.cwidInterval = 120;
+  if(eeprom.extMult > 1)
      {
         Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
      }
@@ -294,19 +294,19 @@ void setCwIdent(void)
        Serial.print("Enter FSK Shift in Hz ---> ");
      }
 
-  cwidShift = inputNumber() / (double) extMult ;
-  cwidShift = cwidShift / 1000000.0;      //convert to MHz
+  eeprom.cwidShift = inputNumber() / (double) eeprom.extMult ;
+  eeprom.cwidShift = eeprom.cwidShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + cwidShift);
+  chipSetFrequency(nominal + eeprom.cwidShift);
   chipSaveFskShift();
   Serial.println("Actual final frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");
-  double up = chipGetFrequency() * (double) extMult;
+  double up = chipGetFrequency() * (double) eeprom.extMult;
   Serial.print(up,10);
   Serial.println(" MHz");
   chipSetFrequency(nominal); 
   Serial.print("Key Down Frequency = ");
-  double down = chipGetFrequency() * (double) extMult;
+  double down = chipGetFrequency() * (double) eeprom.extMult;
   Serial.print(down,10);
   Serial.println(" MHz");
   Serial.print("FSK Shift = ");
@@ -317,21 +317,21 @@ void setCwIdent(void)
 
 }
 
-void setJTMode(void)
+void setjtMode(void)
 {
-  String jtmodes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
+  String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
   char resp;
   String jts;
-  showMenu(jtmodes);
-  jtMode = getSelection("Select JT Mode --->") - '0';
-  if(jtMode < 0) jtMode = 0;
-  if(jtMode > 3) jtMode = 3;
+  showMenu(jtModes);
+  eeprom.jtMode = getSelection("Select JT Mode --->") - '0';
+  if(eeprom.jtMode < 0) eeprom.jtMode = 0;
+  if(eeprom.jtMode > 3) eeprom.jtMode = 3;
 
-  if(jtMode != 0)
+  if(eeprom.jtMode != 0)
     {
       Serial.print("Enter JT Message (Max 13 characters) --->");
       jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
-      jts.toCharArray(&jtid[0], 13 );
+      jts.toCharArray(&eeprom.jtid[0], 13 );
 
       double worsterr = jtInit();
 
@@ -391,10 +391,10 @@ void mainMenu(void)
         Serial.print("Current Frequency is ");
         Serial.print(chipGetFrequency(),10);        
         Serial.println(" MHz");
-        if(extMult >1)
+        if(eeprom.extMult >1)
           {
             Serial.print("Current Final Frequency is ");
-            Serial.print(chipGetFrequency() * (double) extMult,10);        
+            Serial.print(chipGetFrequency() * (double) eeprom.extMult,10);        
             Serial.println(" MHz");
           }
 
@@ -416,10 +416,10 @@ void mainMenu(void)
         resp = getSelection("Enter Chip Type -->");
         if((resp > '0') && (resp < '4'))
         {
-        chip = resp - '0';
+        eeprom.chip = resp - '0';
         }
         Serial.print("Chip type is now ");
-        Serial.println(chipName[chip]);
+        Serial.println(chipName[eeprom.chip]);
         break;
 
         case 'R':
@@ -452,12 +452,12 @@ void mainMenu(void)
 
         case 'I':
         case 'i':
-        setCwIdent();
+        setcwidEnt();
         break;
 
         case 'J':
         case 'j':
-        setJTMode();
+        setjtMode();
         break;
 
         case 'N':

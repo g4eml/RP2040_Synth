@@ -280,11 +280,14 @@ void setcwidEnt(void)
   if(eeprom.cwidSpeed < 5) eeprom.cwidSpeed = 5;
   if(eeprom.cwidSpeed > 30) eeprom.cwidSpeed = 30;
 
-  Serial.println("Enter ident interval (Seconds)");
-  Serial.print("Note:- This value will not be used if JT Modes are also active. ---> ");
-  eeprom.cwidInterval = inputNumber();
-  if(eeprom.cwidInterval < 10) eeprom.cwidInterval = 5;
-  if(eeprom.cwidInterval > 120) eeprom.cwidInterval = 120;
+  if(eeprom.jtMode==0)
+    {
+    Serial.print("Enter ident interval (Seconds)");
+    eeprom.cwidInterval = inputNumber();
+    if(eeprom.cwidInterval < 10) eeprom.cwidInterval = 10;
+    if(eeprom.cwidInterval > 120) eeprom.cwidInterval = 120;
+    }
+
   if(eeprom.extMult > 1)
      {
         Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");

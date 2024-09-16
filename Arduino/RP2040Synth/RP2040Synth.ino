@@ -1,7 +1,6 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2024
 
-#define NUMBEROFCHANNELS 2
 
 //Global values...
 
@@ -69,8 +68,6 @@ JTEncode jtEncode;
 
 int seconds = 0;                         //seconds counter.  counts up to 120 seconds.  0-60 is even minute. 60-120 is odd minute. 
 int milliseconds = 0;                   //millisecond counter used to increment seconds counter. 
-
-int channelNumber = 0;
 
 bool cwidActive = false;                //flag to start sending CW ID
 int nextcwidTime = 60;                   //trigger time for next CWID
@@ -244,6 +241,4 @@ void saveSettings(void)
     EEPROM.write(0, 0x57);         //magic number to indcate EEPROM is valid
     EEPROM.put(1,eeprom);        //Save the channel structure
     EEPROM.commit();
-    Serial.print("\nEEPROM Size = ");
-    Serial.println(sizeof(eeprom));
 }

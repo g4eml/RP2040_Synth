@@ -220,9 +220,9 @@ void ADF4351SetParameters(void)
 void ADF4351Init(void)
 {
   int chip = ADF4351;                  //index to the current chip type
-  numberOfRegs = 6;                   //number of registers in the current chip type
-  numberOfBits = 32;                   //number of bits in each register
-  maxPfd = 35.0;
+  eeprom.numberOfRegs = 6;                   //number of registers in the current chip type
+  eeprom.numberOfBits = 32;                   //number of bits in each register
+  eeprom.maxPfd = 35.0;
   pinMode(ADF4351CEPin,OUTPUT);
   digitalWrite(ADF4351CEPin,HIGH); 
   pinMode(ADF4351LEPin,OUTPUT);
@@ -255,68 +255,68 @@ void ADF4351Send(int32_t val)
 
 void ADF4351EncodeRegs(void)
 {
-  reg[0] = (ADF4351_INT << 15) | (ADF4351_FRAC << 3);
-  reg[1] = (ADF4351_PH << 28) | (ADF4351_PR << 27) | (ADF4351_P << 15) | (ADF4351_M << 3) | 1 ;
-  reg[2] = (ADF4351_NM << 29) | (ADF4351_MUX << 26) | (ADF4351_DBR << 25) | (ADF4351_RDIV2 << 24) | (ADF4351_R << 14) | (ADF4351_REG4DB <<13) | (ADF4351_CP << 9) | (ADF4351_LDF << 8) | (ADF4351_LDP << 7) | (ADF4351_PDP << 6) | (ADF4351_PWDN << 5) | (ADF4351_TRI << 4) | (ADF4351_RST << 3) | 2;
-  reg[3] = (ADF4351_BSM << 23) | (ADF4351_ABP << 22) | (ADF4351_CC << 21) | (ADF4351_CSR << 18) | (ADF4351_CDM << 15) | (ADF4351_CDIV << 3) | 3;
-  reg[4] = (ADF4351_FB << 23) | (ADF4351_RFDIV << 20) | (ADF4351_BS << 12) | (ADF4351_VCOPD << 11) | (ADF4351_MTLD << 10) | (ADF4351_AUXSEL << 9) | (ADF4351_AUXEN << 8) | (ADF4351_AUXPWR << 6) | (ADF4351_RFEN << 5) | (ADF4351_RFPWR << 3) | 4;
-  reg[5] = (ADF4351_LD << 22) | (3 << 19) | 5; 
+  eeprom.reg[0] = (ADF4351_INT << 15) | (ADF4351_FRAC << 3);
+  eeprom.reg[1] = (ADF4351_PH << 28) | (ADF4351_PR << 27) | (ADF4351_P << 15) | (ADF4351_M << 3) | 1 ;
+  eeprom.reg[2] = (ADF4351_NM << 29) | (ADF4351_MUX << 26) | (ADF4351_DBR << 25) | (ADF4351_RDIV2 << 24) | (ADF4351_R << 14) | (ADF4351_REG4DB <<13) | (ADF4351_CP << 9) | (ADF4351_LDF << 8) | (ADF4351_LDP << 7) | (ADF4351_PDP << 6) | (ADF4351_PWDN << 5) | (ADF4351_TRI << 4) | (ADF4351_RST << 3) | 2;
+  eeprom.reg[3] = (ADF4351_BSM << 23) | (ADF4351_ABP << 22) | (ADF4351_CC << 21) | (ADF4351_CSR << 18) | (ADF4351_CDM << 15) | (ADF4351_CDIV << 3) | 3;
+  eeprom.reg[4] = (ADF4351_FB << 23) | (ADF4351_RFDIV << 20) | (ADF4351_BS << 12) | (ADF4351_VCOPD << 11) | (ADF4351_MTLD << 10) | (ADF4351_AUXSEL << 9) | (ADF4351_AUXEN << 8) | (ADF4351_AUXPWR << 6) | (ADF4351_RFEN << 5) | (ADF4351_RFPWR << 3) | 4;
+  eeprom.reg[5] = (ADF4351_LD << 22) | (3 << 19) | 5; 
 }
 
 void ADF4351DecodeRegs(void)
 {
-  ADF4351_INT = (reg[0] >> 15) & 0xFFFF;
-  ADF4351_FRAC = (reg[0] >> 3) & 0x0FFF;
+  ADF4351_INT = (eeprom.reg[0] >> 15) & 0xFFFF;
+  ADF4351_FRAC = (eeprom.reg[0] >> 3) & 0x0FFF;
 
-  ADF4351_PH = (reg[1] >> 28) & 0x01;
-  ADF4351_PR = (reg[1] >> 27) & 0x01;
-  ADF4351_P = (reg[1] >> 15) & 0xFFF; 
-  ADF4351_M = (reg[1] >> 3) & 0xFFF;
+  ADF4351_PH = (eeprom.reg[1] >> 28) & 0x01;
+  ADF4351_PR = (eeprom.reg[1] >> 27) & 0x01;
+  ADF4351_P = (eeprom.reg[1] >> 15) & 0xFFF; 
+  ADF4351_M = (eeprom.reg[1] >> 3) & 0xFFF;
 
-  ADF4351_NM = (reg[2] >> 29) & 0x03;
-  ADF4351_MUX = (reg[2] >> 26) & 0x07;
-  ADF4351_DBR = (reg[2] >> 25) & 0x01;
-  ADF4351_RDIV2 = (reg[2] >> 24) & 0x01;
-  ADF4351_R = (reg[2] >> 14) & 0x3FF;
-  ADF4351_REG4DB = (reg[2] >> 13) & 0x01;
-  ADF4351_CP = (reg[2] >> 9) & 0x0F;
-  ADF4351_LDF = (reg[2] >> 8) & 0x01;
-  ADF4351_LDP = (reg[2] >> 7) & 0x01;
-  ADF4351_PDP = (reg[2] >> 6) & 0x01;
-  ADF4351_PWDN = (reg[2] >> 5) & 0x01;
-  ADF4351_TRI = (reg[2] >> 4) & 0x01;
-  ADF4351_RST = (reg[2] >> 3) & 0x01;
+  ADF4351_NM = (eeprom.reg[2] >> 29) & 0x03;
+  ADF4351_MUX = (eeprom.reg[2] >> 26) & 0x07;
+  ADF4351_DBR = (eeprom.reg[2] >> 25) & 0x01;
+  ADF4351_RDIV2 = (eeprom.reg[2] >> 24) & 0x01;
+  ADF4351_R = (eeprom.reg[2] >> 14) & 0x3FF;
+  ADF4351_REG4DB = (eeprom.reg[2] >> 13) & 0x01;
+  ADF4351_CP = (eeprom.reg[2] >> 9) & 0x0F;
+  ADF4351_LDF = (eeprom.reg[2] >> 8) & 0x01;
+  ADF4351_LDP = (eeprom.reg[2] >> 7) & 0x01;
+  ADF4351_PDP = (eeprom.reg[2] >> 6) & 0x01;
+  ADF4351_PWDN = (eeprom.reg[2] >> 5) & 0x01;
+  ADF4351_TRI = (eeprom.reg[2] >> 4) & 0x01;
+  ADF4351_RST = (eeprom.reg[2] >> 3) & 0x01;
 
-  ADF4351_BSM = (reg[3] >> 23) & 0x01;
-  ADF4351_ABP = (reg[3] >> 22) & 0x01;
-  ADF4351_CC = (reg[3] >> 21) & 0x01;
-  ADF4351_CSR = (reg[3] >> 18) & 0x01;
-  ADF4351_CDM = (reg[3] >> 15) & 0x03;
-  ADF4351_CDIV = (reg[3] >> 3) & 0xFFF;
+  ADF4351_BSM = (eeprom.reg[3] >> 23) & 0x01;
+  ADF4351_ABP = (eeprom.reg[3] >> 22) & 0x01;
+  ADF4351_CC = (eeprom.reg[3] >> 21) & 0x01;
+  ADF4351_CSR = (eeprom.reg[3] >> 18) & 0x01;
+  ADF4351_CDM = (eeprom.reg[3] >> 15) & 0x03;
+  ADF4351_CDIV = (eeprom.reg[3] >> 3) & 0xFFF;
 
-  ADF4351_FB = (reg[4] >> 23) & 0x01;
-  ADF4351_RFDIV = (reg[4] >> 20) & 0x07;
-  ADF4351_BS = (reg[4] >> 12) & 0xFF;
-  ADF4351_VCOPD = (reg[4] >> 11) & 0x01;
-  ADF4351_MTLD = (reg[4] >> 10) & 0x01;
-  ADF4351_AUXSEL = (reg[4] >> 9) & 0x01;
-  ADF4351_AUXEN = (reg[4] >> 8) & 0x01;
-  ADF4351_AUXPWR = (reg[4] >> 6) & 0x03;
-  ADF4351_RFEN = (reg[4] >> 5) & 0x01;
-  ADF4351_RFPWR = (reg[4] >> 3) & 0x03;
+  ADF4351_FB = (eeprom.reg[4] >> 23) & 0x01;
+  ADF4351_RFDIV = (eeprom.reg[4] >> 20) & 0x07;
+  ADF4351_BS = (eeprom.reg[4] >> 12) & 0xFF;
+  ADF4351_VCOPD = (eeprom.reg[4] >> 11) & 0x01;
+  ADF4351_MTLD = (eeprom.reg[4] >> 10) & 0x01;
+  ADF4351_AUXSEL = (eeprom.reg[4] >> 9) & 0x01;
+  ADF4351_AUXEN = (eeprom.reg[4] >> 8) & 0x01;
+  ADF4351_AUXPWR = (eeprom.reg[4] >> 6) & 0x03;
+  ADF4351_RFEN = (eeprom.reg[4] >> 5) & 0x01;
+  ADF4351_RFPWR = (eeprom.reg[4] >> 3) & 0x03;
 
-  ADF4351_LD = (reg[5] >> 22) & 0x03;
+  ADF4351_LD = (eeprom.reg[5] >> 22) & 0x03;
 
 }
 
 void ADF4351Update(void)
 {
-  ADF4351Send(reg[5]);
-  ADF4351Send(reg[4]);
-  ADF4351Send(reg[3]);
-  ADF4351Send(reg[2]);
-  ADF4351Send(reg[1]);
-  ADF4351Send(reg[0]);
+  ADF4351Send(eeprom.reg[5]);
+  ADF4351Send(eeprom.reg[4]);
+  ADF4351Send(eeprom.reg[3]);
+  ADF4351Send(eeprom.reg[2]);
+  ADF4351Send(eeprom.reg[1]);
+  ADF4351Send(eeprom.reg[0]);
 }
 
 
@@ -327,7 +327,7 @@ double ADF4351CalcPFD(double rpfd)
   bool div = 0;
 
   //first try a simple division...
-  r = refOsc / rpfd;
+  r = eeprom.refOsc / rpfd;
 
   if(((double) int(r))  == r)       //check if this is an integer division
     {
@@ -337,7 +337,7 @@ double ADF4351CalcPFD(double rpfd)
   //next try using the doubler
 
   dub = 1;
-  r = (refOsc * 2.0) / rpfd;
+  r = (eeprom.refOsc * 2.0) / rpfd;
   if(((double) int(r)) == r)       //check if this is an integer division
     {
       goto done;
@@ -350,10 +350,10 @@ double ADF4351CalcPFD(double rpfd)
   Serial.print("Unable to acheive a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
-  Serial.print(refOsc, 6);
+  Serial.print(eeprom.refOsc, 6);
   Serial.println(" MHz");
   Serial.print("PFD set to ");
-  Serial.print((refOsc * 2.0) / r, 6);
+  Serial.print((eeprom.refOsc * 2.0) / r, 6);
   Serial.println(" MHz");
 
   done:
@@ -362,7 +362,7 @@ double ADF4351CalcPFD(double rpfd)
   ADF4351_DBR = dub;
   ADF4351_RDIV2 = div;
 
-  return ((refOsc * (1+dub)) / r);
+  return ((eeprom.refOsc * (1+dub)) / r);
 }
 
 void ADF4351SetPfd(void)
@@ -378,14 +378,14 @@ void ADF4351SetPfd(void)
        pfd = inputFloat();
        if(pfd == 0) return;
        pfd = ADF4351CalcPFD(pfd);
-      if(pfd <= maxPfd)
+      if(pfd <= eeprom.maxPfd)
         {
           freqOK = true;
         }
       else
         {
           Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
+          Serial.print(eeprom.maxPfd);
           Serial.println(" MHz");
         }
       
@@ -395,7 +395,7 @@ void ADF4351SetPfd(void)
 
 double ADF4351GetPfd(void)
 {
-  double pfd = refOsc;
+  double pfd = eeprom.refOsc;
   double r = (double) ADF4351_R; 
   if(ADF4351_DBR == 1) pfd = pfd * 2.0;
   pfd = pfd / r;
@@ -427,16 +427,16 @@ void ADF4351SetFrequency(double direct)
    if((resp == 'Y') || (resp == 'y'))
      {
         Serial.print("Enter External Multiplication Factor ---> ");
-        extMult = inputNumber();
+        eeprom.extMult = inputNumber();
      }
    else
      {
-       extMult = 1;
+       eeprom.extMult = 1;
      }
     while(!freqOK)
     {
       Serial.print("\nEnter required Final Frequency in MHz -->");
-      freq = inputFloat() / (double) extMult;
+      freq = inputFloat() / (double) eeprom.extMult;
       if((freq > 34.375) && (freq <= 4400.000))
         {
           freqOK = true;
@@ -524,7 +524,7 @@ void ADF4351CalcFreq(void)
 
   Serial.println();
   Serial.print("Reference Oscillator = ");
-  Serial.print(refOsc,10);
+  Serial.print(eeprom.refOsc,10);
   Serial.println(" MHz");
 
   pfd = ADF4351GetPfd();
@@ -566,10 +566,10 @@ void ADF4351CalcFreq(void)
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
 
-  if(extMult > 1)
+  if(eeprom.extMult > 1)
     {
       Serial.print("Final Multiplied Frequency = ");
-      Serial.print((vco / diva) * (double) extMult, 10);
+      Serial.print((vco / diva) * (double) eeprom.extMult, 10);
       Serial.println(" MHz"); 
     }
 }
@@ -614,8 +614,8 @@ double ADF4351GetFrequency(void)
   if(val == lastval) return;
   lastval = val;
 
-  ADF4351Send((reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
-  ADF4351Send((reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
+  ADF4351Send((eeprom.reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
+  ADF4351Send((eeprom.reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
 }
 
 
@@ -628,13 +628,13 @@ double ADF4351GetFrequency(void)
 
   if(key)
     {
-      ADF4351Send(reg[1]);
-      ADF4351Send(reg[0]);
+      ADF4351Send(eeprom.reg[1]);
+      ADF4351Send(eeprom.reg[0]);
     }
   else
     {
-     ADF4351Send((reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
-     ADF4351Send((reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
+     ADF4351Send((eeprom.reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
+     ADF4351Send((eeprom.reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
     }
 }
 

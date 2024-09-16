@@ -1,6 +1,7 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2024
 
+
 //Global values...
 
 enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 };
@@ -9,22 +10,26 @@ String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595"};
 
 //These values are saved to the EEPROM for recall on statup. 
 
+struct channel
+{
 uint8_t chip = MAX2870;                  //index to the current chip type
-uint32_t reg[128];                    // allow for up to 128 32 bit registers. 
-int numberOfRegs = 6;                  //number of registers in the current chip type
-int numberOfBits = 32;                 //number of bits in each register
-float maxPfd = 105.0;                 //maximum PFD frequency
-double refOsc = 100.000 ;             //reference oscillator frequency in MHz
+uint32_t reg[80];                       // allow for up to 80 32 bit registers. 
+int numberOfRegs = 6;                   //number of registers in the current chip type
+int numberOfBits = 32;                  //number of bits in each register
+float maxPfd = 105.0;                   //maximum PFD frequency
+double refOsc = 100.000 ;               //reference oscillator frequency in MHz
 uint8_t cwidEn = 0;                      //magic number to indicate if CWID is enabled 0x73 = enabled. 
 uint8_t cwidLen = 1;                    //number of characters in the CWID
 uint8_t cwidSpeed = 10;                  //CWID speed in words per minute
 uint8_t cwidInterval = 60;               //CWID Inteval in seconds.
 double cwidShift = 0;                       //CW ID FSK Shift in MHz  
-char cwid[257] = " ";                      //CWID characters
+char cwid[32] = " ";                      // up to 32 CWID characters
 uint8_t jtMode = 0;                        //JT mode
 char jtid[13] = " ";                       //JT Message
 uint8_t extMult = 1;                       //Multiplcation factor for external frequency multiplier. (used to calculate the correct FSK Shifts.)
+};
 
+struct channel eeprom;
 
 
 //End of saved values
@@ -90,46 +95,19 @@ void setup()
   gpsPointer = 0;
   delay(1000);
   EEPROM.begin(1024);
-  if(EEPROM.read(0) == 0x55)        //magic number to indcate EEPROM is valid
+  if(EEPROM.read(0) == 0x57)        //magic number to indcate EEPROM is valid
     {
-      EEPROM.get(1,refOsc);         //get reference oscillator frequency for use in calculations. 
-      EEPROM.get(0x10,chip);        //read the chip type
-      for(int i=0;i<128;i++)        //read the saved register settings in 0x020 to 0x220
-      {
-        EEPROM.get(0x20 + i*4,reg[i]);
-      }
-      EEPROM.get(0x22F,extMult);         //external multiplication factor (used to calculate FSk shifts)
-      EEPROM.get(0x230,cwidEn);       //test if CWID is enabled 
-      if(cwidEn)
-          {
-            EEPROM.get(0x231,cwidLen);        //number of characters in CWID
-            EEPROM.get(0x232,cwidSpeed);       //speed in words per minute 
-            EEPROM.get(0x233,cwidInterval);    //interval in seconds.
-            EEPROM.get(0x234 , cwidShift);      //Desired CWID shift in MHz  (may not be the actual shift achieved)
-            for(int i = 0 ; i< cwidLen ; i++)
-              {
-                EEPROM.get(0x240 + i , cwid[i+1]);    //read in the characters
-              }
-          }
-       EEPROM.get(0x350,jtMode);                //test if Jt mode is enabled
-       if(jtMode)
-         {
-          for(int i = 0 ; i< 13 ; i++)
-              {
-                EEPROM.get(0x360 + i , jtid[i]);    //read in the characters
-              }
-         }
-
+      EEPROM.get(1,eeprom);         //get eeprom structure. 
       chipDecodeRegs();
     }
 
   chipInit();
-  if(cwidEn)
+  if(eeprom.cwidEn)
     {
       cwidInit();
     }
    
-   if(jtMode)
+   if(eeprom.jtMode)
      {
        jtInit();
      }
@@ -140,7 +118,7 @@ void setup()
 void loop() 
 {
   Serial.print("\n");
-  Serial.print(chipName[chip]);
+  Serial.print(chipName[eeprom.chip]);
   Serial.println(" Synthesiser programmed, Sleeping");
 
   chipUpdate();
@@ -172,23 +150,23 @@ void loop()
          }
 
 
-     if((cwidEn) & (seconds == nextcwidTime))
+     if((eeprom.cwidEn) & (seconds == nextcwidTime))
        {
         cwidActive = true;                                        //start this CW ID
-        nextcwidTime = (seconds + cwidInterval) % 120;            //schedule the next CW ID
+        nextcwidTime = (seconds + eeprom.cwidInterval) % 120;            //schedule the next CW ID
        }
 
-     if((jtMode != 0) & (seconds == jtTime))
+     if((eeprom.jtMode != 0) & (seconds == jtTime))
        {
         jtActive = true;                                        //start the JT Sequence
        }
 
-    if(cwidEn)
+    if(eeprom.cwidEn)
       {
         cwidTick();
       }
 
-    if(jtMode != 0)
+    if(eeprom.jtMode != 0)
       {
         jtTick();
       }
@@ -199,11 +177,11 @@ void loop()
        chipUpdate();
        seconds = -1;                       //reset the timing after using the menu.
        milliseconds = 0;
-       if(cwidEn)
+       if(eeprom.cwidEn)
          {
            cwidInit();
          }
-       if(jtMode != 0)
+       if(eeprom.jtMode != 0)
          {
            jtInit();
          }      
@@ -260,33 +238,7 @@ void processNMEA(void)
 
 void saveSettings(void)
 {
-    EEPROM.write(0, 0x55);         //magic number to indcate EEPROM is valid
-    EEPROM.put(1,refOsc);
-    EEPROM.put(0x10,chip);        //read the chip type
-    for(int i=0;i<128;i++)         //all register settings
-      {
-        EEPROM.put(0x20 + i*4,reg[i]);
-      }
-    EEPROM.put(0x22F,extMult);      //external multiplcation factor. 
-    EEPROM.put(0x230,cwidEn);       //CWID 
-      if(cwidEn)
-          {
-            EEPROM.put(0x231,cwidLen);        //number of characters in CWID
-            EEPROM.put(0x232,cwidSpeed);       //speed in words per minute 
-            EEPROM.put(0x233,cwidInterval);    //interval in seconds.
-            EEPROM.put(0x234, cwidShift);        //Desired Shift in Hz. 
-            for(int i = 0 ; i< cwidLen ; i++)
-              {
-                EEPROM.put(0x240 + i , cwid[i + 1]);    //save the characters
-              }
-          }
-    EEPROM.put(0x350,jtMode);
-      if(jtMode)
-         {
-            for(int i = 0 ; i< 13 ; i++)
-              {
-                EEPROM.put(0x360 + i , jtid[i]);    //save the characters
-              }
-         }
+    EEPROM.write(0, 0x57);         //magic number to indcate EEPROM is valid
+    EEPROM.put(1,eeprom);        //Save the channel structure
     EEPROM.commit();
 }

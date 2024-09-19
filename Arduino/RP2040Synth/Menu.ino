@@ -127,9 +127,22 @@ void showMenu(String *list)
 
  Serial.print("\n");
  Serial.print("Chip type is ");
- Serial.println(chipName[eeprom.chip]);
+ Serial.println(chipName[chip]);
+ Serial.print("Ref Osc =  ");
+ Serial.print(refOsc , 10);
+ Serial.println(" MHz");
+ Serial.print("Channel Number ");
+ if(selChan == 255)
+  {
+    Serial.print(" (Externally Selected) = ");
+    channel = readChannelInputs();
+  }
+else
+  {
+    Serial.print(" (Fixed) = "); 
+  }
+ Serial.println(channel);
  Serial.println();
-
   while(list[i] != "$$$")
   {
     Serial.println(list[i++]);
@@ -154,12 +167,12 @@ void enterOsc(void)
 {
   double oscFreq = 0;
   Serial.print("\nCurrent Reference Oscillator is ");
-  Serial.print(eeprom.refOsc , 10);
+  Serial.print(refOsc , 10);
   Serial.print(" MHz\nEnter New Reference Oscillator Frequency in MHz --> ");
   oscFreq = inputFloat();
   if (oscFreq > 0 )
     {
-      eeprom.refOsc = oscFreq;
+      refOsc = oscFreq;
     }
 }
 
@@ -191,7 +204,7 @@ void enterRegs(void)
         Serial.println("Enter blank line to exit");
         Serial.println("Valid Register Numbers (See Chip Data Sheet) are:-");
         Serial.print("R0 to R");
-        Serial.println(eeprom.numberOfRegs -1);
+        Serial.println(numberOfRegs -1);
         Serial.println();
       }
     
@@ -216,18 +229,18 @@ void enterRegs(void)
            param = param.substring(1);   //remove the R character
            param.trim();
            regno = param.toInt();
-           if(regno < eeprom.numberOfRegs)
+           if(regno < numberOfRegs)
              {
              if(value.length() >0)
                {
                   char buf[16];
                   value.toCharArray(buf,16);
-                  eeprom.reg[regno] = (uint32_t) strtol(buf,0,16);
+                  chanData[channel].reg[regno] = (uint32_t) strtol(buf,0,16);
                }
              Serial.print("\nR");
              Serial.print(regno);
              Serial.print(" = ");
-             printHex(eeprom.reg[regno],8);
+             printHex(chanData[channel].reg[regno],8);
              Serial.println("");
 
            }
@@ -235,12 +248,12 @@ void enterRegs(void)
       if(param[0] == '*')
         {
           Serial.println();
-          for(int i = eeprom.numberOfRegs -1; i>=0; i--)
+          for(int i = numberOfRegs -1; i>=0; i--)
           {
              Serial.print("R");
              Serial.print(i);
              Serial.print("\t");
-             printHex(eeprom.reg[i],8);
+             printHex(chanData[channel].reg[i],8);
              Serial.println("");
           }
         }
@@ -264,31 +277,31 @@ void setcwidEnt(void)
   resp = getSelection("Enable CW Ident? Y or N --->");
   if((resp == 'N') || (resp == 'n'))
    {
-     eeprom.cwidEn = 0;
+     chanData[channel].cwidEn = 0;
      Serial.println();
      return;
    }
 
-  eeprom.cwidEn = 0x73;
+  chanData[channel].cwidEn = 0x73;
   Serial.print("Enter CW Ident (max 32 characters) --->");
   cws = inputString(true);
-  cws.toCharArray(&eeprom.cwid[1], 32 );
-  eeprom.cwidLen = cws.length();
+  cws.toCharArray(&chanData[channel].cwid[1], 32 );
+  chanData[channel].cwidLen = cws.length();
 
   Serial.print("Enter CW speed (5 - 30 Words per Minute) ---> ");
-  eeprom.cwidSpeed = inputNumber();
-  if(eeprom.cwidSpeed < 5) eeprom.cwidSpeed = 5;
-  if(eeprom.cwidSpeed > 30) eeprom.cwidSpeed = 30;
+  chanData[channel].cwidSpeed = inputNumber();
+  if(chanData[channel].cwidSpeed < 5) chanData[channel].cwidSpeed = 5;
+  if(chanData[channel].cwidSpeed > 30) chanData[channel].cwidSpeed = 30;
 
-  if(eeprom.jtMode==0)
+  if(chanData[channel].jtMode==0)
     {
-    Serial.print("Enter ident interval (Seconds)");
-    eeprom.cwidInterval = inputNumber();
-    if(eeprom.cwidInterval < 10) eeprom.cwidInterval = 10;
-    if(eeprom.cwidInterval > 120) eeprom.cwidInterval = 120;
+    Serial.print("Enter ident interval (Seconds) -->");
+    chanData[channel].cwidInterval = inputNumber();
+    if(chanData[channel].cwidInterval < 10) chanData[channel].cwidInterval = 10;
+    if(chanData[channel].cwidInterval > 120) chanData[channel].cwidInterval = 120;
     }
 
-  if(eeprom.extMult > 1)
+  if(chanData[channel].extMult > 1)
      {
         Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
      }
@@ -297,25 +310,25 @@ void setcwidEnt(void)
        Serial.print("Enter FSK Shift in Hz ---> ");
      }
 
-  eeprom.cwidShift = inputNumber() / (double) eeprom.extMult ;
-  eeprom.cwidShift = eeprom.cwidShift / 1000000.0;      //convert to MHz
+  chanData[channel].cwidShift = inputNumber() / (double) chanData[channel].extMult ;
+  chanData[channel].cwidShift = chanData[channel].cwidShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + eeprom.cwidShift);
+  chipSetFrequency(nominal + chanData[channel].cwidShift);
   chipSaveFskShift();
-  Serial.println("Actual final frequencies achievable with the current PFD will be :-");
+  Serial.println("\nActual final frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");
-  double up = chipGetFrequency() * (double) eeprom.extMult;
+  double up = chipGetFrequency() * (double) chanData[channel].extMult;
   Serial.print(up,10);
   Serial.println(" MHz");
   chipSetFrequency(nominal); 
   Serial.print("Key Down Frequency = ");
-  double down = chipGetFrequency() * (double) eeprom.extMult;
+  double down = chipGetFrequency() * (double) chanData[channel].extMult;
   Serial.print(down,10);
   Serial.println(" MHz");
   Serial.print("FSK Shift = ");
   Serial.print((down - up) * 1000000 , 3);
   Serial.println(" Hz");
-  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
+  Serial.println("\nDon't forget to save the settings to eeprom if you are happy with them.");
   Serial.println("CW ID will only run when not in the menu. Type X to exit menu.");
 
 }
@@ -326,15 +339,15 @@ void setjtMode(void)
   char resp;
   String jts;
   showMenu(jtModes);
-  eeprom.jtMode = getSelection("Select JT Mode --->") - '0';
-  if(eeprom.jtMode < 0) eeprom.jtMode = 0;
-  if(eeprom.jtMode > 3) eeprom.jtMode = 3;
+  chanData[channel].jtMode = getSelection("Select JT Mode --->") - '0';
+  if(chanData[channel].jtMode < 0) chanData[channel].jtMode = 0;
+  if(chanData[channel].jtMode > 3) chanData[channel].jtMode = 3;
 
-  if(eeprom.jtMode != 0)
+  if(chanData[channel].jtMode != 0)
     {
       Serial.print("Enter JT Message (Max 13 characters) --->");
       jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
-      jts.toCharArray(&eeprom.jtid[0], 13 );
+      jts.toCharArray(&chanData[channel].jtid[0], 13 );
 
       double worsterr = jtInit();
 
@@ -345,7 +358,7 @@ void setjtMode(void)
         Serial.println(" Hz");
       }
     }
-  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
+  Serial.println("\nDon't forget to save the settings to eeprom if you are happy with them.");
   Serial.println("JT Encoding will only run when not in the menu. Type X to exit menu.");
 
 }
@@ -370,7 +383,7 @@ void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "D = Set Default Register Values for chip" , "O = Set Reference Oscillator Frequency" , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "N = View GPS NMEA data", "S = Save Registers to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "G = View GPS NMEA data", "S = Save to eeprom" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -379,14 +392,34 @@ void mainMenu(void)
    showMenu(menuList);
    do
     {
-      resp = getSelection("Enter Command -->");
+      resp = getSelection("Enter Command (? for menu) -->");
 
       switch(resp)
       {
+        case 'N':
+        case 'n':
+        Serial.print("Enter Channel Number 0-");
+        Serial.print(NUMBEROFCHANNELS -1);
+        Serial.print(" or 255 for Externally Selected -->");
+        selChan = inputNumber();
+        if(selChan < 0) selChan = 0;
+        if((selChan > NUMBEROFCHANNELS -1)&(selChan !=255)) selChan=NUMBEROFCHANNELS -1;
+        if(selChan < NUMBEROFCHANNELS)
+         {
+           channel=selChan;
+         }
+        else
+         {
+          channel=readChannelInputs();
+         } 
+        initChannel();
+        chipUpdate();
+        break;
+
         case 'S':
         case 's':
         saveSettings();
-        Serial.println("\nRegisters saved to EEPROM");
+        Serial.println("\nSettings saved to eeprom");
         break;
 
         case 'F':
@@ -394,43 +427,51 @@ void mainMenu(void)
         Serial.print("Current Frequency is ");
         Serial.print(chipGetFrequency(),10);        
         Serial.println(" MHz");
-        if(eeprom.extMult >1)
+        if(chanData[channel].extMult >1)
           {
             Serial.print("Current Final Frequency is ");
-            Serial.print(chipGetFrequency() * (double) eeprom.extMult,10);        
+            Serial.print(chipGetFrequency() * (double) chanData[channel].extMult,10);        
             Serial.println(" MHz");
           }
 
         chipSetFrequency(0);
         chipUpdate();
         Serial.println("\nFrequency Updated");
-        chipCalcFreq();
         break;
 
         case 'V':
         case 'v':
         chipSetParameters();
-        chipCalcFreq();
         break;
 
         case 'T':
         case 't':
+        Serial.println("Warning:- Changing Chip Type will reset all channels to default.");
+        resp=getSelection("Do you want to continue? -->");
+        if ((resp != 'Y') & (resp != 'y')) break;
         showMenu(chipList);
         resp = getSelection("Enter Chip Type -->");
         if((resp > '0') && (resp < '4'))
         {
-        eeprom.chip = resp - '0';
+        chip = resp - '0';
         }
         Serial.print("Chip type is now ");
-        Serial.println(chipName[eeprom.chip]);
+        Serial.println(chipName[chip]);
+        channel = 0;
+        selChan = 0;
         chipInit();
+        enterOsc();
+        chipSetDefault();
+        for(int c=1 ; c < NUMBEROFCHANNELS;c++)
+          {
+            chanData[c] = chanData[0];
+          }
         break;
 
         case 'R':
         case 'r':
         enterRegs();
         chipDecodeRegs();
-        chipCalcFreq();
         break;
 
         case 'O':
@@ -452,7 +493,6 @@ void mainMenu(void)
         Serial.println("Default register values loaded.");
         chipInit();
         chipSetDefault();
-        chipCalcFreq();
         break;
 
         case 'I':
@@ -465,8 +505,8 @@ void mainMenu(void)
         setjtMode();
         break;
 
-        case 'N':
-        case 'n':
+        case 'G':
+        case 'g':
         viewNMEA();
         break;
 

@@ -2,7 +2,7 @@
 
 void chipUpdate(void)
 {
-  switch(eeprom.chip)
+  switch(chip)
   {
     case MAX2870:
     Max2870Update();
@@ -20,7 +20,7 @@ void chipUpdate(void)
 
 void chipSetParameters(void)
 {
-  switch(eeprom.chip)
+  switch(chip)
   {
     case MAX2870:
     Max2870SetParameters();
@@ -38,7 +38,7 @@ void chipSetParameters(void)
 
 void chipInit(void)
 {
-  switch(eeprom.chip)
+  switch(chip)
   {
     case MAX2870:
     Max2870Init();
@@ -56,7 +56,7 @@ void chipInit(void)
 
 void chipSetFrequency(double f)
 {
-  switch(eeprom.chip)
+  switch(chip)
   {
     case MAX2870:
     Max2870SetFrequency(f);
@@ -75,7 +75,7 @@ void chipSetFrequency(double f)
 double chipGetFrequency(void)
 {
   double freq;
-  switch(eeprom.chip)
+  switch(chip)
   {
     case MAX2870:
     freq = Max2870GetFrequency();
@@ -95,7 +95,7 @@ double chipGetFrequency(void)
 
 void chipCalcFreq(void)
 {
-        switch(eeprom.chip)
+        switch(chip)
         {
           case MAX2870:
           Max2870CalcFreq();
@@ -112,7 +112,7 @@ void chipCalcFreq(void)
 }
   void chipDecodeRegs(void)
   {
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870DecodeRegs();
@@ -130,7 +130,7 @@ void chipCalcFreq(void)
 
     void chipSetDefault(void)
   {
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870SetDefault();
@@ -149,7 +149,7 @@ void chipCalcFreq(void)
     void chipFskKey(bool key)
   {
 
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870FskKey(key);
@@ -168,7 +168,7 @@ void chipCalcFreq(void)
     void chipJtShift(uint8_t val)
   {
 
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870jtShift(val);
@@ -188,7 +188,7 @@ void chipCalcFreq(void)
     void chipSaveFskShift(void)
   {
 
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870SaveFskShift();
@@ -207,7 +207,7 @@ void chipCalcFreq(void)
     void chipSaveJt(uint8_t index)
   {
 
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870SaveJt(index);
@@ -226,7 +226,7 @@ void chipCalcFreq(void)
     void chipSetPfd(void)
   {
 
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           Max2870SetPfd();
@@ -245,7 +245,7 @@ void chipCalcFreq(void)
     double chipGetPfd(void)
   {
      double pfd;
-      switch(eeprom.chip)
+      switch(chip)
         {
           case MAX2870:
           pfd = Max2870GetPfd();

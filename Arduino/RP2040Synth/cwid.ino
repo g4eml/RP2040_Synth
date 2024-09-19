@@ -13,16 +13,16 @@ void cwidInit(void)
   cwidByteIndex = 0;
   cwidPattern=0;
   cwidTicks = 0;
-  cwidBitInterval = 1200 / eeprom.cwidSpeed;
+  cwidBitInterval = 1200 / chanData[channel].cwidSpeed;
   cwidActive = false;
   nextcwidTime = 0;           //CW ID always starts at the beginning of each even minute
-  eeprom.cwid[0] = 255;             // add an initial 1 second of silence. 
-  eeprom.cwid[eeprom.cwidLen + 1] = 255;    // and also at the end if the ident
+  chanData[channel].cwid[0] = 255;             // add an initial 1 second of silence. 
+  chanData[channel].cwid[chanData[channel].cwidLen + 1] = 255;    // and also at the end if the ident
   cwidEncode(0);
 
 // calculate the required f/d value for the CWID FSK Offset
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + eeprom.cwidShift / (double) eeprom.extMult);
+  chipSetFrequency(nominal + chanData[channel].cwidShift / (double) chanData[channel].extMult);
   chipSaveFskShift();
   chipSetFrequency(nominal); 
 }
@@ -43,7 +43,7 @@ void cwidTick(void)
           if(cwidBitCount == 0)
             {
               cwidByteIndex++;
-              if(cwidByteIndex == eeprom.cwidLen + 2)
+              if(cwidByteIndex == chanData[channel].cwidLen + 2)
                 {
                   cwidActive= false;
                   cwidByteIndex = 0;
@@ -76,7 +76,7 @@ void cwidEncode(int index)
   
   uint8_t charIndex;
 
-  charIndex = eeprom.cwid[index];
+  charIndex = chanData[channel].cwid[index];
   
   switch(charIndex)
     {

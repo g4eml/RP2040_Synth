@@ -10,49 +10,49 @@ double jtInit(void)
   double thisf = 0;
   double worsterr = 0;
   
-  switch(eeprom.jtMode)
+  switch(chanData[channel].jtMode)
     {
       case 0:
       return 0;
       break;
 
       case 1:
-      jtEncode.jt4_encode(eeprom.jtid , jtBuffer);
+      jtEncode.jt4_encode(chanData[channel].jtid , jtBuffer);
       jtToneDelay = JT4_DELAY;
       jtNumberOfTones = 4;
       jtToneSpacing = JT4G_TONE_SPACING;
       jtSymbolCount = JT4_SYMBOL_COUNT;
       jtTime = 1;                           //JT message every even minute
-      eeprom.cwidInterval = 120;            //override CW interval when Jt mode is active
+      chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
       nextcwidTime = 60;                    //CW ID every Odd minute
       break;
 
       case 2:
-      jtEncode.jt65_encode(eeprom.jtid , jtBuffer);
+      jtEncode.jt65_encode(chanData[channel].jtid , jtBuffer);
       jtToneDelay = JT65_DELAY;
       jtNumberOfTones = 65;
       jtToneSpacing = JT65B_TONE_SPACING;
       jtSymbolCount = JT65_SYMBOL_COUNT;
       jtTime = 1;                           //JT message every even minute
-      eeprom.cwidInterval = 120;            //override CW interval when Jt mode is active
+      chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
       nextcwidTime = 60;                    //CW ID every Odd minute
       break;    
 
       case 3:
-      jtEncode.jt65_encode(eeprom.jtid , jtBuffer);
+      jtEncode.jt65_encode(chanData[channel].jtid , jtBuffer);
       jtToneDelay = JT65_DELAY;
       jtNumberOfTones = 65;
       jtToneSpacing = JT65C_TONE_SPACING;
       jtSymbolCount = JT65_SYMBOL_COUNT;
       jtTime = 1;                           //JT message every even minute
-      eeprom.cwidInterval = 120;            //override CW interval when Jt mode is active
+      chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
       nextcwidTime = 60;                    //CW ID every Odd minute
       break; 
     }
 
   for(int i = 0;i < jtNumberOfTones;i++)
    {
-    nomf = nominal + i * ((jtToneSpacing/1000000.0) / (double) eeprom.extMult);
+    nomf = nominal + i * ((jtToneSpacing/1000000.0) / (double) chanData[channel].extMult);
      chipSetFrequency(nomf);
      chipSaveJt(i);
      thisf = chipGetFrequency();
@@ -68,7 +68,7 @@ double jtInit(void)
   jtPointer = 0;
   jtTicks = 0;
 
-  return worsterr * (double) eeprom.extMult;
+  return worsterr * (double) chanData[channel].extMult;
 }
 
 void jtTick(void)

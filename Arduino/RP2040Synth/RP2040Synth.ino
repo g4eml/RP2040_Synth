@@ -2,39 +2,46 @@
 // Colin Durbridge G4EML 2024
 
 
+#define NUMBEROFCHANNELS 10
+
 //Global values...
 
 enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 };
 String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595"};
 
 
-//These values are saved to the EEPROM for recall on statup. 
+//These values are saved to the eeprom for recall on statup. 
+//these values alpply to all channels
 
-struct channel
+uint8_t chip = MAX2870;                 //index to the current chip type (applies to all channels)
+uint8_t selChan = 0;                    //FF if channel is externally selected by switches. Channel number to force one channel. 
+double refOsc = 100.000 ;               //reference oscillator frequency in MHz (applies to all channels)
+
+//this structure is repeated for each channel
+
+struct chanstruct
 {
-uint8_t chip = MAX2870;                  //index to the current chip type
 uint32_t reg[80];                       // allow for up to 80 32 bit registers. 
-int numberOfRegs = 6;                   //number of registers in the current chip type
-int numberOfBits = 32;                  //number of bits in each register
-float maxPfd = 105.0;                   //maximum PFD frequency
-double refOsc = 100.000 ;               //reference oscillator frequency in MHz
-uint8_t cwidEn = 0;                      //magic number to indicate if CWID is enabled 0x73 = enabled. 
+uint8_t cwidEn = 0;                     //magic number to indicate if CWID is enabled 0x73 = enabled. 
 uint8_t cwidLen = 1;                    //number of characters in the CWID
-uint8_t cwidSpeed = 10;                  //CWID speed in words per minute
-uint8_t cwidInterval = 60;               //CWID Inteval in seconds.
-double cwidShift = 0;                       //CW ID FSK Shift in MHz  
-char cwid[32] = " ";                      // up to 32 CWID characters
-uint8_t jtMode = 0;                        //JT mode
-char jtid[13] = " ";                       //JT Message
-uint8_t extMult = 1;                       //Multiplcation factor for external frequency multiplier. (used to calculate the correct FSK Shifts.)
+uint8_t cwidSpeed = 10;                 //CWID speed in words per minute
+uint8_t cwidInterval = 60;              //CWID Inteval in seconds.
+double cwidShift = 0;                   //CW ID FSK Shift in MHz  
+char cwid[32] = " ";                    // up to 32 CWID characters
+uint8_t jtMode = 0;                     //JT mode
+char jtid[13] = " ";                    //JT Message
+uint8_t extMult = 1;                    //Multiplcation factor for external frequency multiplier. (used to calculate the correct FSK Shifts.)
 };
 
-struct channel eeprom;
+struct chanstruct chanData[NUMBEROFCHANNELS];
 
 
 //End of saved values
 
-
+int numberOfRegs = 6;                     //number of registers in the current chip type
+int numberOfBits = 32;                    //number of bits in each register
+float maxPfd = 105.0;                     //maximum PFD frequency
+uint8_t channel = 0;                      //currently active channel.
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency. Calculated by cwidInit()
 uint32_t cwidKeyUpNum = 1;                //Key up value for the PLL numerator used to shift the frequency. Calculated by cwidInit()
@@ -79,6 +86,11 @@ int  jtTime = 1;                       //trigger time for next JT sequence
 #define GPSTXPin 0                      //Serial data to GPS module 
 #define GPSRXPin 1                      //SeriaL data from GPS module
 
+#define CHANSEL0Pin 10                  //External channel select pins. Pulled up to 3V3. High is Logic 0 Low is Logic 1
+#define CHANSEL1Pin 11
+#define CHANSEL2Pin 12
+#define CHANSEL3Pin 13
+
 char gpsBuffer[256];                     //GPS data buffer
 int gpsPointer;                          //GPS buffer pointer. 
 char gpsCh;
@@ -91,34 +103,39 @@ void setup()
   Serial.begin();                       //USB serial port
   Serial1.setRX(GPSRXPin);              //Configure the GPIO pins for the GPS module
   Serial1.setTX(GPSTXPin);
+
+  pinMode(CHANSEL0Pin, INPUT_PULLUP);   //configure the channel select pins. 
+  pinMode(CHANSEL1Pin, INPUT_PULLUP);   //Inverted logic to allow switches to ground. 
+  pinMode(CHANSEL2Pin, INPUT_PULLUP);
+  pinMode(CHANSEL3Pin, INPUT_PULLUP);
+
   Serial1.begin(9600);                  //start GPS port comms
   gpsPointer = 0;
   delay(1000);
-  EEPROM.begin(1024);
-  if(EEPROM.read(0) == 0x57)        //magic number to indcate EEPROM is valid
+  EEPROM.begin(4096);
+  if(EEPROM.read(0) == 0x56)        //magic number to indcate EEPROM is valid
     {
-      EEPROM.get(1,eeprom);         //get eeprom structure. 
-      chipDecodeRegs();
+      EEPROM.get(1,chip);              //chip type for all channels
+      EEPROM.get(2,selChan);           //read the selected channel. 0xFF if externally switched.
+      EEPROM.get(3,refOsc);           //reference oscillator for all channels. 
+      EEPROM.get(12,chanData);         //get channel data structure.
+      if(selChan == 255)
+        {
+          channel = readChannelInputs();      //read the channel select bits. 
+        }
+      else
+        {
+          channel = selChan;          //fix the channel number. 
+        } 
     }
-
-  chipInit();
-  if(eeprom.cwidEn)
-    {
-      cwidInit();
-    }
-   
-   if(eeprom.jtMode)
-     {
-       jtInit();
-     }
-
-    seconds = -1;
+   initChannel();
+   seconds = -1;
 }
 
 void loop() 
 {
   Serial.print("\n");
-  Serial.print(chipName[eeprom.chip]);
+  Serial.print(chipName[chip]);
   Serial.println(" Synthesiser programmed, Sleeping");
 
   chipUpdate();
@@ -149,24 +166,37 @@ void loop()
           gpsActive = false;
          }
 
-
-     if((eeprom.cwidEn) & (seconds == nextcwidTime))
+     if(selChan == 255)             //external chaannel selection
        {
-        cwidActive = true;                                        //start this CW ID
-        nextcwidTime = (seconds + eeprom.cwidInterval) % 120;            //schedule the next CW ID
+         uint8_t newChan=readChannelInputs();
+         if(newChan != channel)
+           {
+            channel=newChan;
+            seconds = -1;                       //reset the timing after changing channel.
+            milliseconds = 0;
+            initChannel();
+            chipUpdate();
+           }
+
        }
 
-     if((eeprom.jtMode != 0) & (seconds == jtTime))
+     if((chanData[channel].cwidEn) & (seconds == nextcwidTime))
+       {
+        cwidActive = true;                                        //start this CW ID
+        nextcwidTime = (seconds + chanData[channel].cwidInterval) % 120;            //schedule the next CW ID
+       }
+
+     if((chanData[channel].jtMode != 0) & (seconds == jtTime))
        {
         jtActive = true;                                        //start the JT Sequence
        }
 
-    if(eeprom.cwidEn)
+    if(chanData[channel].cwidEn)
       {
         cwidTick();
       }
 
-    if(eeprom.jtMode != 0)
+    if(chanData[channel].jtMode != 0)
       {
         jtTick();
       }
@@ -174,17 +204,10 @@ void loop()
       if(Serial.available() > 0 )          //test for USB command connected
      {
        mainMenu();                         //timing loop stops while the menu system is running.
-       chipUpdate();
        seconds = -1;                       //reset the timing after using the menu.
        milliseconds = 0;
-       if(eeprom.cwidEn)
-         {
-           cwidInit();
-         }
-       if(eeprom.jtMode != 0)
-         {
-           jtInit();
-         }      
+       initChannel();  
+       chipUpdate();    
        Serial.print("\nSynthesiser programmed. Press any key for menu");
        delay(500);
        flushInput();
@@ -212,6 +235,21 @@ void loop()
 
 }
 
+void initChannel()
+{
+  chipDecodeRegs();
+  chipInit();
+  if(chanData[channel].cwidEn)
+    {
+      cwidInit();
+    }
+   
+   if(chanData[channel].jtMode)
+     {
+       jtInit();
+     }
+}
+
 void processNMEA(void)
 {
   float gpsTime;
@@ -235,10 +273,24 @@ void processNMEA(void)
 
 }
 
+uint8_t readChannelInputs(void)
+{
+  uint8_t ch;
+  ch = (digitalRead(CHANSEL3Pin) << 3) | (digitalRead(CHANSEL2Pin) << 2) | (digitalRead(CHANSEL1Pin) << 1) | (digitalRead(CHANSEL0Pin));
+  ch = ~ch & 0x0F;           //invert the logic and limit to 4 bits. 
+  if(ch > (NUMBEROFCHANNELS -1)) ch = NUMBEROFCHANNELS-1;
+  return ch;
+}
 
 void saveSettings(void)
 {
-    EEPROM.write(0, 0x57);         //magic number to indcate EEPROM is valid
-    EEPROM.put(1,eeprom);        //Save the channel structure
+    EEPROM.write(0, 0x56);         //magic number to indcate EEPROM is valid
+    EEPROM.put(1,chip);            //save the chip type
+    EEPROM.put(2,selChan);         //Save the currently selected channel
+    EEPROM.put(3,refOsc);          //reference oscillator for all channels.
+    EEPROM.put(12,chanData);         //get channel data structure. 
     EEPROM.commit();
+
+    Serial.print("EEPROM Size used = ");
+    Serial.print(12 + sizeof(chanData));
 }

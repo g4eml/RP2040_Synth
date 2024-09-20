@@ -457,10 +457,9 @@ void LMX2595SetParameters(void)
 
 void LMX2595Init(void)
 {
-  int chip = LMX2595;                  //index to the current chip type
-  eeprom.numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
-  eeprom.numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
-  eeprom.maxPfd = 250.0;
+  numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
+  numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
+  maxPfd = 250.0;
   pinMode(LMX2595CEPin,OUTPUT);
   digitalWrite(LMX2595CEPin,HIGH); 
   pinMode(LMX2595CSBPin,OUTPUT);
@@ -492,228 +491,228 @@ void LMX2595Send(int32_t val)
 void LMX2595EncodeRegs(void)
 {
   // first we initialise the address field of all the registers. 
-  for(int r = 0 ;r < eeprom.numberOfRegs ; r++)
+  for(int r = 0 ;r < numberOfRegs ; r++)
     {
-      eeprom.reg[r] = r << 16;
+      chanData[channel].reg[r] = r << 16;
     }
   
   //next we map the parameters into the registers. Most registera also have additionla fixed bit patterns defined in the datasheet. 
-  eeprom.reg[0] = (eeprom.reg[0]) | (LMX2595_RAMP_EN << 15) | (LMX2595_VCO_PHASE_SYNC << 14) | (0b1001 << 10) | (LMX2595_OUT_MUTE << 9) | (LMX2595_FCAL_HPFD_ADJ << 7) | (LMX2595_FCAL_LPFD_ADJ << 5) | (1 << 4) | (LMX2595_FCAL_EN << 3) | (LMX2595_MUXOUT_LD_SEL << 2) | (LMX2595_RESET << 1) | (LMX2595_POWERDOWN);
-  eeprom.reg[1] = (eeprom.reg[1]) | (0b100000001 << 3) | (LMX2595_CAL_CLK_DIV);
-  eeprom.reg[2] = (eeprom.reg[2]) | (0b101 << 8);
-  eeprom.reg[3] = (eeprom.reg[3]) | (0b11001000010);
-  eeprom.reg[4] = (eeprom.reg[4]) | (LMX2595_ACAL_CMP_DLY << 8) | (0b1000011);
-  eeprom.reg[5] = (eeprom.reg[5]) | (0b11001 << 3);
-  eeprom.reg[6] = (eeprom.reg[6]) | (0b1100100000000010);
-  eeprom.reg[7] = (eeprom.reg[7]) | (LMX2595_OUT_FORCE << 14) | (0b10110010);
-  eeprom.reg[8] = (eeprom.reg[8]) | (LMX2595_VCO_DACISET_FORCE <<14) | ( 1 << 13) | (LMX2595_VCO_CAPCTRL_FORCE << 11);
-  eeprom.reg[9] = (eeprom.reg[9]) | (LMX2595_OSC_2X << 12) | (0b11000000100);
-  eeprom.reg[10] = (eeprom.reg[10]) | (1 << 12) | (LMX2595_MULT << 7) | (0b1011000);
-  eeprom.reg[11] = (eeprom.reg[11]) | (LMX2595_PLL_R << 4) | (0b1000);
-  eeprom.reg[12] = (eeprom.reg[12]) | (0b101 << 12) | (LMX2595_PLL_R_PRE);
-  eeprom.reg[13] = (eeprom.reg[13]) | (1 << 14);
-  eeprom.reg[14] = (eeprom.reg[14]) | (0b1111 << 9) | (LMX2595_CPG << 4);
-  eeprom.reg[15] = (eeprom.reg[15]) | (0b11001001111); 
-  eeprom.reg[16] = (eeprom.reg[16]) | (LMX2595_VCO_DACISET);
-  eeprom.reg[17] = (eeprom.reg[17]) | (LMX2595_VCO_DACISET_STRT);
-  eeprom.reg[18] = (eeprom.reg[18]) | (0b1100100); 
-  eeprom.reg[19] = (eeprom.reg[19]) | (0b100111 << 8) | (LMX2595_VCO_CAPCTRL); 
-  eeprom.reg[20] = (eeprom.reg[20]) | (0b11 << 14) | (LMX2595_VCO_SEL << 11) | (LMX2595_VCO_SEL_FORCE <<10) | (0b1001000); 
-  eeprom.reg[21] = (eeprom.reg[21]) | (0b10000000001); 
-  eeprom.reg[22] = (eeprom.reg[22]) | (0b1);
-  eeprom.reg[23] = (eeprom.reg[23]) | (0b1111100);
-  eeprom.reg[24] = (eeprom.reg[24]) | (0b11100011010);
-  eeprom.reg[25] = (eeprom.reg[25]) | (LMX2595_DBLR_IBIAS_CTRL1);
-  eeprom.reg[26] = (eeprom.reg[26]) | (0b110110110000); 
-  eeprom.reg[27] = (eeprom.reg[27]) | (1 << 1) | (LMX2595_VCO2X_EN); 
-  eeprom.reg[28] = (eeprom.reg[28]) | (0b10010001000); 
-  eeprom.reg[29] = (eeprom.reg[29]) | (0b11000110001100); 
-  eeprom.reg[30] = (eeprom.reg[30]) | (0b11000110001100); 
-  eeprom.reg[31] = (eeprom.reg[31]) | (LMX2595_SEG1_EN << 14) | (0b1111101100);
-  eeprom.reg[32] = (eeprom.reg[32]) | (0b1110010011); 
-  eeprom.reg[33] = (eeprom.reg[33]) | (0b1111000100001);
+  chanData[channel].reg[0] = (chanData[channel].reg[0]) | (LMX2595_RAMP_EN << 15) | (LMX2595_VCO_PHASE_SYNC << 14) | (0b1001 << 10) | (LMX2595_OUT_MUTE << 9) | (LMX2595_FCAL_HPFD_ADJ << 7) | (LMX2595_FCAL_LPFD_ADJ << 5) | (1 << 4) | (LMX2595_FCAL_EN << 3) | (LMX2595_MUXOUT_LD_SEL << 2) | (LMX2595_RESET << 1) | (LMX2595_POWERDOWN);
+  chanData[channel].reg[1] = (chanData[channel].reg[1]) | (0b100000001 << 3) | (LMX2595_CAL_CLK_DIV);
+  chanData[channel].reg[2] = (chanData[channel].reg[2]) | (0b101 << 8);
+  chanData[channel].reg[3] = (chanData[channel].reg[3]) | (0b11001000010);
+  chanData[channel].reg[4] = (chanData[channel].reg[4]) | (LMX2595_ACAL_CMP_DLY << 8) | (0b1000011);
+  chanData[channel].reg[5] = (chanData[channel].reg[5]) | (0b11001 << 3);
+  chanData[channel].reg[6] = (chanData[channel].reg[6]) | (0b1100100000000010);
+  chanData[channel].reg[7] = (chanData[channel].reg[7]) | (LMX2595_OUT_FORCE << 14) | (0b10110010);
+  chanData[channel].reg[8] = (chanData[channel].reg[8]) | (LMX2595_VCO_DACISET_FORCE <<14) | ( 1 << 13) | (LMX2595_VCO_CAPCTRL_FORCE << 11);
+  chanData[channel].reg[9] = (chanData[channel].reg[9]) | (LMX2595_OSC_2X << 12) | (0b11000000100);
+  chanData[channel].reg[10] = (chanData[channel].reg[10]) | (1 << 12) | (LMX2595_MULT << 7) | (0b1011000);
+  chanData[channel].reg[11] = (chanData[channel].reg[11]) | (LMX2595_PLL_R << 4) | (0b1000);
+  chanData[channel].reg[12] = (chanData[channel].reg[12]) | (0b101 << 12) | (LMX2595_PLL_R_PRE);
+  chanData[channel].reg[13] = (chanData[channel].reg[13]) | (1 << 14);
+  chanData[channel].reg[14] = (chanData[channel].reg[14]) | (0b1111 << 9) | (LMX2595_CPG << 4);
+  chanData[channel].reg[15] = (chanData[channel].reg[15]) | (0b11001001111); 
+  chanData[channel].reg[16] = (chanData[channel].reg[16]) | (LMX2595_VCO_DACISET);
+  chanData[channel].reg[17] = (chanData[channel].reg[17]) | (LMX2595_VCO_DACISET_STRT);
+  chanData[channel].reg[18] = (chanData[channel].reg[18]) | (0b1100100); 
+  chanData[channel].reg[19] = (chanData[channel].reg[19]) | (0b100111 << 8) | (LMX2595_VCO_CAPCTRL); 
+  chanData[channel].reg[20] = (chanData[channel].reg[20]) | (0b11 << 14) | (LMX2595_VCO_SEL << 11) | (LMX2595_VCO_SEL_FORCE <<10) | (0b1001000); 
+  chanData[channel].reg[21] = (chanData[channel].reg[21]) | (0b10000000001); 
+  chanData[channel].reg[22] = (chanData[channel].reg[22]) | (0b1);
+  chanData[channel].reg[23] = (chanData[channel].reg[23]) | (0b1111100);
+  chanData[channel].reg[24] = (chanData[channel].reg[24]) | (0b11100011010);
+  chanData[channel].reg[25] = (chanData[channel].reg[25]) | (LMX2595_DBLR_IBIAS_CTRL1);
+  chanData[channel].reg[26] = (chanData[channel].reg[26]) | (0b110110110000); 
+  chanData[channel].reg[27] = (chanData[channel].reg[27]) | (1 << 1) | (LMX2595_VCO2X_EN); 
+  chanData[channel].reg[28] = (chanData[channel].reg[28]) | (0b10010001000); 
+  chanData[channel].reg[29] = (chanData[channel].reg[29]) | (0b11000110001100); 
+  chanData[channel].reg[30] = (chanData[channel].reg[30]) | (0b11000110001100); 
+  chanData[channel].reg[31] = (chanData[channel].reg[31]) | (LMX2595_SEG1_EN << 14) | (0b1111101100);
+  chanData[channel].reg[32] = (chanData[channel].reg[32]) | (0b1110010011); 
+  chanData[channel].reg[33] = (chanData[channel].reg[33]) | (0b1111000100001);
   //split 32 bit variable into two parts
   LMX2595_PLL_NH = (LMX2595_PLL_N >> 16) & 0x7;
   LMX2595_PLL_NL = LMX2595_PLL_N & 0xFFFF;
-  eeprom.reg[34] = (eeprom.reg[34]) | (LMX2595_PLL_NH);
-  eeprom.reg[35] = (eeprom.reg[35]) | (0b100); 
-  eeprom.reg[36] = (eeprom.reg[36]) | (LMX2595_PLL_NL); 
-  eeprom.reg[37] = (eeprom.reg[37]) | (LMX2595_MASH_SEED_EN << 15) | (LMX2595_PFD_DLY_SEL << 8) | (0b100);
+  chanData[channel].reg[34] = (chanData[channel].reg[34]) | (LMX2595_PLL_NH);
+  chanData[channel].reg[35] = (chanData[channel].reg[35]) | (0b100); 
+  chanData[channel].reg[36] = (chanData[channel].reg[36]) | (LMX2595_PLL_NL); 
+  chanData[channel].reg[37] = (chanData[channel].reg[37]) | (LMX2595_MASH_SEED_EN << 15) | (LMX2595_PFD_DLY_SEL << 8) | (0b100);
   //split 32 bit variable into two parts
   LMX2595_PLL_DENH = (LMX2595_PLL_DEN >> 16) & 0xFFFF;
   LMX2595_PLL_DENL = LMX2595_PLL_DEN & 0xFFFF; 
-  eeprom.reg[38] = (eeprom.reg[38]) | (LMX2595_PLL_DENH);
-  eeprom.reg[39] = (eeprom.reg[39]) | (LMX2595_PLL_DENL); 
+  chanData[channel].reg[38] = (chanData[channel].reg[38]) | (LMX2595_PLL_DENH);
+  chanData[channel].reg[39] = (chanData[channel].reg[39]) | (LMX2595_PLL_DENL); 
   //split 32 bit variable into two parts
   LMX2595_MASH_SEEDH = (LMX2595_MASH_SEED >> 16) & 0xFFFF;
   LMX2595_MASH_SEEDL = LMX2595_MASH_SEED & 0xFFFF; 
-  eeprom.reg[40] = (eeprom.reg[40]) | (LMX2595_MASH_SEEDH);
-  eeprom.reg[41] = (eeprom.reg[41]) | (LMX2595_MASH_SEEDL);  
+  chanData[channel].reg[40] = (chanData[channel].reg[40]) | (LMX2595_MASH_SEEDH);
+  chanData[channel].reg[41] = (chanData[channel].reg[41]) | (LMX2595_MASH_SEEDL);  
   //split 32 bit variable into two parts
   LMX2595_PLL_NUMH = (LMX2595_PLL_NUM >> 16) & 0xFFFF;
   LMX2595_PLL_NUML = LMX2595_PLL_NUM & 0xFFFF; 
-  eeprom.reg[42] = (eeprom.reg[42]) | (LMX2595_PLL_NUMH);
-  eeprom.reg[43] = (eeprom.reg[43]) | (LMX2595_PLL_NUML); 
-  eeprom.reg[44] = (eeprom.reg[44]) | (LMX2595_OUTA_PWR << 8) | (LMX2595_OUTB_PD << 7) | (LMX2595_OUTA_PD << 6) | (LMX2595_MASH_RESET_N << 5) | (LMX2595_MASH_ORDER);
-  eeprom.reg[45] = (eeprom.reg[45]) | (0b11 <<14) | (LMX2595_OUTA_MUX << 11) | (LMX2595_OUT_ISET << 9) | (0b11 <<6) | (LMX2595_OUTB_PWR);
-  eeprom.reg[46] = (eeprom.reg[46]) | (0b111111111 <<2) | (LMX2595_OUTB_MUX);
-  eeprom.reg[47] = (eeprom.reg[47]) | (0b1100000000);
-  eeprom.reg[48] = (eeprom.reg[48]) | (0b1100000000); 
-  eeprom.reg[49] = (eeprom.reg[49]) | (0b100000110000000); 
-  eeprom.reg[50] = (eeprom.reg[50]) | (0b0); 
-  eeprom.reg[51] = (eeprom.reg[51]) | (0b10000000); 
-  eeprom.reg[52] = (eeprom.reg[52]) | (0b100000100000); 
-  eeprom.reg[53] = (eeprom.reg[53]) | (0b0); 
-  eeprom.reg[54] = (eeprom.reg[54]) | (0b0); 
-  eeprom.reg[55] = (eeprom.reg[55]) | (0b0); 
-  eeprom.reg[56] = (eeprom.reg[56]) | (0b0); 
-  eeprom.reg[57] = (eeprom.reg[57]) | (0b100000); 
-  eeprom.reg[58] = (eeprom.reg[58]) | (LMX2595_INPIN_IGNORE << 15) | (LMX2595_INPIN_HYST << 14) | (LMX2595_INPIN_LVL << 12) | (LMX2595_INPIN_FMT << 9) | (0b1); 
-  eeprom.reg[59] = (eeprom.reg[59]) | (LMX2595_LD_TYPE);
-  eeprom.reg[60] = (eeprom.reg[60]) | (LMX2595_LD_DLY);
-  eeprom.reg[61] = (eeprom.reg[61]) | (0b10101000); 
-  eeprom.reg[62] = (eeprom.reg[62]) | (0b1100100010); 
-  eeprom.reg[63] = (eeprom.reg[63]) | (0b0); 
-  eeprom.reg[64] = (eeprom.reg[64]) | (0b1001110001000); 
-  eeprom.reg[65] = (eeprom.reg[65]) | (0b0); 
-  eeprom.reg[66] = (eeprom.reg[66]) | (0b111110100); 
-  eeprom.reg[67] = (eeprom.reg[67]) | (0b0); 
-  eeprom.reg[68] = (eeprom.reg[68]) | (0b1111101000); 
+  chanData[channel].reg[42] = (chanData[channel].reg[42]) | (LMX2595_PLL_NUMH);
+  chanData[channel].reg[43] = (chanData[channel].reg[43]) | (LMX2595_PLL_NUML); 
+  chanData[channel].reg[44] = (chanData[channel].reg[44]) | (LMX2595_OUTA_PWR << 8) | (LMX2595_OUTB_PD << 7) | (LMX2595_OUTA_PD << 6) | (LMX2595_MASH_RESET_N << 5) | (LMX2595_MASH_ORDER);
+  chanData[channel].reg[45] = (chanData[channel].reg[45]) | (0b11 <<14) | (LMX2595_OUTA_MUX << 11) | (LMX2595_OUT_ISET << 9) | (0b11 <<6) | (LMX2595_OUTB_PWR);
+  chanData[channel].reg[46] = (chanData[channel].reg[46]) | (0b111111111 <<2) | (LMX2595_OUTB_MUX);
+  chanData[channel].reg[47] = (chanData[channel].reg[47]) | (0b1100000000);
+  chanData[channel].reg[48] = (chanData[channel].reg[48]) | (0b1100000000); 
+  chanData[channel].reg[49] = (chanData[channel].reg[49]) | (0b100000110000000); 
+  chanData[channel].reg[50] = (chanData[channel].reg[50]) | (0b0); 
+  chanData[channel].reg[51] = (chanData[channel].reg[51]) | (0b10000000); 
+  chanData[channel].reg[52] = (chanData[channel].reg[52]) | (0b100000100000); 
+  chanData[channel].reg[53] = (chanData[channel].reg[53]) | (0b0); 
+  chanData[channel].reg[54] = (chanData[channel].reg[54]) | (0b0); 
+  chanData[channel].reg[55] = (chanData[channel].reg[55]) | (0b0); 
+  chanData[channel].reg[56] = (chanData[channel].reg[56]) | (0b0); 
+  chanData[channel].reg[57] = (chanData[channel].reg[57]) | (0b100000); 
+  chanData[channel].reg[58] = (chanData[channel].reg[58]) | (LMX2595_INPIN_IGNORE << 15) | (LMX2595_INPIN_HYST << 14) | (LMX2595_INPIN_LVL << 12) | (LMX2595_INPIN_FMT << 9) | (0b1); 
+  chanData[channel].reg[59] = (chanData[channel].reg[59]) | (LMX2595_LD_TYPE);
+  chanData[channel].reg[60] = (chanData[channel].reg[60]) | (LMX2595_LD_DLY);
+  chanData[channel].reg[61] = (chanData[channel].reg[61]) | (0b10101000); 
+  chanData[channel].reg[62] = (chanData[channel].reg[62]) | (0b1100100010); 
+  chanData[channel].reg[63] = (chanData[channel].reg[63]) | (0b0); 
+  chanData[channel].reg[64] = (chanData[channel].reg[64]) | (0b1001110001000); 
+  chanData[channel].reg[65] = (chanData[channel].reg[65]) | (0b0); 
+  chanData[channel].reg[66] = (chanData[channel].reg[66]) | (0b111110100); 
+  chanData[channel].reg[67] = (chanData[channel].reg[67]) | (0b0); 
+  chanData[channel].reg[68] = (chanData[channel].reg[68]) | (0b1111101000); 
   //split 32 bit variable into two parts
   LMX2595_MASH_RST_COUNTH = (LMX2595_MASH_RST_COUNT >> 16) & 0xFFFF;
   LMX2595_MASH_RST_COUNTL = LMX2595_MASH_RST_COUNT & 0xFFFF; 
-  eeprom.reg[69] = (eeprom.reg[69]) | (LMX2595_MASH_RST_COUNTH);
-  eeprom.reg[70] = (eeprom.reg[70]) | (LMX2595_MASH_RST_COUNTL); 
-  eeprom.reg[71] = (eeprom.reg[71]) | (LMX2595_SYSREF_DIV_PRE << 5) | (LMX2595_SYSREF_PULSE << 4) | (LMX2595_SYSREF_EN << 3) | (LMX2595_SYSREF_REPEAT << 2) | (0b1); 
-  eeprom.reg[72] = (eeprom.reg[72]) | (LMX2595_SYSREF_DIV);
-  eeprom.reg[73] = (eeprom.reg[73]) | (LMX2595_JESD_DAC2_CTRL << 6) | (LMX2595_JESD_DAC1_CTRL);
-  eeprom.reg[74] = (eeprom.reg[74]) | (LMX2595_SYSREF_PULSE_CNT << 12) | (LMX2595_JESD_DAC4_CTRL << 6) | (LMX2595_JESD_DAC3_CTRL);
-  eeprom.reg[75] = (eeprom.reg[75]) | (0b1 << 11) | (LMX2595_CHDIV<< 6);
-  eeprom.reg[76] = (eeprom.reg[76]) | (0b1100); 
-  eeprom.reg[77] = (eeprom.reg[77]) | (0b0); 
-  eeprom.reg[78] = (eeprom.reg[78]) | (LMX2595_RAMP_THRESH32 << 11) | (LMX2595_QUICK_RECAL_EN << 9) | (LMX2595_VCO_CAPCTRL_STRT << 1) | (0b1); 
+  chanData[channel].reg[69] = (chanData[channel].reg[69]) | (LMX2595_MASH_RST_COUNTH);
+  chanData[channel].reg[70] = (chanData[channel].reg[70]) | (LMX2595_MASH_RST_COUNTL); 
+  chanData[channel].reg[71] = (chanData[channel].reg[71]) | (LMX2595_SYSREF_DIV_PRE << 5) | (LMX2595_SYSREF_PULSE << 4) | (LMX2595_SYSREF_EN << 3) | (LMX2595_SYSREF_REPEAT << 2) | (0b1); 
+  chanData[channel].reg[72] = (chanData[channel].reg[72]) | (LMX2595_SYSREF_DIV);
+  chanData[channel].reg[73] = (chanData[channel].reg[73]) | (LMX2595_JESD_DAC2_CTRL << 6) | (LMX2595_JESD_DAC1_CTRL);
+  chanData[channel].reg[74] = (chanData[channel].reg[74]) | (LMX2595_SYSREF_PULSE_CNT << 12) | (LMX2595_JESD_DAC4_CTRL << 6) | (LMX2595_JESD_DAC3_CTRL);
+  chanData[channel].reg[75] = (chanData[channel].reg[75]) | (0b1 << 11) | (LMX2595_CHDIV<< 6);
+  chanData[channel].reg[76] = (chanData[channel].reg[76]) | (0b1100); 
+  chanData[channel].reg[77] = (chanData[channel].reg[77]) | (0b0); 
+  chanData[channel].reg[78] = (chanData[channel].reg[78]) | (LMX2595_RAMP_THRESH32 << 11) | (LMX2595_QUICK_RECAL_EN << 9) | (LMX2595_VCO_CAPCTRL_STRT << 1) | (0b1); 
 }
 
 void LMX2595DecodeRegs(void)
 {
 //Reg 0
-LMX2595_RAMP_EN = (eeprom.reg[0] >> 15) & 0x01;
-LMX2595_VCO_PHASE_SYNC = (eeprom.reg[0] >> 14) & 0x01;
-LMX2595_OUT_MUTE = (eeprom.reg[0] >> 9) & 0x01;
-LMX2595_FCAL_HPFD_ADJ = (eeprom.reg[0] >> 7) & 0x03;
-LMX2595_FCAL_LPFD_ADJ = (eeprom.reg[0] >> 5) & 0x03;
-LMX2595_FCAL_EN = (eeprom.reg[0] >> 3) & 0x01;
-LMX2595_MUXOUT_LD_SEL = (eeprom.reg[0] >> 2) & 0x01;
-LMX2595_RESET = (eeprom.reg[0] >> 1) & 0x01;
-LMX2595_POWERDOWN = (eeprom.reg[0]) & 0x01;
+LMX2595_RAMP_EN = (chanData[channel].reg[0] >> 15) & 0x01;
+LMX2595_VCO_PHASE_SYNC = (chanData[channel].reg[0] >> 14) & 0x01;
+LMX2595_OUT_MUTE = (chanData[channel].reg[0] >> 9) & 0x01;
+LMX2595_FCAL_HPFD_ADJ = (chanData[channel].reg[0] >> 7) & 0x03;
+LMX2595_FCAL_LPFD_ADJ = (chanData[channel].reg[0] >> 5) & 0x03;
+LMX2595_FCAL_EN = (chanData[channel].reg[0] >> 3) & 0x01;
+LMX2595_MUXOUT_LD_SEL = (chanData[channel].reg[0] >> 2) & 0x01;
+LMX2595_RESET = (chanData[channel].reg[0] >> 1) & 0x01;
+LMX2595_POWERDOWN = (chanData[channel].reg[0]) & 0x01;
 //Reg 1
-LMX2595_CAL_CLK_DIV = (eeprom.reg[1]) & 0x07;
+LMX2595_CAL_CLK_DIV = (chanData[channel].reg[1]) & 0x07;
 //Reg 4
-LMX2595_ACAL_CMP_DLY = (eeprom.reg[4] >> 8) & 0xFF;
+LMX2595_ACAL_CMP_DLY = (chanData[channel].reg[4] >> 8) & 0xFF;
 //Reg 7
-LMX2595_OUT_FORCE = (eeprom.reg[7] >> 14) & 0x01;
+LMX2595_OUT_FORCE = (chanData[channel].reg[7] >> 14) & 0x01;
 //Reg 8
-LMX2595_VCO_DACISET_FORCE = (eeprom.reg[8] >> 14) & 0x01;
-LMX2595_VCO_CAPCTRL_FORCE = (eeprom.reg[8] >> 11) & 0x01;
+LMX2595_VCO_DACISET_FORCE = (chanData[channel].reg[8] >> 14) & 0x01;
+LMX2595_VCO_CAPCTRL_FORCE = (chanData[channel].reg[8] >> 11) & 0x01;
 //Reg 9
-LMX2595_OSC_2X = (eeprom.reg[9] >> 12) & 0x01;
+LMX2595_OSC_2X = (chanData[channel].reg[9] >> 12) & 0x01;
 //Reg 10
-LMX2595_MULT = (eeprom.reg[10] >> 7) & 0x1F;
+LMX2595_MULT = (chanData[channel].reg[10] >> 7) & 0x1F;
 //Reg 11
-LMX2595_PLL_R = (eeprom.reg[11] >> 4) & 0xFF;
+LMX2595_PLL_R = (chanData[channel].reg[11] >> 4) & 0xFF;
 //Reg 12
-LMX2595_PLL_R_PRE = (eeprom.reg[12]) & 0xFFF;
+LMX2595_PLL_R_PRE = (chanData[channel].reg[12]) & 0xFFF;
 //Reg 14
-LMX2595_CPG = (eeprom.reg[14] >> 4) & 0x07;
+LMX2595_CPG = (chanData[channel].reg[14] >> 4) & 0x07;
 //Reg 16
-LMX2595_VCO_DACISET = (eeprom.reg[16]) & 0x1FF;
+LMX2595_VCO_DACISET = (chanData[channel].reg[16]) & 0x1FF;
 //Reg 17
-LMX2595_VCO_DACISET_STRT = (eeprom.reg[17]) & 0x1FF;
+LMX2595_VCO_DACISET_STRT = (chanData[channel].reg[17]) & 0x1FF;
 //Reg 19
-LMX2595_VCO_CAPCTRL = (eeprom.reg[19]) & 0xFF;
+LMX2595_VCO_CAPCTRL = (chanData[channel].reg[19]) & 0xFF;
 //Reg 20
-LMX2595_VCO_SEL = (eeprom.reg[20] >> 11) & 0x07;
-LMX2595_VCO_SEL_FORCE = (eeprom.reg[20] >> 10) & 0x01;
+LMX2595_VCO_SEL = (chanData[channel].reg[20] >> 11) & 0x07;
+LMX2595_VCO_SEL_FORCE = (chanData[channel].reg[20] >> 10) & 0x01;
 //Reg 25
-LMX2595_DBLR_IBIAS_CTRL1 = (eeprom.reg[25]) & 0xFFFF;
+LMX2595_DBLR_IBIAS_CTRL1 = (chanData[channel].reg[25]) & 0xFFFF;
 //Reg 27
-LMX2595_VCO2X_EN = (eeprom.reg[27]) & 0x01;
+LMX2595_VCO2X_EN = (chanData[channel].reg[27]) & 0x01;
 //Reg 31
-LMX2595_SEG1_EN = (eeprom.reg[31] >> 14) & 0x01;
+LMX2595_SEG1_EN = (chanData[channel].reg[31] >> 14) & 0x01;
 //Reg 34
-LMX2595_PLL_NH = (eeprom.reg[34]) & 0x07;                //High 3 bits
+LMX2595_PLL_NH = (chanData[channel].reg[34]) & 0x07;                //High 3 bits
 //Reg 36
-LMX2595_PLL_NL = (eeprom.reg[36]) & 0xFFFF;             //Low 16 bits
+LMX2595_PLL_NL = (chanData[channel].reg[36]) & 0xFFFF;             //Low 16 bits
 //combined 19 bit variable for conveniance 
 LMX2595_PLL_N = (LMX2595_PLL_NH << 16) | LMX2595_PLL_NL ;
 //Reg 37
-LMX2595_MASH_SEED_EN = (eeprom.reg[37] >> 15) & 0x01;
-LMX2595_PFD_DLY_SEL = (eeprom.reg[37] >> 8) & 0x3F;
+LMX2595_MASH_SEED_EN = (chanData[channel].reg[37] >> 15) & 0x01;
+LMX2595_PFD_DLY_SEL = (chanData[channel].reg[37] >> 8) & 0x3F;
 //Reg 38
-LMX2595_PLL_DENH = (eeprom.reg[38]) & 0xFFFF;        //High 16 bits
+LMX2595_PLL_DENH = (chanData[channel].reg[38]) & 0xFFFF;        //High 16 bits
 //Reg 39
-LMX2595_PLL_DENL = (eeprom.reg[39]) & 0xFFFF ;        //Low 16 bits
+LMX2595_PLL_DENL = (chanData[channel].reg[39]) & 0xFFFF ;        //Low 16 bits
 //combined 32 bit variable for conveniance 
 LMX2595_PLL_DEN = (LMX2595_PLL_DENH << 16) | LMX2595_PLL_DENL;    
 //Reg 40
-LMX2595_MASH_SEEDH = (eeprom.reg[40]) & 0xFFFF;        //High 16 bits
+LMX2595_MASH_SEEDH = (chanData[channel].reg[40]) & 0xFFFF;        //High 16 bits
 //Reg 41
-LMX2595_MASH_SEEDL = (eeprom.reg[41]) & 0xFFFF;        //Low 16 bits
+LMX2595_MASH_SEEDL = (chanData[channel].reg[41]) & 0xFFFF;        //Low 16 bits
 //combined 32 bit variable for conveniance 
 LMX2595_MASH_SEED = (LMX2595_MASH_SEEDH << 16) | LMX2595_MASH_SEEDL ;
 //Reg 42
-LMX2595_PLL_NUMH = (eeprom.reg[42]) & 0xFFFF;        //High 16 bits
+LMX2595_PLL_NUMH = (chanData[channel].reg[42]) & 0xFFFF;        //High 16 bits
 //Reg 43
-LMX2595_PLL_NUML = (eeprom.reg[43]) & 0xFFFF;        //Low 16 bits
+LMX2595_PLL_NUML = (chanData[channel].reg[43]) & 0xFFFF;        //Low 16 bits
 //combined 32 bit variable for conveniance 
 LMX2595_PLL_NUM = (LMX2595_PLL_NUMH <<16) | LMX2595_PLL_NUML;
 //Reg 44
-LMX2595_OUTA_PWR = (eeprom.reg[44] >> 8) & 0x3F;
-LMX2595_OUTB_PD = (eeprom.reg[44] >> 7) & 0x01;
-LMX2595_OUTA_PD = (eeprom.reg[44] >> 6) & 0x01;
-LMX2595_MASH_RESET_N = (eeprom.reg[44] >> 5) & 0x01;
-LMX2595_MASH_ORDER = (eeprom.reg[44]) & 0x07;
+LMX2595_OUTA_PWR = (chanData[channel].reg[44] >> 8) & 0x3F;
+LMX2595_OUTB_PD = (chanData[channel].reg[44] >> 7) & 0x01;
+LMX2595_OUTA_PD = (chanData[channel].reg[44] >> 6) & 0x01;
+LMX2595_MASH_RESET_N = (chanData[channel].reg[44] >> 5) & 0x01;
+LMX2595_MASH_ORDER = (chanData[channel].reg[44]) & 0x07;
 //Reg 45
-LMX2595_OUTA_MUX = (eeprom.reg[45] >> 11) & 0x03;
-LMX2595_OUT_ISET = (eeprom.reg[45] >> 9) & 0x03;
-LMX2595_OUTB_PWR = (eeprom.reg[45] ) & 0x3F;
+LMX2595_OUTA_MUX = (chanData[channel].reg[45] >> 11) & 0x03;
+LMX2595_OUT_ISET = (chanData[channel].reg[45] >> 9) & 0x03;
+LMX2595_OUTB_PWR = (chanData[channel].reg[45] ) & 0x3F;
 //Reg 46
-LMX2595_OUTB_MUX = (eeprom.reg[46]) & 0x03;
+LMX2595_OUTB_MUX = (chanData[channel].reg[46]) & 0x03;
 //Reg 58
-LMX2595_INPIN_IGNORE = (eeprom.reg[58] >> 15) & 0x01;
-LMX2595_INPIN_HYST = (eeprom.reg[58] >> 14) & 0x01;
-LMX2595_INPIN_LVL = (eeprom.reg[58] >> 12) & 0x03;
-LMX2595_INPIN_FMT = (eeprom.reg[58] >> 9) & 0x07;
+LMX2595_INPIN_IGNORE = (chanData[channel].reg[58] >> 15) & 0x01;
+LMX2595_INPIN_HYST = (chanData[channel].reg[58] >> 14) & 0x01;
+LMX2595_INPIN_LVL = (chanData[channel].reg[58] >> 12) & 0x03;
+LMX2595_INPIN_FMT = (chanData[channel].reg[58] >> 9) & 0x07;
 //Reg 59
-LMX2595_LD_TYPE = (eeprom.reg[59]) & 0x01;
+LMX2595_LD_TYPE = (chanData[channel].reg[59]) & 0x01;
 //Reg 60
-LMX2595_LD_DLY = (eeprom.reg[60]) & 0xFFFF;
+LMX2595_LD_DLY = (chanData[channel].reg[60]) & 0xFFFF;
 //Reg 69
-LMX2595_MASH_RST_COUNTH = (eeprom.reg[69]) & 0xFFFF;       //High 16 bits
+LMX2595_MASH_RST_COUNTH = (chanData[channel].reg[69]) & 0xFFFF;       //High 16 bits
 //Reg 70
-LMX2595_MASH_RST_COUNTL = (eeprom.reg[70]) & 0xFFFF;       //Low 16 bits
+LMX2595_MASH_RST_COUNTL = (chanData[channel].reg[70]) & 0xFFFF;       //Low 16 bits
 //combined 32 bit variable for conveniance 
 LMX2595_MASH_RST_COUNT = (LMX2595_MASH_RST_COUNTH << 16) | LMX2595_MASH_RST_COUNTL;
 //Reg 71
-LMX2595_SYSREF_DIV_PRE = (eeprom.reg[71] >> 5) & 0x07;
-LMX2595_SYSREF_PULSE = (eeprom.reg[71] >> 4) & 0x01;
-LMX2595_SYSREF_EN = (eeprom.reg[71] >> 3) & 0x01;
-LMX2595_SYSREF_REPEAT = (eeprom.reg[71] >> 2) & 0x01;
+LMX2595_SYSREF_DIV_PRE = (chanData[channel].reg[71] >> 5) & 0x07;
+LMX2595_SYSREF_PULSE = (chanData[channel].reg[71] >> 4) & 0x01;
+LMX2595_SYSREF_EN = (chanData[channel].reg[71] >> 3) & 0x01;
+LMX2595_SYSREF_REPEAT = (chanData[channel].reg[71] >> 2) & 0x01;
 //Reg 72
-LMX2595_SYSREF_DIV = (eeprom.reg[72]) & 0x7FF;
+LMX2595_SYSREF_DIV = (chanData[channel].reg[72]) & 0x7FF;
 //Reg 73
-LMX2595_JESD_DAC2_CTRL = (eeprom.reg[73] >> 6) & 0x3F;
-LMX2595_JESD_DAC1_CTRL = (eeprom.reg[73]) & 0x3F;
+LMX2595_JESD_DAC2_CTRL = (chanData[channel].reg[73] >> 6) & 0x3F;
+LMX2595_JESD_DAC1_CTRL = (chanData[channel].reg[73]) & 0x3F;
 //Reg 74
-LMX2595_SYSREF_PULSE_CNT = (eeprom.reg[74] >> 12) & 0x0F;
-LMX2595_JESD_DAC4_CTRL = (eeprom.reg[74] >> 6) & 0x3F;
-LMX2595_JESD_DAC3_CTRL = (eeprom.reg[74]) & 0x3F;
+LMX2595_SYSREF_PULSE_CNT = (chanData[channel].reg[74] >> 12) & 0x0F;
+LMX2595_JESD_DAC4_CTRL = (chanData[channel].reg[74] >> 6) & 0x3F;
+LMX2595_JESD_DAC3_CTRL = (chanData[channel].reg[74]) & 0x3F;
 //Reg 75
-LMX2595_CHDIV = (eeprom.reg[75] >> 6) & 0x1F;
+LMX2595_CHDIV = (chanData[channel].reg[75] >> 6) & 0x1F;
 //Reg 78
-LMX2595_RAMP_THRESH32 = (eeprom.reg[78] >> 11) & 0x01;
-LMX2595_QUICK_RECAL_EN = (eeprom.reg[78] >> 9) & 0x01;
-LMX2595_VCO_CAPCTRL_STRT = (eeprom.reg[78] >> 1) & 0xFF;
+LMX2595_RAMP_THRESH32 = (chanData[channel].reg[78] >> 11) & 0x01;
+LMX2595_QUICK_RECAL_EN = (chanData[channel].reg[78] >> 9) & 0x01;
+LMX2595_VCO_CAPCTRL_STRT = (chanData[channel].reg[78] >> 1) & 0xFF;
 
 }
 
@@ -721,12 +720,12 @@ void LMX2595Update(void)
 {
   LMX2595Send(0x2);           //Reg 0 + reset bit
   LMX2595Send(0x0);           //Reg 0 no reset
-  for(int r = eeprom.numberOfRegs - 1; r >= 0; r--)
+  for(int r = numberOfRegs - 1; r >= 0; r--)
   {
-      LMX2595Send(eeprom.reg[r]);
+      LMX2595Send(chanData[channel].reg[r]);
   }
   delay(10);
-  LMX2595Send(eeprom.reg[0] | 0x08);         //set FCAL_EN 
+  LMX2595Send(chanData[channel].reg[0] | 0x08);         //set FCAL_EN 
 }
 
 
@@ -740,7 +739,7 @@ double LMX2595CalcPFD(double rpfd)
 
 
   //first try a simple division...
-  r = eeprom.refOsc / rpfd;
+  r = refOsc / rpfd;
   if(((double) int(r))  == r)       //check if this is an integer division
     {
       goto done;
@@ -748,17 +747,17 @@ double LMX2595CalcPFD(double rpfd)
 
   //next try using the doubler
 
-  r = (eeprom.refOsc * 2.0) / rpfd;
+  r = (refOsc * 2.0) / rpfd;
   if(((double) int(r)) == r)       //check if this is an integer division
     {
       dub = 1;
       goto done;
     }
 
-   if(eeprom.refOsc < rpfd)                      //try the multiplier
+   if(refOsc < rpfd)                      //try the multiplier
      {
-      mult = int(rpfd / eeprom.refOsc);
-      r = (eeprom.refOsc * mult) / rpfd;
+      mult = int(rpfd / refOsc);
+      r = (refOsc * mult) / rpfd;
       if(((double) int(r)) == r)      //check if this is an integer division 
         {
           goto done;
@@ -769,10 +768,10 @@ double LMX2595CalcPFD(double rpfd)
   Serial.print("Unable to acheive a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
-  Serial.print(eeprom.refOsc, 6);
+  Serial.print(refOsc, 6);
   Serial.println(" MHz");
   Serial.print("PFD set to ");
-  Serial.print((eeprom.refOsc * (1+dub) * mult) / r, 6);
+  Serial.print((refOsc * (1+dub) * mult) / r, 6);
   Serial.println(" MHz");
 
   done:
@@ -783,7 +782,7 @@ double LMX2595CalcPFD(double rpfd)
   LMX2595_OSC_2X = dub;           //Reference doubler if wee need it
 
 //calculate the actual PFD set and adjust the HP and LP registers to suit
-  rpfd = (eeprom.refOsc * (1 + dub) * mult) / r;
+  rpfd = (refOsc * (1 + dub) * mult) / r;
 
   if(rpfd <= 100.0) LMX2595_FCAL_HPFD_ADJ = 0;
   if((rpfd > 100.0) && (rpfd <= 150.0))  LMX2595_FCAL_HPFD_ADJ = 1; 
@@ -810,14 +809,14 @@ void LMX2595SetPfd(void)
        pfd = inputFloat();
        if(pfd == 0) return;
        pfd = LMX2595CalcPFD(pfd);
-      if(pfd <= eeprom.maxPfd)
+      if(pfd <= maxPfd)
         {
           freqOK = true;
         }
       else
         {
           Serial.print("\nPFD must be less than ");
-          Serial.print(eeprom.maxPfd);
+          Serial.print(maxPfd);
           Serial.println(" MHz");
         }
       
@@ -827,7 +826,7 @@ void LMX2595SetPfd(void)
 
 double LMX2595GetPfd(void)
 {
-  double pfd = eeprom.refOsc;
+  double pfd = refOsc;
   double r = (double) LMX2595_PLL_R * LMX2595_PLL_R_PRE ;
   if(LMX2595_OSC_2X == 1) pfd = pfd * 2.0;
   pfd = (pfd * LMX2595_MULT) / r;
@@ -850,7 +849,7 @@ void LMX2595SetFrequency(double direct)
   bool maxDivisor;
   char resp;
 
-  if((eeprom.cwidEn) || (eeprom.jtMode))           //if we are using FSK keying then we must keep the divisor to the same value to avoid glitches
+  if((chanData[channel].cwidEn) || (chanData[channel].jtMode))           //if we are using FSK keying then we must keep the divisor to the same value to avoid glitches
   {
     maxDivisor = true;
   }
@@ -868,16 +867,16 @@ void LMX2595SetFrequency(double direct)
    if((resp == 'Y') || (resp == 'y'))
      {
         Serial.print("Enter External Multiplication Factor ---> ");
-        eeprom.extMult = inputNumber();
+        chanData[channel].extMult = inputNumber();
      }
    else
      {
-       eeprom.extMult = 1;
+       chanData[channel].extMult = 1;
      }
     while(!freqOK)
     {
       Serial.print("\nEnter required Final Frequency in MHz -->");
-      freq = inputFloat() / (double) eeprom.extMult;
+      freq = inputFloat() / (double) chanData[channel].extMult;
       if((freq > 9.766) && (freq <= 20000.000))
         {
           freqOK = true;
@@ -1094,7 +1093,7 @@ void LMX2595CalcFreq(void)
 
   Serial.println();
   Serial.print("Reference Oscillator = ");
-  Serial.print(eeprom.refOsc,10);
+  Serial.print(refOsc,10);
   Serial.println(" MHz");
 
   pfd = LMX2595GetPfd();
@@ -1142,10 +1141,10 @@ void LMX2595CalcFreq(void)
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
 
-  if(eeprom.extMult > 1)
+  if(chanData[channel].extMult > 1)
     {
       Serial.print("Final Multiplied Frequency = ");
-      Serial.print((vco / diva) * (double) eeprom.extMult, 10);
+      Serial.print((vco / diva) * (double) chanData[channel].extMult, 10);
       Serial.println(" MHz"); 
     }
 }
@@ -1215,14 +1214,14 @@ void LMX2595FskKey(bool key)
   if(key)
     {
 
-       LMX2595Send(eeprom.reg[34]);
-       LMX2595Send(eeprom.reg[36]);       
+       LMX2595Send(chanData[channel].reg[34]);
+       LMX2595Send(chanData[channel].reg[36]);       
 
-        LMX2595Send(eeprom.reg[38]);
-        LMX2595Send(eeprom.reg[39]);
+        LMX2595Send(chanData[channel].reg[38]);
+        LMX2595Send(chanData[channel].reg[39]);
 
-       LMX2595Send(eeprom.reg[42]);
-       LMX2595Send(eeprom.reg[43]);
+       LMX2595Send(chanData[channel].reg[42]);
+       LMX2595Send(chanData[channel].reg[43]);
 
     }
   else

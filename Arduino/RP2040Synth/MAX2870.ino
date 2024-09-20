@@ -228,9 +228,9 @@ void Max2870SetParameters(void)
 void Max2870Init(void)
 {
   int chip = MAX2870;                  //index to the current chip type
-  eeprom.numberOfRegs = 6;                   //number of registers in the current chip type
-  eeprom.numberOfBits = 32;                   //number of bits in each register
-  eeprom.maxPfd = 105.0;                      //maximum PFD frequency
+  numberOfRegs = 6;                   //number of registers in the current chip type
+  numberOfBits = 32;                   //number of bits in each register
+  maxPfd = 105.0;                      //maximum PFD frequency
   pinMode(MAX2870CEPin,OUTPUT);
   digitalWrite(MAX2870CEPin,HIGH); 
   pinMode(MAX2870LEPin,OUTPUT);
@@ -263,71 +263,71 @@ void Max2870Send(int32_t val)
 
 void Max2870EncodeRegs(void)
 {
-  eeprom.reg[0] = (Max2870_INT << 31) | (Max2870_N << 15) | (Max2870_FRAC << 3);
-  eeprom.reg[1] = (Max2870_CPOC << 31) | (Max2870_CPL << 29) | (Max2870_CPT << 27) | (Max2870_P << 15) | (Max2870_M << 3) | 1 ;
-  eeprom.reg[2] = (Max2870_LDS << 31) | (Max2870_SDN << 29) | (Max2870_MUX << 26) | (Max2870_DBR << 25) | (Max2870_RDIV2 << 24) | (Max2870_R << 14) | (Max2870_REG4DB <<13) | (Max2870_CP << 9) | (Max2870_LDF << 8) | (Max2870_LDP << 7) | (Max2870_PDP << 6) | (Max2870_SHDN << 5) | (Max2870_TRI << 4) | (Max2870_RST << 3) | 2;
-  eeprom.reg[3] = (Max2870_VCO << 26) | (Max2870_VAS_SHDN << 25) | (Max2870_RETUNE << 24) | (Max2870_CDM << 15) | (Max2870_CDIV << 3) | 3;
-  eeprom.reg[4] = (6 << 28) | (Max2870_BS_MSBS << 24) | (Max2870_FB << 23) | (Max2870_DIVA << 20) | (Max2870_BS << 12) | (Max2870_BDIV << 9) | (Max2870_RFB_EN << 8) | (Max2870_BPWR << 6) | (Max2870_RFA_EN << 5) | (Max2870_APWR << 3) | 4;
-  eeprom.reg[5] = (Max2870_F01 << 24) | (Max2870_LD << 22) | (Max2870_MUX_MSB << 18) | 5; 
+  chanData[channel].reg[0] = (Max2870_INT << 31) | (Max2870_N << 15) | (Max2870_FRAC << 3);
+  chanData[channel].reg[1] = (Max2870_CPOC << 31) | (Max2870_CPL << 29) | (Max2870_CPT << 27) | (Max2870_P << 15) | (Max2870_M << 3) | 1 ;
+  chanData[channel].reg[2] = (Max2870_LDS << 31) | (Max2870_SDN << 29) | (Max2870_MUX << 26) | (Max2870_DBR << 25) | (Max2870_RDIV2 << 24) | (Max2870_R << 14) | (Max2870_REG4DB <<13) | (Max2870_CP << 9) | (Max2870_LDF << 8) | (Max2870_LDP << 7) | (Max2870_PDP << 6) | (Max2870_SHDN << 5) | (Max2870_TRI << 4) | (Max2870_RST << 3) | 2;
+  chanData[channel].reg[3] = (Max2870_VCO << 26) | (Max2870_VAS_SHDN << 25) | (Max2870_RETUNE << 24) | (Max2870_CDM << 15) | (Max2870_CDIV << 3) | 3;
+  chanData[channel].reg[4] = (6 << 28) | (Max2870_BS_MSBS << 24) | (Max2870_FB << 23) | (Max2870_DIVA << 20) | (Max2870_BS << 12) | (Max2870_BDIV << 9) | (Max2870_RFB_EN << 8) | (Max2870_BPWR << 6) | (Max2870_RFA_EN << 5) | (Max2870_APWR << 3) | 4;
+  chanData[channel].reg[5] = (Max2870_F01 << 24) | (Max2870_LD << 22) | (Max2870_MUX_MSB << 18) | 5; 
 }
 
 void Max2870DecodeRegs(void)
 {
-  Max2870_INT = (eeprom.reg[0] >> 31) & 0x01;
-  Max2870_N = (eeprom.reg[0] >> 15) & 0xFFFF;
-  Max2870_FRAC = (eeprom.reg[0] >> 3) & 0xFFF;
+  Max2870_INT = (chanData[channel].reg[0] >> 31) & 0x01;
+  Max2870_N = (chanData[channel].reg[0] >> 15) & 0xFFFF;
+  Max2870_FRAC = (chanData[channel].reg[0] >> 3) & 0xFFF;
 
-  Max2870_CPOC = (eeprom.reg[1] >> 31) & 0x01;
-  Max2870_CPL = (eeprom.reg[1] >> 29) & 0x03;
-  Max2870_CPT = (eeprom.reg[1] >> 27) & 0x03;
-  Max2870_P = (eeprom.reg[1] >> 15) & 0x0FFF; 
-  Max2870_M = (eeprom.reg[1] >> 3) & 0x0FFF;
+  Max2870_CPOC = (chanData[channel].reg[1] >> 31) & 0x01;
+  Max2870_CPL = (chanData[channel].reg[1] >> 29) & 0x03;
+  Max2870_CPT = (chanData[channel].reg[1] >> 27) & 0x03;
+  Max2870_P = (chanData[channel].reg[1] >> 15) & 0x0FFF; 
+  Max2870_M = (chanData[channel].reg[1] >> 3) & 0x0FFF;
 
-  Max2870_LDS = (eeprom.reg[2] >> 31) & 0x01;
-  Max2870_SDN = (eeprom.reg[2] >> 29) & 0x03;
-  Max2870_MUX = (eeprom.reg[2] >> 26) & 0x0F;
-  Max2870_DBR = (eeprom.reg[2] >> 25) & 0x01; 
-  Max2870_RDIV2 = (eeprom.reg[2] >> 24) & 0x01; 
-  Max2870_R = (eeprom.reg[2] >> 14) & 0x3FF; 
-  Max2870_REG4DB = (eeprom.reg[2] >> 13) & 0x01;
-  Max2870_CP = (eeprom.reg[2] >> 9) & 0x0F;
-  Max2870_LDF = (eeprom.reg[2] >> 8) & 0x01;
-  Max2870_LDP = (eeprom.reg[2] >> 7) & 0x01;
-  Max2870_PDP = (eeprom.reg[2] >> 6) & 0x01;
-  Max2870_SHDN = (eeprom.reg[2] >> 5) & 0x01; 
-  Max2870_TRI = (eeprom.reg[2] >> 4) & 0x01;
-  Max2870_RST = (eeprom.reg[2] >> 3) & 0x01;
+  Max2870_LDS = (chanData[channel].reg[2] >> 31) & 0x01;
+  Max2870_SDN = (chanData[channel].reg[2] >> 29) & 0x03;
+  Max2870_MUX = (chanData[channel].reg[2] >> 26) & 0x0F;
+  Max2870_DBR = (chanData[channel].reg[2] >> 25) & 0x01; 
+  Max2870_RDIV2 = (chanData[channel].reg[2] >> 24) & 0x01; 
+  Max2870_R = (chanData[channel].reg[2] >> 14) & 0x3FF; 
+  Max2870_REG4DB = (chanData[channel].reg[2] >> 13) & 0x01;
+  Max2870_CP = (chanData[channel].reg[2] >> 9) & 0x0F;
+  Max2870_LDF = (chanData[channel].reg[2] >> 8) & 0x01;
+  Max2870_LDP = (chanData[channel].reg[2] >> 7) & 0x01;
+  Max2870_PDP = (chanData[channel].reg[2] >> 6) & 0x01;
+  Max2870_SHDN = (chanData[channel].reg[2] >> 5) & 0x01; 
+  Max2870_TRI = (chanData[channel].reg[2] >> 4) & 0x01;
+  Max2870_RST = (chanData[channel].reg[2] >> 3) & 0x01;
 
-  Max2870_VCO = (eeprom.reg[3] >> 26) & 0x3F;
-  Max2870_VAS_SHDN = (eeprom.reg[3] >> 25) & 0x01;
-  Max2870_RETUNE = (eeprom.reg[3] >> 24) & 0x01;
-  Max2870_CDM = (eeprom.reg[3] >> 15) & 0x03;
-  Max2870_CDIV = (eeprom.reg[3] >> 3) & 0xFFF;
+  Max2870_VCO = (chanData[channel].reg[3] >> 26) & 0x3F;
+  Max2870_VAS_SHDN = (chanData[channel].reg[3] >> 25) & 0x01;
+  Max2870_RETUNE = (chanData[channel].reg[3] >> 24) & 0x01;
+  Max2870_CDM = (chanData[channel].reg[3] >> 15) & 0x03;
+  Max2870_CDIV = (chanData[channel].reg[3] >> 3) & 0xFFF;
 
-  Max2870_BS_MSBS = (eeprom.reg[4] >> 24) & 0x03;
-  Max2870_FB = (eeprom.reg[4] >> 23) & 0x01;
-  Max2870_DIVA = (eeprom.reg[4] >> 20) & 0x07;
-  Max2870_BS = (eeprom.reg[4] >> 12) & 0xFF;
-  Max2870_BDIV = (eeprom.reg[4] >> 9) & 0x01;
-  Max2870_RFB_EN = (eeprom.reg[4] >> 8) & 0x01;
-  Max2870_BPWR = (eeprom.reg[4] >> 6) & 0x03;
-  Max2870_RFA_EN = (eeprom.reg[4] >> 5) & 0x01; 
-  Max2870_APWR = (eeprom.reg[4] >> 3) & 0x03;
+  Max2870_BS_MSBS = (chanData[channel].reg[4] >> 24) & 0x03;
+  Max2870_FB = (chanData[channel].reg[4] >> 23) & 0x01;
+  Max2870_DIVA = (chanData[channel].reg[4] >> 20) & 0x07;
+  Max2870_BS = (chanData[channel].reg[4] >> 12) & 0xFF;
+  Max2870_BDIV = (chanData[channel].reg[4] >> 9) & 0x01;
+  Max2870_RFB_EN = (chanData[channel].reg[4] >> 8) & 0x01;
+  Max2870_BPWR = (chanData[channel].reg[4] >> 6) & 0x03;
+  Max2870_RFA_EN = (chanData[channel].reg[4] >> 5) & 0x01; 
+  Max2870_APWR = (chanData[channel].reg[4] >> 3) & 0x03;
 
-  Max2870_F01 = (eeprom.reg[5] >> 24) & 0x01;
-  Max2870_LD = (eeprom.reg[5] >> 22) & 0x03;
-  Max2870_MUX_MSB = (eeprom.reg[5] >> 18) & 0x01;
+  Max2870_F01 = (chanData[channel].reg[5] >> 24) & 0x01;
+  Max2870_LD = (chanData[channel].reg[5] >> 22) & 0x03;
+  Max2870_MUX_MSB = (chanData[channel].reg[5] >> 18) & 0x01;
 
 }
 
 void Max2870Update(void)
 {
-  Max2870Send(eeprom.reg[5]);
-  Max2870Send(eeprom.reg[4]);
-  Max2870Send(eeprom.reg[3]);
-  Max2870Send(eeprom.reg[2]);
-  Max2870Send(eeprom.reg[1]);
-  Max2870Send(eeprom.reg[0]);
+  Max2870Send(chanData[channel].reg[5]);
+  Max2870Send(chanData[channel].reg[4]);
+  Max2870Send(chanData[channel].reg[3]);
+  Max2870Send(chanData[channel].reg[2]);
+  Max2870Send(chanData[channel].reg[1]);
+  Max2870Send(chanData[channel].reg[0]);
 }
 
 
@@ -338,7 +338,7 @@ double Max2870CalcPFD(double rpfd)
   bool div = 0;
 
   //first try a simple division...
-  r = eeprom.refOsc / rpfd;
+  r = refOsc / rpfd;
   if(((double) int(r))  == r)       //check if this is an integer division
     {
       goto done;
@@ -347,7 +347,7 @@ double Max2870CalcPFD(double rpfd)
   //next try using the doubler
 
   dub = 1;
-  r = (eeprom.refOsc * 2.0) / rpfd;
+  r = (refOsc * 2.0) / rpfd;
   if(((double) int(r)) == r)       //check if this is an integer division
     {
       goto done;
@@ -360,10 +360,10 @@ double Max2870CalcPFD(double rpfd)
   Serial.print("Unable to acheive a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
-  Serial.print(eeprom.refOsc, 6);
+  Serial.print(refOsc, 6);
   Serial.println(" MHz");
   Serial.print("PFD set to ");
-  Serial.print((eeprom.refOsc * 2.0) / r, 6);
+  Serial.print((refOsc * 2.0) / r, 6);
   Serial.println(" MHz");
 
   done:
@@ -372,7 +372,7 @@ double Max2870CalcPFD(double rpfd)
   Max2870_DBR = dub;
   Max2870_RDIV2 = div;
 
-  return ((eeprom.refOsc * (1+dub)) / r);
+  return ((refOsc * (1+dub)) / r);
 }
 
 void Max2870SetPfd(void)
@@ -388,14 +388,14 @@ void Max2870SetPfd(void)
        pfd = inputFloat();
        if(pfd == 0) return;
        pfd = Max2870CalcPFD(pfd);
-      if(pfd <= eeprom.maxPfd)
+      if(pfd <= maxPfd)
         {
           freqOK = true;
         }
       else
         {
           Serial.print("\nPFD must be less than ");
-          Serial.print(eeprom.maxPfd);
+          Serial.print(maxPfd);
           Serial.println(" MHz");
         }
       
@@ -406,7 +406,7 @@ void Max2870SetPfd(void)
 
 double Max2870GetPfd(void)
 {
-  double pfd = eeprom.refOsc;
+  double pfd = refOsc;
   double r = (double) Max2870_R;
   if(Max2870_DBR == 1) pfd = pfd * 2.0;
   pfd = pfd / r;
@@ -438,17 +438,17 @@ void Max2870SetFrequency(double direct)
    if((resp == 'Y') || (resp == 'y'))
      {
         Serial.print("Enter External Multiplication Factor ---> ");
-        eeprom.extMult = inputNumber();
+        chanData[channel].extMult = inputNumber();
      }
    else
      {
-       eeprom.extMult = 1;
+       chanData[channel].extMult = 1;
      }
   
    while(!freqOK)
     {
       Serial.print("\nEnter required Final Frequency in MHz -->");
-      freq = inputFloat() / (double) eeprom.extMult;
+      freq = inputFloat() / (double) chanData[channel].extMult;
       if((freq > 23.500) && (freq <= 6000.000))
         {
           freqOK = true;
@@ -534,7 +534,7 @@ void Max2870CalcFreq(void)
 
   Serial.println();
   Serial.print("Reference Oscillator = ");
-  Serial.print(eeprom.refOsc,10);
+  Serial.print(refOsc,10);
   Serial.println(" MHz");
 
 
@@ -592,10 +592,10 @@ void Max2870CalcFreq(void)
   Serial.print(vco / diva , 10);
   Serial.println(" MHz");
 
-  if(eeprom.extMult > 1)
+  if(chanData[channel].extMult > 1)
     {
       Serial.print("Final Multiplied Frequency = ");
-      Serial.print((vco / diva) * (double) eeprom.extMult, 10);
+      Serial.print((vco / diva) * (double) chanData[channel].extMult, 10);
       Serial.println(" MHz"); 
     }
 }
@@ -655,8 +655,8 @@ double Max2870GetFrequency(void)
   if(val == lastval) return;
   lastval = val;
 
-   Max2870Send((eeprom.reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
-   Max2870Send((eeprom.reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
+   Max2870Send((chanData[channel].reg[1] & 0xFFFF8007) | (jtDen[val] << 3));
+   Max2870Send((chanData[channel].reg[0] & 0x80000007) | (jtN[val] << 15) | (jtNum[val] <<3));
 
 }
 
@@ -669,13 +669,13 @@ double Max2870GetFrequency(void)
 
   if(key)
     {
-      Max2870Send(eeprom.reg[1]);
-      Max2870Send(eeprom.reg[0]);
+      Max2870Send(chanData[channel].reg[1]);
+      Max2870Send(chanData[channel].reg[0]);
     }
   else
     {
-      Max2870Send((eeprom.reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
-      Max2870Send((eeprom.reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
+      Max2870Send((chanData[channel].reg[1] & 0xFFFF8007) | (cwidKeyUpDen << 3));
+      Max2870Send((chanData[channel].reg[0] & 0x80000007) | (cwidKeyUpN << 15) | (cwidKeyUpNum <<3));
     }
 }
 

@@ -6,6 +6,7 @@ A Fractional N synthesiser controller based on the RP2040 processor.  This curre
 
 Support for CW ident and JT digital modes. 
 
+Support for external switches to select one of ten channels. Each channel contains all synthesiser, CWID,  and JT settings. 
 
 
 ## Features
@@ -20,7 +21,9 @@ Support for FSK CW Identification for beacon use.
 
 Supports JT4G, JT65B and JT65C data modes for Beacon Identification.
 
-Supports GPS connection for the accurate timing required for JT data modes 
+Supports GPS connection for the accurate timing required for JT data modes. 
+
+Supports 10 different channels which can be selected by external switches. 
 
 Default register settings can be loaded for all synthesiser types to produce some initial RF output. This is often the hardest thing to do with a new chip type.
 
@@ -157,6 +160,18 @@ The firmware also supports the optional connection of a GPS module. This is used
 | :---:  |    :---:   |
 |GP0     |Rx          |
 |GP1     |Tx          |
+
+4 switches can be used to select the operating channel. (These are optional. If they are not used the power-up channel can be selected using the menu.)
+The 4 inputs have internal pull up resistors to 3.3V. All that is needed is 4 switches to connect the pins to ground. 
+Inverted logic is used. A grounded pin is read as a Logic 1. A floating pin is read as a logic 0.
+For example, all pins left open circuit is read as channel 0. 
+
+| RP2040 | GPS Module |
+| :---:  |    :---:   |
+|GP10    |Bit 0  Channel 1|
+|GP11    |Bit 1  Channel 2|
+|GP12    |Bit 2  Channel 4|
+|GP13    |Bit 3  Channel 8|
 
 ## Firmware description
 

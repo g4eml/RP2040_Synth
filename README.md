@@ -180,18 +180,24 @@ By default on power up the firmware will immediately send the EEPROM saved regis
 In normal use, for example as a Local oscillator or Beacon, that is all that is needed! 
 
 To enter programming mode  (which you will need to do at least once) you need to connect to the USB serial port using a terminal program such as Putty or Terraterm. Pressing any key should result in the menu being displayed.
-![Screenshot (107)](https://github.com/user-attachments/assets/b3ee984a-904e-44e2-97f2-e83ef55f8ae6)
+![Screenshot (111)](https://github.com/user-attachments/assets/62a67221-5909-4c1e-aec3-ca3a856d7937)
 
 
 ### Commands
 Commands are entered by a single key press. Text and numbers require a carriage return to enter. Pressing Question Mark will usually give more detailed help. 
 Changes to registers and parameters will be applied immediatey so you should be able to observe the result of the change in real time. 
 
-T = Select Chip Type. Allows the Synthesiser chip type to be selected. Normally only needed the first time you configure the firmware. 
+#### The first three Menu Items are common to all channels. 
 
-D = Set Default Register Values for chip. Sets default values to all registers. Tries to program a 10Mhz PFD and requests a frequency. After this your Synthesiser should start to output RF. 
+T = Select Chip Type. Allows the Synthesiser chip type to be selected. Normally only needed the first time you configure the firmware. This will also clear all memories and reset them to the default settings. 
 
 O = Set Reference Oscillator Frequency. Sets the Reference Oscillator Frequency. Enter the actual frequency of your reference including any frequency error. The firmware will attempt to adjust for this. 
+
+N = Set Channel Number. Enter the channel number from 0 to 9. This channel will then be loaded and you can adjust the settings using the menu. This overrides the channel selected by any external switches. if you wish to use external switches to select a channel then you must change this setting to 255 before saving the EEPROM. A setting of 255 enables external channel selection. 
+
+#### The following menu settings are applied to the currently selected channel. Each channel may have different settings. 
+
+D = Restores the Default Register Values for chip. Sets default values to all registers. Tries to program a 10Mhz PFD and requests a frequency. After this your Synthesiser should start to output RF. 
 
 P = Enter PFD Frequency. Set the required PFD frequency. The firmware will attempt to get as close as possible to the requested value but not all values can be achieved. 
 
@@ -207,7 +213,7 @@ I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK 
 
 J = Configure JT modes. Allows entry of a 13 character message. This would normally be the Callsign and Maidenhead locator. The JT ident will be sent every Even minute. Accurate timing requires a GPS module to be connected. 
 
-N = View GPS NMEA data. This is used to test the GPS connection. when selected it will echo all GPS data to the screen. Press any key to exit this mode. 
+G = View GPS NMEA data. This is used to test the GPS connection. when selected it will echo all GPS data to the screen. Press any key to exit this mode. 
 
 S = Save Registers to EEPROM. Saves the current Synthesiser settings to EEPROM. They will then be automatically loaded on the next power cycle. You must do this at least once. 
 

@@ -86,6 +86,11 @@ int  jtTime = 1;                       //trigger time for next JT sequence
 #define GPSTXPin 0                      //Serial data to GPS module 
 #define GPSRXPin 1                      //SeriaL data from GPS module
 
+#define CHANSEL0Pin 10                  //External channel select pins. Pulled up to 3V3. High is Logic 0 Low is Logic 1
+#define CHANSEL1Pin 11
+#define CHANSEL2Pin 12
+#define CHANSEL3Pin 13
+
 char gpsBuffer[256];                     //GPS data buffer
 int gpsPointer;                          //GPS buffer pointer. 
 char gpsCh;
@@ -98,6 +103,12 @@ void setup()
   Serial.begin();                       //USB serial port
   Serial1.setRX(GPSRXPin);              //Configure the GPIO pins for the GPS module
   Serial1.setTX(GPSTXPin);
+
+  pinMode(CHANSEL0Pin, INPUT_PULLUP);   //configure the channel select pins. 
+  pinMode(CHANSEL1Pin, INPUT_PULLUP);   //Inverted logic to allow switches to ground. 
+  pinMode(CHANSEL2Pin, INPUT_PULLUP);
+  pinMode(CHANSEL3Pin, INPUT_PULLUP);
+
   Serial1.begin(9600);                  //start GPS port comms
   gpsPointer = 0;
   delay(1000);
@@ -161,6 +172,8 @@ void loop()
          if(newChan != channel)
            {
             channel=newChan;
+            seconds = -1;                       //reset the timing after changing channel.
+            milliseconds = 0;
             initChannel();
             chipUpdate();
            }
@@ -262,7 +275,11 @@ void processNMEA(void)
 
 uint8_t readChannelInputs(void)
 {
-  return 4;
+  uint8_t ch;
+  ch = (digitalRead(CHANSEL3Pin) << 3) | (digitalRead(CHANSEL2Pin) << 2) | (digitalRead(CHANSEL1Pin) << 1) | (digitalRead(CHANSEL0Pin));
+  ch = ~ch & 0x0F;           //invert the logic and limit to 4 bits. 
+  if(ch > (NUMBEROFCHANNELS -1)) ch = NUMBEROFCHANNELS-1;
+  return ch;
 }
 
 void saveSettings(void)

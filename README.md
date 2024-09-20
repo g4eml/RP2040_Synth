@@ -55,6 +55,18 @@ If you wish to use the JT data modes you will also need a GPS module to provide 
 
 ![GPS](https://github.com/user-attachments/assets/53ceb650-0525-4138-a7ff-bff1f450c409)
 
+## Connecting
+
+All of the various synthesiser moduels use different connectors and pinouts. That makes it difficult to design a Suitable PCB. 
+
+The simplest solution is just to solder wires directly to the RP2040 module and fit suitable plugs for the modules to the other end. Keep the wiring as short as possible. Probably no more than 100mm long. 
+
+The power can be provided by the USB connector or 5V can be fed into the 5V pin of the module for stand alone operation. The 3V3 output from the module can be used to power the synthesiser if required. As with all synthesiser designs the power supply needs to be clean and well regulated. 
+
+Wiring diagram for RP2040 Zero
+
+![Wiring](https://github.com/user-attachments/assets/476a157a-da51-437e-96b2-5a910df71370)
+
 
 ## Programming or updating the RP2040 (quick method)
 

@@ -64,7 +64,6 @@ double jtInit(void)
 
    chipSetFrequency(nominal);
 
-
   jtPointer = 0;
   jtTicks = 0;
 

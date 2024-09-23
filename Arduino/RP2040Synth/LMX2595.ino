@@ -460,6 +460,7 @@ void LMX2595Init(void)
   numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
   numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
   maxPfd = 250.0;
+  jt4Only = false;
   pinMode(LMX2595CEPin,OUTPUT);
   digitalWrite(LMX2595CEPin,HIGH); 
   pinMode(LMX2595CSBPin,OUTPUT);

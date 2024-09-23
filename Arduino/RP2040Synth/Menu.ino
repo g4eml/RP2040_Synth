@@ -336,12 +336,30 @@ void setcwidEnt(void)
 void setjtMode(void)
 {
   String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
+  String jtModesReduced[] = {"0 = None" , "1 = JT4G" , "$$$"};
   char resp;
+  char maxresp;
   String jts;
-  showMenu(jtModes);
-  chanData[channel].jtMode = getSelection("Select JT Mode --->") - '0';
-  if(chanData[channel].jtMode < 0) chanData[channel].jtMode = 0;
-  if(chanData[channel].jtMode > 3) chanData[channel].jtMode = 3;
+  if(jt4Only)
+    {
+      showMenu(jtModesReduced);
+      maxresp = '1';
+    }
+  else
+    {
+      showMenu(jtModes);
+      maxresp = '3';
+    }
+  resp = getSelection("Select JT Mode --->");
+  if((resp >='0') && (resp <= maxresp))
+    {
+      chanData[channel].jtMode =  resp - '0';
+    }
+  else
+    {
+      chanData[channel].jtMode = 0;
+    }
+
 
   if(chanData[channel].jtMode != 0)
     {
@@ -353,7 +371,8 @@ void setjtMode(void)
 
       if((worsterr * 1000000.0)> 0.009)
       {
-        Serial.print("The current chip settings can produce the required tones with a maximum error of ");
+        Serial.println("The current settings can produce the required tones");
+        Serial.print("with a maximum error of ");
         Serial.print(worsterr * 1000000.0);
         Serial.println(" Hz");
       }

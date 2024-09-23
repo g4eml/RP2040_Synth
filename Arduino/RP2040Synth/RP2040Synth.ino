@@ -41,6 +41,7 @@ struct chanstruct chanData[NUMBEROFCHANNELS];
 int numberOfRegs = 6;                     //number of registers in the current chip type
 int numberOfBits = 32;                    //number of bits in each register
 float maxPfd = 105.0;                     //maximum PFD frequency
+bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size.  
 uint8_t channel = 0;                      //currently active channel.
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency. Calculated by cwidInit()
@@ -290,7 +291,4 @@ void saveSettings(void)
     EEPROM.put(3,refOsc);          //reference oscillator for all channels.
     EEPROM.put(12,chanData);         //get channel data structure. 
     EEPROM.commit();
-
-    Serial.print("EEPROM Size used = ");
-    Serial.print(12 + sizeof(chanData));
 }

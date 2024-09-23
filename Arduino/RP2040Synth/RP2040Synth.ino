@@ -129,6 +129,7 @@ void setup()
           channel = selChan;          //fix the channel number. 
         } 
     }
+   chipInit();
    initChannel();
    seconds = -1;
 }

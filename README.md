@@ -19,7 +19,7 @@ Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
-Supports JT4G, JT65B and JT65C data modes for Beacon Identification.
+Supports JT data modes for Beacon Identification.  JT4G is available on all chip types. JT65B and JT65C are only available on the LMX2595. 
 
 Supports GPS connection for the accurate timing required for JT data modes. 
 

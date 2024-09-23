@@ -175,8 +175,8 @@ void loop()
             channel=newChan;
             seconds = -1;                       //reset the timing after changing channel.
             milliseconds = 0;
-            initChannel();
             chipUpdate();
+            initChannel();
            }
 
        }
@@ -239,7 +239,6 @@ void loop()
 void initChannel()
 {
   chipDecodeRegs();
-  chipInit();
   if(chanData[channel].cwidEn)
     {
       cwidInit();

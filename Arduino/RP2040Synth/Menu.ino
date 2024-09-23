@@ -478,6 +478,8 @@ void mainMenu(void)
         Serial.println(chipName[chip]);
         channel = 0;
         selChan = 0;
+        chanData[channel].cwidEn = 0;
+        chanData[channel].jtMode = 0;
         chipInit();
         enterOsc();
         chipSetDefault();

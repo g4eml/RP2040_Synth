@@ -235,7 +235,7 @@ void enterRegs(void)
                {
                   char buf[16];
                   value.toCharArray(buf,16);
-                  chanData[channel].reg[regno] = (uint32_t) strtol(buf,0,16);
+                  chanData[channel].reg[regno] = (uint32_t) strtoll(buf,0,16);
                }
              Serial.print("\nR");
              Serial.print(regno);
@@ -248,7 +248,7 @@ void enterRegs(void)
       if(param[0] == '*')
         {
           Serial.println();
-          for(int i = numberOfRegs -1; i>=0; i--)
+          for(int i = 0 ;i < numberOfRegs; i++)
           {
              Serial.print("R");
              Serial.print(i);

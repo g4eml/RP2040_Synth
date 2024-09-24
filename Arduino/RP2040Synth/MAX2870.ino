@@ -70,7 +70,7 @@ void Max2870SetDefault(void)
 
   //Reg 1
   Max2870_CPOC = 0;
-  Max2870_CPL = 0;
+  Max2870_CPL = 1;
   Max2870_CPT = 0;
   Max2870_P = 1;
   Max2870_M = 100;
@@ -383,6 +383,15 @@ double Max2870CalcPFD(double rpfd)
   Max2870_BS = bs & 0xFF;
   Max2870_BS_MSBS = (bs >> 8) & 0x03;
 
+  if(setpfd > 32.0) 
+   {
+    Max2870_LDS = 1;
+   }
+  else
+  {
+   Max2870_LDS = 0;
+  }
+  
   return setpfd;
 }
 

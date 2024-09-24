@@ -337,6 +337,8 @@ double Max2870CalcPFD(double rpfd)
   double r = 0;
   bool dub = 0;
   bool div = 0;
+  double setpfd = 0;
+  uint16_t bs = 0;
 
   //first try a simple division...
   r = refOsc / rpfd;
@@ -373,7 +375,18 @@ double Max2870CalcPFD(double rpfd)
   Max2870_DBR = dub;
   Max2870_RDIV2 = div;
 
-  return ((refOsc * (1+dub)) / r);
+  setpfd = ((refOsc * (1+dub)) / r);
+
+  bs = setpfd/0.0500;              // band select clock should be fPFD/50Khz.
+  if(bs <1) bs =1;
+  if(bs > 1023) bs = 1023;
+  Max2870_BS = bs & 0xFF;
+  Max2870_BS_MSBS = (bs >> 8) & 0x03;
+
+  Serial.print("BS = ");
+  Serial.println(bs);
+
+  return setpfd;
 }
 
 void Max2870SetPfd(void)
@@ -401,7 +414,6 @@ void Max2870SetPfd(void)
         }
       
     }
-
    
 }
 

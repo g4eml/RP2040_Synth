@@ -383,9 +383,6 @@ double Max2870CalcPFD(double rpfd)
   Max2870_BS = bs & 0xFF;
   Max2870_BS_MSBS = (bs >> 8) & 0x03;
 
-  Serial.print("BS = ");
-  Serial.println(bs);
-
   return setpfd;
 }
 

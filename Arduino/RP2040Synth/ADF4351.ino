@@ -473,11 +473,11 @@ void ADF4351SetFrequency(double direct)
   //n now has the desired fractional part. Now we need to work put the best f/d to acheive this
    err = 1.0;
    bestnom = 0;
-   bestden = 1;
+   bestden = 2;
 
      for(den = 2; den <= 4095 ; den++)
      {
-      nom = int((den + 0.0000000001)  * n);
+      nom = int((den * n) + 0.0000000001);
       if(nom < 1) continue;
 
       part = (double) nom / (double) den;

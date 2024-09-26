@@ -962,13 +962,13 @@ if (freq > 15000.0)                 //use the doubler between 15 and 20 GHz
  // first try to calculate the fraction up to a denominator of FFFF. This is an arbritary limit to keep the speed up. 
  err = 1.0;
  uint32_t  bestnum = 0;
- uint32_t  bestden = 1;
+ uint32_t  bestden = 2;
 
 if(! maxDivisor)
 {
    for(den = 2; den <= 0xFFFF ; den++)
      {
-      num = int((den + 0.0000000001)  * n);
+      num = int((den * n) + 0.0000000001 );
       if(num < 1) continue;
 
       part = (double) num / (double) den;

@@ -17,16 +17,24 @@ uint8_t chip = MAX2870;                 //index to the current chip type (applie
 uint8_t selChan = 0;                    //FF if channel is externally selected by switches. Channel number to force one channel. 
 double refOsc = 100.000 ;               //reference oscillator frequency in MHz (applies to all channels)
 
+//Bit definitions for fskMode flags
+
+#define CWIDBIT 0x01
+#define NOTCWIDBIT 0xFE
+#define EXTKEYBIT 0x02
+#define NOTEXTKEYBIT 0xFD
+
 //this structure is repeated for each channel
 
 struct chanstruct
 {
 uint32_t reg[80];                       // allow for up to 80 32 bit registers. 
-uint8_t cwidEn = 0;                     //magic number to indicate if CWID is enabled 0x73 = enabled. 
+uint8_t fskMode = 0;                    // 8 flag bits to indicate enabled special FSK modes.  Bit 0 = CWID   Bit 1 = External Key  
 uint8_t cwidLen = 1;                    //number of characters in the CWID
 uint8_t cwidSpeed = 10;                 //CWID speed in words per minute
 uint8_t cwidInterval = 60;              //CWID Inteval in seconds.
-double cwidShift = 0;                   //CW ID FSK Shift in MHz  
+float cwidShift = 0;                    //CW ID FSK Shift in MHz 
+float keyShift = 0;                     //external key FSK Shift in MHz 
 char cwid[32] = " ";                    // up to 32 CWID characters
 uint8_t jtMode = 0;                     //JT mode
 char jtid[13] = " ";                    //JT Message
@@ -44,9 +52,13 @@ float maxPfd = 105.0;                     //maximum PFD frequency
 bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size.  
 uint8_t channel = 0;                      //currently active channel.
 
-uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency. Calculated by cwidInit()
-uint32_t cwidKeyUpNum = 1;                //Key up value for the PLL numerator used to shift the frequency. Calculated by cwidInit()
-uint32_t cwidKeyUpDen = 1;                //Key up value for the PLL denominator used to shift the frequency. Calculated by cwidInit()
+uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency for CWID. Calculated by cwidInit()
+uint32_t cwidKeyUpNum = 1;                //Key up value for the PLL numerator used to shift the frequency for CWID. Calculated by cwidInit()
+uint32_t cwidKeyUpDen = 1;                //Key up value for the PLL denominator used to shift the frequency for CWID. Calculated by cwidInit()
+
+uint32_t ExtKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency for External Key. Calculated by ExtKeyInit()
+uint32_t ExtKeyUpNum = 1;                //Key up value for the PLL numerator used to shift the frequency for External Key. Calculated by ExtKeyInit()
+uint32_t ExtKeyUpDen = 1;                //Key up value for the PLL denominator used to shift the frequency for External Key. Calculated by ExtKeyInit()
 
 void saveSettings(void);
 
@@ -83,6 +95,7 @@ int nextcwidTime = 60;                   //trigger time for next CWID
 bool jtActive = false;                  //flag to start Jt Sending
 int  jtTime = 1;                       //trigger time for next JT sequence
 
+bool lastKeyState = 1;                 //external key state last pass 1 = key up 0 = key down
 
 #define GPSTXPin 0                      //Serial data to GPS module 
 #define GPSRXPin 1                      //SeriaL data from GPS module
@@ -91,6 +104,8 @@ int  jtTime = 1;                       //trigger time for next JT sequence
 #define CHANSEL1Pin 11
 #define CHANSEL2Pin 12
 #define CHANSEL3Pin 13
+
+#define EXTKEYPin 14                    //External Key input Pulled upp to 3V3 ground to key.
 
 char gpsBuffer[256];                     //GPS data buffer
 int gpsPointer;                          //GPS buffer pointer. 
@@ -110,11 +125,13 @@ void setup()
   pinMode(CHANSEL2Pin, INPUT_PULLUP);
   pinMode(CHANSEL3Pin, INPUT_PULLUP);
 
+  pinMode(EXTKEYPin, INPUT_PULLUP);     //configure the external Key Input
+
   Serial1.begin(9600);                  //start GPS port comms
   gpsPointer = 0;
   delay(1000);
   EEPROM.begin(4096);
-  if(EEPROM.read(0) == 0x56)        //magic number to indcate EEPROM is valid
+  if(EEPROM.read(0) == 0x57)        //magic number to indcate EEPROM is valid
     {
       EEPROM.get(1,chip);              //chip type for all channels
       EEPROM.get(2,selChan);           //read the selected channel. 0xFF if externally switched.
@@ -182,7 +199,7 @@ void loop()
 
        }
 
-     if((chanData[channel].cwidEn) & (seconds == nextcwidTime))
+     if((chanData[channel].fskMode & CWIDBIT) & (seconds == nextcwidTime))
        {
         cwidActive = true;                                        //start this CW ID
         nextcwidTime = (seconds + chanData[channel].cwidInterval) % 120;            //schedule the next CW ID
@@ -193,7 +210,7 @@ void loop()
         jtActive = true;                                        //start the JT Sequence
        }
 
-    if(chanData[channel].cwidEn)
+    if(chanData[channel].fskMode & CWIDBIT)
       {
         cwidTick();
       }
@@ -201,6 +218,11 @@ void loop()
     if(chanData[channel].jtMode != 0)
       {
         jtTick();
+      }
+
+    if(chanData[channel].fskMode & EXTKEYBIT)
+      {
+        keyTick();
       }
 
       if(Serial.available() > 0 )          //test for USB command connected
@@ -240,15 +262,22 @@ void loop()
 void initChannel()
 {
   chipDecodeRegs();
-  if(chanData[channel].cwidEn)
+  if(chanData[channel].fskMode & CWIDBIT)
     {
       cwidInit();
     }
    
+  if(chanData[channel].fskMode & EXTKEYBIT)
+    {
+      keyInit();
+    }
+
    if(chanData[channel].jtMode)
      {
        jtInit();
      }
+
+
 }
 
 void processNMEA(void)
@@ -285,7 +314,7 @@ uint8_t readChannelInputs(void)
 
 void saveSettings(void)
 {
-    EEPROM.write(0, 0x56);         //magic number to indcate EEPROM is valid
+    EEPROM.write(0, 0x57);         //magic number to indcate EEPROM is valid
     EEPROM.put(1,chip);            //save the chip type
     EEPROM.put(2,selChan);         //Save the currently selected channel
     EEPROM.put(3,refOsc);          //reference oscillator for all channels.

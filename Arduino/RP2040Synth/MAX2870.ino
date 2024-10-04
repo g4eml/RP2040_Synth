@@ -697,12 +697,32 @@ double Max2870GetFrequency(void)
     }
 }
 
+  void Max2870ExtKey(bool key)
+{
+  if(key)
+    {
+      Max2870Send(chanData[channel].reg[1]);
+      Max2870Send(chanData[channel].reg[0]);
+    }
+  else
+    {
+      Max2870Send((chanData[channel].reg[1] & 0xFFFF8007) | (ExtKeyUpDen << 3));
+      Max2870Send((chanData[channel].reg[0] & 0x80000007) | (ExtKeyUpN << 15) | (ExtKeyUpNum <<3));
+    }
+}
 
 void Max2870SaveFskShift(void)
 {
   cwidKeyUpN = Max2870_N;
   cwidKeyUpDen = Max2870_M;
   cwidKeyUpNum = Max2870_FRAC;
+}
+
+void Max2870SaveKeyShift(void)
+{
+  ExtKeyUpN = Max2870_N;
+  ExtKeyUpDen = Max2870_M;
+  ExtKeyUpNum = Max2870_FRAC;
 }
 
 void Max2870SaveJt(uint8_t index)

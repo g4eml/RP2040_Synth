@@ -193,19 +193,21 @@ void loop()
             channel=newChan;
             seconds = -1;                       //reset the timing after changing channel.
             milliseconds = 0;
+            jtActive = false;
+            cwidActive = false;
             chipUpdate();
             initChannel();
            }
 
        }
 
-     if((chanData[channel].fskMode & CWIDBIT) & (seconds == nextcwidTime))
+     if((chanData[channel].fskMode & CWIDBIT) && (seconds == nextcwidTime))
        {
         cwidActive = true;                                        //start this CW ID
         nextcwidTime = (seconds + chanData[channel].cwidInterval) % 120;            //schedule the next CW ID
        }
 
-     if((chanData[channel].jtMode != 0) & (seconds == jtTime))
+     if((chanData[channel].jtMode != 0) && (seconds == jtTime))
        {
         jtActive = true;                                        //start the JT Sequence
        }

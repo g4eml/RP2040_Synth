@@ -303,7 +303,7 @@ void setCwIdent(void)
 
   if(chanData[channel].extMult > 1)
      {
-        Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
+        Serial.print("Enter Final Multiplied Frequency FSK Shift in Hz ---> ");
      }
   else
      {
@@ -315,7 +315,7 @@ void setCwIdent(void)
   double nominal = chipGetFrequency();
   chipSetFrequency(nominal + (double) chanData[channel].cwidShift);
   chipSaveFskShift();
-  Serial.println("\nActual final frequencies achievable with the current PFD will be :-");
+  Serial.println("\nActual Final Multiplied frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");
   double up = chipGetFrequency() * (double) chanData[channel].extMult;
   Serial.print(up,10);
@@ -398,7 +398,7 @@ void setKeyMode(void)
 
   if(chanData[channel].extMult > 1)
      {
-        Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
+        Serial.print("Enter Final Multiplied Frequency FSK Shift in Hz ---> ");
      }
   else
      {
@@ -410,7 +410,7 @@ void setKeyMode(void)
   double nominal = chipGetFrequency();
   chipSetFrequency(nominal + (double) chanData[channel].keyShift);
   chipSaveKeyShift();
-  Serial.println("\nActual final frequencies achievable with the current PFD will be :-");
+  Serial.println("\nActual Final Multiplied Frequencies achievable with the current PFD will be :-");
   Serial.print("Key Down Frequency = ");
   double down = chipGetFrequency() * (double) chanData[channel].extMult;
   Serial.print(down,10);
@@ -449,7 +449,7 @@ void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -495,7 +495,7 @@ void mainMenu(void)
         Serial.println(" MHz");
         if(chanData[channel].extMult >1)
           {
-            Serial.print("Current Final Frequency is ");
+            Serial.print("Current Final Multiplied Frequency is ");
             Serial.print(chipGetFrequency() * (double) chanData[channel].extMult,10);        
             Serial.println(" MHz");
           }
@@ -503,6 +503,20 @@ void mainMenu(void)
         chipSetFrequency(0);
         chipUpdate();
         Serial.println("\nFrequency Updated");
+        break;
+
+        case 'M':
+        case 'm':
+        resp = getSelection("Is there an external Multiplier chain? Y or N --->");
+        if((resp == 'Y') || (resp == 'y'))
+          {
+           Serial.print("Enter External Multiplication Factor ---> ");
+           chanData[channel].extMult = inputNumber();
+          }
+        else
+          {
+           chanData[channel].extMult = 1;
+          }
         break;
 
         case 'V':
@@ -554,6 +568,7 @@ void mainMenu(void)
         case 'C':
         case 'c':
         chipCalcFreq();
+ 
         break;
 
         case 'D':

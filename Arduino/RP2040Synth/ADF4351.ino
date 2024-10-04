@@ -423,20 +423,19 @@ void ADF4351SetFrequency(double direct)
   freqOK = false;
   if(direct ==0)
    {
-   resp = getSelection("Is there an external Multiplier chain? Y or N --->");
-   if((resp == 'Y') || (resp == 'y'))
-     {
-        Serial.print("Enter External Multiplication Factor ---> ");
-        chanData[channel].extMult = inputNumber();
-     }
-   else
-     {
-       chanData[channel].extMult = 1;
-     }
     while(!freqOK)
     {
-      Serial.print("\nEnter required Final Frequency in MHz -->");
+      if(chanData[channel].extMult > 1)
+      {
+      Serial.print("\nEnter Required Final Multiplied Frequency in MHz -->");
       freq = inputFloat() / (double) chanData[channel].extMult;
+      }
+      else
+      {
+      Serial.print("\nEnter Required Frequency in MHz -->");
+      freq = inputFloat();        
+      }
+
       if((freq > 34.375) && (freq <= 4400.000))
         {
           freqOK = true;

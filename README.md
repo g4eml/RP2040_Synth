@@ -62,7 +62,7 @@ The power can be provided by the USB connector or 5V can be fed into the 5V pin 
 
 Wiring diagram for RP2040 Zero
 
-![Wiring](https://github.com/user-attachments/assets/476a157a-da51-437e-96b2-5a910df71370)
+![Connections](https://github.com/user-attachments/assets/0d4ceeed-c08f-4f58-9903-f303c243daff)
 
 
 ## Programming or updating the RP2040 (quick method)
@@ -192,7 +192,9 @@ By default on power up the firmware will immediately send the EEPROM saved regis
 In normal use, for example as a Local oscillator or Beacon, that is all that is needed! 
 
 To enter programming mode  (which you will need to do at least once) you need to connect to the USB serial port using a terminal program such as Putty or Terraterm. Pressing any key should result in the menu being displayed.
-![Screenshot (111)](https://github.com/user-attachments/assets/62a67221-5909-4c1e-aec3-ca3a856d7937)
+
+![Screenshot (112)](https://github.com/user-attachments/assets/1e3f835e-65b7-4d6e-8606-7d9504bda405)
+
 
 
 ### Commands

@@ -269,7 +269,7 @@ void printHex(uint32_t num, int precision)
   Serial.print(tmp);
 }
 
-void setcwidEnt(void)
+void setCwIdent(void)
 {
   char resp;
   String cws;
@@ -277,12 +277,12 @@ void setcwidEnt(void)
   resp = getSelection("Enable CW Ident? Y or N --->");
   if((resp == 'N') || (resp == 'n'))
    {
-     chanData[channel].cwidEn = 0;
+     chanData[channel].fskMode &= NOTCWIDBIT;
      Serial.println();
      return;
    }
 
-  chanData[channel].cwidEn = 0x73;
+  chanData[channel].fskMode |= CWIDBIT;
   Serial.print("Enter CW Ident (max 32 characters) --->");
   cws = inputString(true);
   cws.toCharArray(&chanData[channel].cwid[1], 32 );
@@ -303,7 +303,7 @@ void setcwidEnt(void)
 
   if(chanData[channel].extMult > 1)
      {
-        Serial.print("Enter Final Frequency FSK Shift in Hz ---> ");
+        Serial.print("Enter Final Multiplied Frequency FSK Shift in Hz ---> ");
      }
   else
      {
@@ -313,9 +313,9 @@ void setcwidEnt(void)
   chanData[channel].cwidShift = inputNumber() / (double) chanData[channel].extMult ;
   chanData[channel].cwidShift = chanData[channel].cwidShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + chanData[channel].cwidShift);
+  chipSetFrequency(nominal + (double) chanData[channel].cwidShift);
   chipSaveFskShift();
-  Serial.println("\nActual final frequencies achievable with the current PFD will be :-");
+  Serial.println("\nActual Final Multiplied frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");
   double up = chipGetFrequency() * (double) chanData[channel].extMult;
   Serial.print(up,10);
@@ -328,7 +328,7 @@ void setcwidEnt(void)
   Serial.print("FSK Shift = ");
   Serial.print((down - up) * 1000000 , 3);
   Serial.println(" Hz");
-  Serial.println("\nDon't forget to save the settings to eeprom if you are happy with them.");
+  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
   Serial.println("CW ID will only run when not in the menu. Type X to exit menu.");
 
 }
@@ -377,10 +377,57 @@ void setjtMode(void)
         Serial.println(" Hz");
       }
     }
-  Serial.println("\nDon't forget to save the settings to eeprom if you are happy with them.");
+  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
   Serial.println("JT Encoding will only run when not in the menu. Type X to exit menu.");
 
 }
+
+void setKeyMode(void)
+{
+  char resp;
+  Serial.println();
+  resp = getSelection("Enable External CW Key? Y or N --->");
+  if((resp == 'N') || (resp == 'n'))
+   {
+     chanData[channel].fskMode &= NOTEXTKEYBIT;
+     Serial.println();
+     return;
+   }
+
+  chanData[channel].fskMode |= EXTKEYBIT;
+
+  if(chanData[channel].extMult > 1)
+     {
+        Serial.print("Enter Final Multiplied Frequency FSK Shift in Hz ---> ");
+     }
+  else
+     {
+       Serial.print("Enter FSK Shift in Hz ---> ");
+     }
+
+  chanData[channel].keyShift = inputNumber() / (double) chanData[channel].extMult ;
+  chanData[channel].keyShift = chanData[channel].keyShift / 1000000.0;      //convert to MHz
+  double nominal = chipGetFrequency();
+  chipSetFrequency(nominal + (double) chanData[channel].keyShift);
+  chipSaveKeyShift();
+  Serial.println("\nActual Final Multiplied Frequencies achievable with the current PFD will be :-");
+  Serial.print("Key Down Frequency = ");
+  double down = chipGetFrequency() * (double) chanData[channel].extMult;
+  Serial.print(down,10);
+  Serial.println(" MHz");
+  chipSetFrequency(nominal); 
+  Serial.print("Key Up Frequency = ");
+  double up = chipGetFrequency() * (double) chanData[channel].extMult;
+  Serial.print(up,10);
+  Serial.println(" MHz");
+  Serial.print("FSK Shift = ");
+  Serial.print((down - up) * 1000000 , 3);
+  Serial.println(" Hz");
+  Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");
+  Serial.println("CW ID will only run when not in the menu. Type X to exit menu.");
+}
+
+
 
 void viewNMEA(void)
 {
@@ -402,7 +449,7 @@ void mainMenu(void)
 {
   char resp;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" , "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "G = View GPS NMEA data", "S = Save to eeprom" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
@@ -438,7 +485,7 @@ void mainMenu(void)
         case 'S':
         case 's':
         saveSettings();
-        Serial.println("\nSettings saved to eeprom");
+        Serial.println("\nSettings saved to EEPROM");
         break;
 
         case 'F':
@@ -448,7 +495,7 @@ void mainMenu(void)
         Serial.println(" MHz");
         if(chanData[channel].extMult >1)
           {
-            Serial.print("Current Final Frequency is ");
+            Serial.print("Current Final Multiplied Frequency is ");
             Serial.print(chipGetFrequency() * (double) chanData[channel].extMult,10);        
             Serial.println(" MHz");
           }
@@ -456,6 +503,20 @@ void mainMenu(void)
         chipSetFrequency(0);
         chipUpdate();
         Serial.println("\nFrequency Updated");
+        break;
+
+        case 'M':
+        case 'm':
+        resp = getSelection("Is there an external Multiplier chain? Y or N --->");
+        if((resp == 'Y') || (resp == 'y'))
+          {
+           Serial.print("Enter External Multiplication Factor ---> ");
+           chanData[channel].extMult = inputNumber();
+          }
+        else
+          {
+           chanData[channel].extMult = 1;
+          }
         break;
 
         case 'V':
@@ -478,7 +539,7 @@ void mainMenu(void)
         Serial.println(chipName[chip]);
         channel = 0;
         selChan = 0;
-        chanData[channel].cwidEn = 0;
+        chanData[channel].fskMode = 0;
         chanData[channel].jtMode = 0;
         chipInit();
         enterOsc();
@@ -507,6 +568,7 @@ void mainMenu(void)
         case 'C':
         case 'c':
         chipCalcFreq();
+ 
         break;
 
         case 'D':
@@ -518,12 +580,17 @@ void mainMenu(void)
 
         case 'I':
         case 'i':
-        setcwidEnt();
+        setCwIdent();
         break;
 
         case 'J':
         case 'j':
         setjtMode();
+        break;
+
+        case 'K':
+        case 'k':
+        setKeyMode();
         break;
 
         case 'G':

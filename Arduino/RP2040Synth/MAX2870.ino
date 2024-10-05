@@ -453,21 +453,18 @@ void Max2870SetFrequency(double direct)
   freqOK = false;
   if(direct ==0)
   {
-  resp = getSelection("Is there an external Multiplier chain? Y or N --->");
-   if((resp == 'Y') || (resp == 'y'))
-     {
-        Serial.print("Enter External Multiplication Factor ---> ");
-        chanData[channel].extMult = inputNumber();
-     }
-   else
-     {
-       chanData[channel].extMult = 1;
-     }
-  
    while(!freqOK)
     {
-      Serial.print("\nEnter required Final Frequency in MHz -->");
+      if(chanData[channel].extMult > 1)
+      {
+      Serial.print("\nEnter Required Final Multiplied Frequency in MHz -->");
       freq = inputFloat() / (double) chanData[channel].extMult;
+      }
+      else
+      {
+      Serial.print("\nEnter Required Frequency in MHz -->");
+      freq = inputFloat();        
+      }
       if((freq > 23.500) && (freq <= 6000.000))
         {
           freqOK = true;
@@ -697,12 +694,32 @@ double Max2870GetFrequency(void)
     }
 }
 
+  void Max2870ExtKey(bool key)
+{
+  if(key)
+    {
+      Max2870Send(chanData[channel].reg[1]);
+      Max2870Send(chanData[channel].reg[0]);
+    }
+  else
+    {
+      Max2870Send((chanData[channel].reg[1] & 0xFFFF8007) | (ExtKeyUpDen << 3));
+      Max2870Send((chanData[channel].reg[0] & 0x80000007) | (ExtKeyUpN << 15) | (ExtKeyUpNum <<3));
+    }
+}
 
 void Max2870SaveFskShift(void)
 {
   cwidKeyUpN = Max2870_N;
   cwidKeyUpDen = Max2870_M;
   cwidKeyUpNum = Max2870_FRAC;
+}
+
+void Max2870SaveKeyShift(void)
+{
+  ExtKeyUpN = Max2870_N;
+  ExtKeyUpDen = Max2870_M;
+  ExtKeyUpNum = Max2870_FRAC;
 }
 
 void Max2870SaveJt(uint8_t index)

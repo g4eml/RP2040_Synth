@@ -423,20 +423,19 @@ void ADF4351SetFrequency(double direct)
   freqOK = false;
   if(direct ==0)
    {
-   resp = getSelection("Is there an external Multiplier chain? Y or N --->");
-   if((resp == 'Y') || (resp == 'y'))
-     {
-        Serial.print("Enter External Multiplication Factor ---> ");
-        chanData[channel].extMult = inputNumber();
-     }
-   else
-     {
-       chanData[channel].extMult = 1;
-     }
     while(!freqOK)
     {
-      Serial.print("\nEnter required Final Frequency in MHz -->");
+      if(chanData[channel].extMult > 1)
+      {
+      Serial.print("\nEnter Required Final Multiplied Frequency in MHz -->");
       freq = inputFloat() / (double) chanData[channel].extMult;
+      }
+      else
+      {
+      Serial.print("\nEnter Required Frequency in MHz -->");
+      freq = inputFloat();        
+      }
+
       if((freq > 34.375) && (freq <= 4400.000))
         {
           freqOK = true;
@@ -638,11 +637,32 @@ double ADF4351GetFrequency(void)
     }
 }
 
+void ADF4351ExtKey(bool key)
+{
+  if(key)
+    {
+      ADF4351Send(chanData[channel].reg[1]);
+      ADF4351Send(chanData[channel].reg[0]);
+    }
+  else
+    {
+     ADF4351Send((chanData[channel].reg[1] & 0xFFFF8007) | (ExtKeyUpDen << 3));
+     ADF4351Send((chanData[channel].reg[0] & 0x80000007) | (ExtKeyUpN << 15) | (ExtKeyUpNum <<3));
+    }
+}
+
 void ADF4351SaveFskShift(void)
 {
   cwidKeyUpN = ADF4351_INT;
   cwidKeyUpDen = ADF4351_M;
   cwidKeyUpNum = ADF4351_FRAC;
+}
+
+void ADF4351SaveKeyShift(void)
+{
+  ExtKeyUpN = ADF4351_INT;
+  ExtKeyUpDen = ADF4351_M;
+  ExtKeyUpNum = ADF4351_FRAC;
 }
 
 void ADF4351SaveJt(uint8_t index)

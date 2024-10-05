@@ -850,7 +850,7 @@ void LMX2595SetFrequency(double direct)
   bool maxDivisor;
   char resp;
 
-  if((chanData[channel].cwidEn) || (chanData[channel].jtMode))           //if we are using FSK keying then we must keep the divisor to the same value to avoid glitches
+  if((chanData[channel].fskMode) || (chanData[channel].jtMode))           //if we are using any FSK keying then we must keep the divisor to the same value to avoid glitches
   {
     maxDivisor = true;
   }
@@ -864,20 +864,18 @@ void LMX2595SetFrequency(double direct)
   freqOK = false;
   if(direct == 0)
    {
-   resp = getSelection("Is there an external Multiplier chain? Y or N --->");
-   if((resp == 'Y') || (resp == 'y'))
-     {
-        Serial.print("Enter External Multiplication Factor ---> ");
-        chanData[channel].extMult = inputNumber();
-     }
-   else
-     {
-       chanData[channel].extMult = 1;
-     }
     while(!freqOK)
     {
-      Serial.print("\nEnter required Final Frequency in MHz -->");
+      if(chanData[channel].extMult > 1)
+      {
+      Serial.print("\nEnter Required Final Multiplied Frequency in MHz -->");
       freq = inputFloat() / (double) chanData[channel].extMult;
+      }
+      else
+      {
+      Serial.print("\nEnter Required Frequency in MHz -->");
+      freq = inputFloat();        
+      }
       if((freq > 9.766) && (freq <= 20000.000))
         {
           freqOK = true;
@@ -1239,11 +1237,47 @@ void LMX2595FskKey(bool key)
     }
 }
 
+void LMX2595ExtKey(bool key)
+{
+  if(key)
+    {
+
+       LMX2595Send(chanData[channel].reg[34]);
+       LMX2595Send(chanData[channel].reg[36]);       
+
+        LMX2595Send(chanData[channel].reg[38]);
+        LMX2595Send(chanData[channel].reg[39]);
+
+       LMX2595Send(chanData[channel].reg[42]);
+       LMX2595Send(chanData[channel].reg[43]);
+
+    }
+  else
+    {
+
+        LMX2595Send((34 << 16) | ((ExtKeyUpN >> 16) & 0xFFFF));
+        LMX2595Send((36 << 16) | (ExtKeyUpN & 0xFFFF));     
+
+        LMX2595Send((38 << 16) | ((ExtKeyUpDen >> 16) & 0xFFFF));
+        LMX2595Send((39 << 16) | (ExtKeyUpDen & 0xFFFF));
+
+        LMX2595Send((42 << 16) | ((ExtKeyUpNum >> 16) & 0xFFFF));
+        LMX2595Send((43 << 16) | (ExtKeyUpNum & 0xFFFF));
+    }
+}
+
 void LMX2595SaveFskShift(void)
 {
   cwidKeyUpN = LMX2595_PLL_N;
   cwidKeyUpDen = LMX2595_PLL_DEN;
   cwidKeyUpNum = LMX2595_PLL_NUM;
+}
+
+void LMX2595SaveKeyShift(void)
+{
+  ExtKeyUpN = LMX2595_PLL_N;
+  ExtKeyUpDen = LMX2595_PLL_DEN;
+  ExtKeyUpNum = LMX2595_PLL_NUM;
 }
 
 void LMX2595SaveJt(uint8_t index)

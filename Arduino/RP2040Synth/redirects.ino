@@ -165,6 +165,25 @@ void chipCalcFreq(void)
         }
   }
 
+  void chipExtKey(bool key)
+  {
+
+      switch(chip)
+        {
+          case MAX2870:
+          Max2870ExtKey(key);
+          break;
+
+          case ADF4351:
+          ADF4351ExtKey(key);
+          break;
+
+          case LMX2595:
+          LMX2595ExtKey(key);
+          break;
+        }
+  }
+
     void chipJtShift(uint8_t val)
   {
 
@@ -203,6 +222,26 @@ void chipCalcFreq(void)
           break;
         }
   }
+
+      void chipSaveKeyShift(void)
+  {
+
+      switch(chip)
+        {
+          case MAX2870:
+          Max2870SaveKeyShift();
+          break;
+
+          case ADF4351:
+          ADF4351SaveKeyShift();
+          break;
+
+          case LMX2595:
+          LMX2595SaveKeyShift();
+          break;
+        }
+  }
+
 
     void chipSaveJt(uint8_t index)
   {

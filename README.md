@@ -4,11 +4,6 @@
 
 A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 3 different type of synthesiser chip, the ADF4351, the Max2870 and the LMX2595.
 
-Support for CW ident and JT digital modes. 
-
-Support for external switches to select one of ten channels. Each channel contains all synthesiser, CWID,  and JT settings. 
-
-
 ## Features
 
 No special programming hardware or software required. 
@@ -24,6 +19,8 @@ Supports JT data modes for Beacon Identification.  JT4G is available on all chip
 Supports GPS connection for the accurate timing required for JT data modes. 
 
 Supports 10 different channels which can be selected by external switches. 
+
+Supports External Key Input with independently configurable FSK Shift. 
 
 Default register settings can be loaded for all synthesiser types to produce some initial RF output. This is often the hardest thing to do with a new chip type.
 
@@ -178,12 +175,15 @@ The 4 inputs have internal pull up resistors to 3.3V. All that is needed is 4 sw
 Inverted logic is used. A grounded pin is read as a Logic 1. A floating pin is read as a logic 0.
 For example, all pins left open circuit is read as channel 0. 
 
-| RP2040 | GPS Module |
+An external Morse Key can be connected between GP14 and Ground. This can be configured for FSK keying using the K Menu Option. 
+
+| RP2040 | Function |
 | :---:  |    :---:   |
 |GP10    |Bit 0  Channel 1|
 |GP11    |Bit 1  Channel 2|
 |GP12    |Bit 2  Channel 4|
 |GP13    |Bit 3  Channel 8|
+|GP14    |External Key|
 
 ## Firmware description
 
@@ -211,7 +211,9 @@ N = Set Channel Number. Enter the channel number from 0 to 9. This channel will 
 
 D = Restores the Default Register Values for chip. Sets default values to all registers. Tries to program a 10Mhz PFD and requests a frequency. After this your Synthesiser should start to output RF. 
 
-P = Enter PFD Frequency. Set the required PFD frequency. The firmware will attempt to get as close as possible to the requested value but not all values can be achieved. 
+P = Enter PFD Frequency. Set the required PFD frequency. The firmware will attempt to get as close as possible to the requested value but not all values can be achieved.
+
+M = Set External Multiplier. If the Synthesiser is followed by a multiplier for higher frequencies this option allows you to specify the multiplcation factor. Final Multiplied Frequencies can then be entered and viewed. 
 
 F = Enter Output Frequency. Set the required output frequency. The firmware will attempt to calculate the closest register values to achieve this. Changing the PFD may improve the result. 
 
@@ -223,7 +225,9 @@ R = View / Enter Registers Directly in Hex. Allws direct entry of regiser values
 
 I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. Ident period is only valid for a CW only configuration. If a JT mode is also enbled then the CW ident will be sent every odd minute. 
 
-J = Configure JT modes. Allows entry of a 13 character message. This would normally be the Callsign and Maidenhead locator. The JT ident will be sent every Even minute. Accurate timing requires a GPS module to be connected. 
+J = Configure JT modes. Allows entry of a 13 character message. This would normally be the Callsign and Maidenhead locator. The JT ident will be sent every Even minute. Accurate timing requires a GPS module to be connected.
+
+K = Configure External Key. An External Morse key can be connected and used to frequency shift the signal. The FSK Shift can be entered and is seperate from the CWID shift. 
 
 G = View GPS NMEA data. This is used to test the GPS connection. when selected it will echo all GPS data to the screen. Press any key to exit this mode. 
 

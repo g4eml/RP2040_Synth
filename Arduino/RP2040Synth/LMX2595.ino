@@ -737,7 +737,7 @@ double LMX2595CalcPFD(double rpfd)
 {
   double r = 0;
   double mult = 1;
-  double multOutfreq =1;
+  double multOutFreq =1;
   bool dub = 0;
   bool div = 0;
 
@@ -748,17 +748,19 @@ double LMX2595CalcPFD(double rpfd)
       goto done;
     }
 
+
   //next try using the doubler
 
   r = (refOsc * 2.0) / rpfd;
-  if(((double) int(r)) == r)       //check if this is an integer division
+  dub = 1;
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
-      dub = 1;
       goto done;
     }
 
    if((refOsc < rpfd) && (refOsc >=30) && (refOsc <=70))                     //try the multiplier if we are within its limits
      {
+      dub = 0;
       mult = int(rpfd / refOsc);
       multOutFreq = refOsc * mult;
       
@@ -777,7 +779,10 @@ double LMX2595CalcPFD(double rpfd)
 
      }
 
-  Serial.print("Unable to acheive a PFD of ");
+  r = int(r);
+  if(r < 1) r=1;
+
+  Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);

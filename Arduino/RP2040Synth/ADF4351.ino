@@ -350,7 +350,7 @@ double ADF4351CalcPFD(double rpfd)
 
   if(r < 1) r=1;
 
-  Serial.print("Unable to acheive a PFD of ");
+  Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);

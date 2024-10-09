@@ -615,6 +615,8 @@ void mainMenu(void)
 void enterPfd(void)
  {
   double pfd;
+  double rpfd;
+  double temp;
   bool freqOK;
   
   freqOK = false;
@@ -638,13 +640,14 @@ void enterPfd(void)
         {
           Serial.print("\nPFD must be between ");
           Serial.print(minPfd);
-          Serial.println(" MHz");
-          Serial.print(" and ")
+          Serial.print(" MHz");
+          Serial.print(" and ");
           Serial.print(maxPfd);
           Serial.println(" MHz");
         }    
     }
    
+    rpfd = chipCalcPfd(pfd);
     Serial.println("Recalculating frequency with new PFD.");
     chipSetFrequency(temp);
     chipUpdate();

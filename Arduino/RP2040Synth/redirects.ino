@@ -283,3 +283,24 @@ void chipCalcFreq(void)
 
     return pfd;
   }
+
+  double chipCalcPfd(double pfd)
+  {
+     double rpfd;
+      switch(chip)
+        {
+          case MAX2870:
+          rpfd = Max2870CalcPFD(pfd);
+          break;
+
+          case ADF4351:
+          rpfd = ADF4351CalcPFD(pfd);
+          break;
+
+          case LMX2595:
+          rpfd = LMX2595CalcPFD(pfd);
+          break;
+        }
+
+    return rpfd;
+  }

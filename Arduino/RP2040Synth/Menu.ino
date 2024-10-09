@@ -170,7 +170,7 @@ void enterOsc(void)
   Serial.print(refOsc , 10);
   Serial.print(" MHz\nEnter New Reference Oscillator Frequency in MHz --> ");
   oscFreq = inputFloat();
-  if (oscFreq > 0 )
+  if ((oscFreq >= minOsc ) && (oscFreq <= maxOsc))
     {
       refOsc = oscFreq;
     }
@@ -601,14 +601,7 @@ void mainMenu(void)
 
         case 'P':
         case 'p':
-        Serial.print("Current PFD is ");
-        Serial.print(chipGetPfd() , 10);
-        Serial.println(" MHz");
-        temp = chipGetFrequency();
-        chipSetPfd();
-        Serial.println("Recalculating frequency with new PFD.");
-        chipSetFrequency(temp);
-        chipUpdate();
+        enterPfd();
         break;
 
         default:
@@ -619,7 +612,43 @@ void mainMenu(void)
     while((resp != 'X')&&(resp != 'x'));
 }
 
+void enterPfd(void)
+ {
+  double pfd;
+  bool freqOK;
+  
+  freqOK = false;
 
+
+  Serial.print("Current PFD is ");
+  Serial.print(chipGetPfd() , 10);
+  Serial.println(" MHz");
+  temp = chipGetFrequency();
+ 
+  while(!freqOK)
+    {
+       Serial.printf("\nEnter required PFD in MHz -->");
+       pfd = inputFloat();
+       if(pfd == 0) return;
+      if((pfd <= maxPfd) && (pfd >= minPfd))
+        {
+          freqOK = true;
+        }
+      else
+        {
+          Serial.print("\nPFD must be between ");
+          Serial.print(minPfd);
+          Serial.println(" MHz");
+          Serial.print(" and ")
+          Serial.print(maxPfd);
+          Serial.println(" MHz");
+        }    
+    }
+   
+    Serial.println("Recalculating frequency with new PFD.");
+    chipSetFrequency(temp);
+    chipUpdate();
+ }
 
 bool paramBool(String param , String name, bool* var , String value)
 {

@@ -262,24 +262,6 @@ void chipCalcFreq(void)
         }
   }
 
-    void chipSetPfd(void)
-  {
-
-      switch(chip)
-        {
-          case MAX2870:
-          Max2870SetPfd();
-          break;
-
-          case ADF4351:
-          ADF4351SetPfd();
-          break;
-
-          case LMX2595:
-          LMX2595SetPfd();
-          break;
-        }
-  }
 
     double chipGetPfd(void)
   {

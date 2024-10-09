@@ -459,7 +459,10 @@ void LMX2595Init(void)
 {
   numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
   numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
-  maxPfd = 250.0;
+  maxPfd = 300.0;
+  minPfd = 5;
+  maxOsc = 1400;
+  minOsc = 5;
   jt4Only = false;
   pinMode(LMX2595CEPin,OUTPUT);
   digitalWrite(LMX2595CEPin,HIGH); 
@@ -734,10 +737,9 @@ double LMX2595CalcPFD(double rpfd)
 {
   double r = 0;
   double mult = 1;
+  double multOutfreq =1;
   bool dub = 0;
   bool div = 0;
-
-
 
   //first try a simple division...
   r = refOsc / rpfd;
@@ -755,11 +757,20 @@ double LMX2595CalcPFD(double rpfd)
       goto done;
     }
 
-   if(refOsc < rpfd)                      //try the multiplier
+   if((refOsc < rpfd) && (refOsc >=30) && (refOsc <=70))                     //try the multiplier if we are within its limits
      {
       mult = int(rpfd / refOsc);
-      r = (refOsc * mult) / rpfd;
-      if(((double) int(r)) == r)      //check if this is an integer division 
+      multOutFreq = refOsc * mult;
+      
+      while((multOutFreq < 180) && (mult <= 7))                                              //Multiplier output must be at least 180 MHz (Data Sheet Limit)
+        {
+          mult=mult+1;
+          multOutFreq = refOsc * mult;
+        }
+
+      r = multOutFreq / rpfd;
+
+      if((((double) int(r)) == r) && (multOutFreq <=250))      //check if this is an integer division and is in range for the divider
         {
           goto done;
         } 
@@ -797,33 +808,6 @@ double LMX2595CalcPFD(double rpfd)
   return rpfd;
 }
 
-void LMX2595SetPfd(void)
-{
-  double pfd;
-  bool freqOK;
-  
-  freqOK = false;
-  
-  while(!freqOK)
-    {
-       Serial.printf("\nEnter required PFD in MHz -->");
-       pfd = inputFloat();
-       if(pfd == 0) return;
-       pfd = LMX2595CalcPFD(pfd);
-      if(pfd <= maxPfd)
-        {
-          freqOK = true;
-        }
-      else
-        {
-          Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
-          Serial.println(" MHz");
-        }
-      
-    }
-   
-}
 
 double LMX2595GetPfd(void)
 {

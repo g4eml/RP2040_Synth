@@ -230,7 +230,10 @@ void Max2870Init(void)
   int chip = MAX2870;                  //index to the current chip type
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
-  maxPfd = 105.0;                      //maximum PFD frequency
+  maxPfd = 50.0;                      //maximum PFD frequency
+  minPfd = 0;
+  maxOsc = 200;
+  minOsc = 10;
   jt4Only = true;
   pinMode(MAX2870CEPin,OUTPUT);
   digitalWrite(MAX2870CEPin,HIGH); 
@@ -395,33 +398,6 @@ double Max2870CalcPFD(double rpfd)
   return setpfd;
 }
 
-void Max2870SetPfd(void)
-{
-  double pfd;
-  bool freqOK;
-  
-  freqOK = false;
-  
-   while(!freqOK)
-    {
-       Serial.printf("Enter required PFD in MHz -->");
-       pfd = inputFloat();
-       if(pfd == 0) return;
-       pfd = Max2870CalcPFD(pfd);
-      if(pfd <= maxPfd)
-        {
-          freqOK = true;
-        }
-      else
-        {
-          Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
-          Serial.println(" MHz");
-        }
-      
-    }
-   
-}
 
 double Max2870GetPfd(void)
 {

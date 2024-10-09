@@ -222,6 +222,9 @@ void ADF4351Init(void)
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 35.0;
+  minPfd = 0;
+  maxOsc = 250;
+  minOsc = 10;
   jt4Only = true;
   pinMode(ADF4351CEPin,OUTPUT);
   digitalWrite(ADF4351CEPin,HIGH); 
@@ -365,33 +368,6 @@ double ADF4351CalcPFD(double rpfd)
   return ((refOsc * (1+dub)) / r);
 }
 
-void ADF4351SetPfd(void)
-{
-  double pfd;
-  bool freqOK;
-  
-  freqOK = false;
-  
-  while(!freqOK)
-    {
-       Serial.printf("\nEnter required PFD in MHz -->");
-       pfd = inputFloat();
-       if(pfd == 0) return;
-       pfd = ADF4351CalcPFD(pfd);
-      if(pfd <= maxPfd)
-        {
-          freqOK = true;
-        }
-      else
-        {
-          Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
-          Serial.println(" MHz");
-        }
-      
-    }
-   
-}
 
 double ADF4351GetPfd(void)
 {

@@ -230,7 +230,10 @@ void Max2870Init(void)
   int chip = MAX2870;                  //index to the current chip type
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
-  maxPfd = 105.0;                      //maximum PFD frequency
+  maxPfd = 50.0;                      //maximum PFD frequency
+  minPfd = 0;
+  maxOsc = 200;
+  minOsc = 10;
   jt4Only = true;
   pinMode(MAX2870CEPin,OUTPUT);
   digitalWrite(MAX2870CEPin,HIGH); 
@@ -342,7 +345,7 @@ double Max2870CalcPFD(double rpfd)
 
   //first try a simple division...
   r = refOsc / rpfd;
-  if(((double) int(r))  == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
@@ -351,23 +354,20 @@ double Max2870CalcPFD(double rpfd)
 
   dub = 1;
   r = (refOsc * 2.0) / rpfd;
-  if(((double) int(r)) == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
 
-  r = int(r);
 
-  if(r < 1)  r = 1;
-
-  Serial.print("Unable to acheive a PFD of ");
+  Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);
   Serial.println(" MHz");
-  Serial.print("PFD set to ");
-  Serial.print((refOsc * 2.0) / r, 6);
-  Serial.println(" MHz");
+  Serial.println("PFD has not been changed");
+
+  return Max2870GetPfd();
 
   done:
   if(r < 1)  r = 1;
@@ -391,37 +391,13 @@ double Max2870CalcPFD(double rpfd)
   {
    Max2870_LDS = 0;
   }
-  
+  Serial.print("PFD changed to ");
+  Serial.print(setpfd , 6);
+  Serial.println("MHz");
   return setpfd;
+
 }
 
-void Max2870SetPfd(void)
-{
-  double pfd;
-  bool freqOK;
-  
-  freqOK = false;
-  
-   while(!freqOK)
-    {
-       Serial.printf("Enter required PFD in MHz -->");
-       pfd = inputFloat();
-       if(pfd == 0) return;
-       pfd = Max2870CalcPFD(pfd);
-      if(pfd <= maxPfd)
-        {
-          freqOK = true;
-        }
-      else
-        {
-          Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
-          Serial.println(" MHz");
-        }
-      
-    }
-   
-}
 
 double Max2870GetPfd(void)
 {

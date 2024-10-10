@@ -1,6 +1,7 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2024
 
+#define VERSION 1.00
 
 #define NUMBEROFCHANNELS 10
 
@@ -49,6 +50,9 @@ struct chanstruct chanData[NUMBEROFCHANNELS];
 int numberOfRegs = 6;                     //number of registers in the current chip type
 int numberOfBits = 32;                    //number of bits in each register
 float maxPfd = 105.0;                     //maximum PFD frequency
+float minPfd = 0;                         //Minimum PFD
+float maxOsc = 100;                       //Maximum Reference Oscillater Freq
+float minOsc = 0;                         //Minimum Reference Oscillator Freq
 bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size.  
 uint8_t channel = 0;                      //currently active channel.
 

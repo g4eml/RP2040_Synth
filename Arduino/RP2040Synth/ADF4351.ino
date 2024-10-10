@@ -222,6 +222,9 @@ void ADF4351Init(void)
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 35.0;
+  minPfd = 0;
+  maxOsc = 250;
+  minOsc = 10;
   jt4Only = true;
   pinMode(ADF4351CEPin,OUTPUT);
   digitalWrite(ADF4351CEPin,HIGH); 
@@ -329,7 +332,7 @@ double ADF4351CalcPFD(double rpfd)
   //first try a simple division...
   r = refOsc / rpfd;
 
-  if(((double) int(r))  == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
@@ -338,23 +341,19 @@ double ADF4351CalcPFD(double rpfd)
 
   dub = 1;
   r = (refOsc * 2.0) / rpfd;
-  if(((double) int(r)) == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
 
-  r = int(r);
-
-  if(r < 1) r=1;
-
-  Serial.print("Unable to acheive a PFD of ");
+  Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);
   Serial.println(" MHz");
-  Serial.print("PFD set to ");
-  Serial.print((refOsc * 2.0) / r, 6);
-  Serial.println(" MHz");
+  Serial.println("PFD has not been changed");
+  
+  return ADF4351GetPfd();
 
   done:
   if(r < 1) r = 1;
@@ -362,36 +361,12 @@ double ADF4351CalcPFD(double rpfd)
   ADF4351_DBR = dub;
   ADF4351_RDIV2 = div;
 
+  Serial.print("PFD changed to ");
+  Serial.print((refOsc * (1+dub)) / r , 6);
+  Serial.println("MHz");
   return ((refOsc * (1+dub)) / r);
 }
 
-void ADF4351SetPfd(void)
-{
-  double pfd;
-  bool freqOK;
-  
-  freqOK = false;
-  
-  while(!freqOK)
-    {
-       Serial.printf("\nEnter required PFD in MHz -->");
-       pfd = inputFloat();
-       if(pfd == 0) return;
-       pfd = ADF4351CalcPFD(pfd);
-      if(pfd <= maxPfd)
-        {
-          freqOK = true;
-        }
-      else
-        {
-          Serial.print("\nPFD must be less than ");
-          Serial.print(maxPfd);
-          Serial.println(" MHz");
-        }
-      
-    }
-   
-}
 
 double ADF4351GetPfd(void)
 {

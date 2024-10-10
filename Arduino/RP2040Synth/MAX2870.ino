@@ -345,7 +345,7 @@ double Max2870CalcPFD(double rpfd)
 
   //first try a simple division...
   r = refOsc / rpfd;
-  if(((double) int(r))  == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
@@ -354,23 +354,20 @@ double Max2870CalcPFD(double rpfd)
 
   dub = 1;
   r = (refOsc * 2.0) / rpfd;
-  if(((double) int(r)) == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
 
-  r = int(r);
-
-  if(r < 1)  r = 1;
 
   Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);
   Serial.println(" MHz");
-  Serial.print("PFD set to ");
-  Serial.print((refOsc * 2.0) / r, 6);
-  Serial.println(" MHz");
+  Serial.println("PFD has not been changed");
+
+  return Max2870GetPfd();
 
   done:
   if(r < 1)  r = 1;
@@ -394,8 +391,11 @@ double Max2870CalcPFD(double rpfd)
   {
    Max2870_LDS = 0;
   }
-  
+  Serial.print("PFD changed to ");
+  Serial.print(setpfd , 6);
+  Serial.println("MHz");
   return setpfd;
+
 }
 
 

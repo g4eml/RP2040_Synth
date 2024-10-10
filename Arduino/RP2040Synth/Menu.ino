@@ -618,12 +618,14 @@ void enterPfd(void)
   double rpfd;
   double temp;
   bool freqOK;
+  double oldpfd;
   
   freqOK = false;
 
+  oldpfd = chipGetPfd();
 
   Serial.print("Current PFD is ");
-  Serial.print(chipGetPfd() , 10);
+  Serial.print(oldpfd , 10);
   Serial.println(" MHz");
   temp = chipGetFrequency();
  
@@ -648,9 +650,13 @@ void enterPfd(void)
     }
    
     rpfd = chipCalcPfd(pfd);
-    Serial.println("Recalculating frequency with new PFD.");
+
+    if(rpfd != oldpfd)
+    {
+     Serial.println("Recalculating frequency with new PFD");
     chipSetFrequency(temp);
-    chipUpdate();
+    chipUpdate();     
+    }
  }
 
 bool paramBool(String param , String name, bool* var , String value)

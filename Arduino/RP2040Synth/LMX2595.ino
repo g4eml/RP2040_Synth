@@ -743,7 +743,7 @@ double LMX2595CalcPFD(double rpfd)
 
   //first try a simple division...
   r = refOsc / rpfd;
-  if(((double) int(r))  == r)       //check if this is an integer division
+  if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
     {
       goto done;
     }
@@ -779,17 +779,15 @@ double LMX2595CalcPFD(double rpfd)
 
      }
 
-  r = int(r);
-  if(r < 1) r=1;
 
   Serial.print("Unable to achieve a PFD of ");
   Serial.print(rpfd, 6);
   Serial.print(" MHz With a Ref Oscillator of ");
   Serial.print(refOsc, 6);
   Serial.println(" MHz");
-  Serial.print("PFD set to ");
-  Serial.print((refOsc * (1+dub) * mult) / r, 6);
-  Serial.println(" MHz");
+  Serial.println("PFD has not been changed");
+
+  return LMX2595GetPfd();
 
   done:
   if(r < 1) r = 1;
@@ -810,6 +808,9 @@ double LMX2595CalcPFD(double rpfd)
   if((rpfd >= 2.5) && (rpfd < 5.0))  LMX2595_FCAL_LPFD_ADJ = 2;
   if(rpfd < 2.5)  LMX2595_FCAL_LPFD_ADJ = 3; 
 
+  Serial.print("PFD changed to ");
+  Serial.print(rpfd , 6);
+  Serial.println("MHz");
   return rpfd;
 }
 

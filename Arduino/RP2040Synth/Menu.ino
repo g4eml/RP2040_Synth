@@ -453,7 +453,8 @@ void mainMenu(void)
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
 
    Serial.println("");
-   Serial.println("G4EML Synthesiser Controller");
+   Serial.print("G4EML Synthesiser Controller Version ");
+   Serial.println(VERSION);
    flushInput();
    showMenu(menuList);
    do

@@ -735,8 +735,10 @@ void LMX2595Update(void)
 
 double LMX2595CalcPFD(double rpfd)
 {
-  double r = 0;
+  double r = 1;
   double mult = 1;
+  double pre =1;
+  double multInFreq = 1;
   double multOutFreq =1;
   bool dub = 0;
   bool div = 0;
@@ -758,26 +760,56 @@ double LMX2595CalcPFD(double rpfd)
       goto done;
     }
 
-   if((refOsc < rpfd) && (refOsc >=30) && (refOsc <=70))                     //try the multiplier if we are within its limits
-     {
-      dub = 0;
-      mult = int(rpfd / refOsc);
-      multOutFreq = refOsc * mult;
+
+
+
+  //  if((refOsc < rpfd) && (refOsc >=30) && (refOsc <=70))                     //try the multiplier if we are within its limits
+  //    {
+  //     dub = 0;
+  //     mult = int(rpfd / refOsc);
+  //     multOutFreq = refOsc * mult;
       
-      while((multOutFreq < 180) && (mult <= 7))                                              //Multiplier output must be at least 180 MHz (Data Sheet Limit)
+  //     while((multOutFreq < 180) && (mult <= 7))                                              //Multiplier output must be at least 180 MHz (Data Sheet Limit)
+  //       {
+  //         mult=mult+1;
+  //         multOutFreq = refOsc * mult;
+  //       }
+
+  //     r = multOutFreq / rpfd;
+
+  //     if((((double) int(r)) == r) && (multOutFreq <=250))      //check if this is an integer division and is in range for the divider
+  //       {
+  //         goto done;
+  //       } 
+
+  //    }
+
+  // Try using the Multiplier 
+
+  dub = 0;                                    //can't use doubler and Multiplier together (data sheet)
+  if((refOsc < rpfd) && (refOsc > 30))        //pfd must be greater than the Ref Osc and we cant use the Multiplier if the ref osc is less than 30
+    {
+      for(int p=1;p < 47;p++)               //try all possible values of Pre divider
         {
-          mult=mult+1;
-          multOutFreq = refOsc * mult;
+          multInFreq=refOsc/(double) p;
+          if(multInFreq < 30) break;        //stop looking if the multiplier input frequency is less than minimum
+          if(multInFreq > 70) continue;     //try the next pre divide value if the multiplier input frequency is above maximum
+
+          for(int m=3;m<8;m++)                  //try all values of the multiplier 
+            {
+              multOutFreq = multInFreq * (double) m;
+              if(multOutFreq > 250) break;      //stop looking if the multiplier output frequency is greater than allowed
+              if(multOutFreq < 180) continue;   //try the next Multiplier if it below the allowed output frequency
+              r = multOutFreq/rpfd;                         //we now have a multOutFreq which we can try to see if the rpfd can be achieved
+              if(fabs(((double) int(r)) - r) < 0.000001 )       //check if this is an integer division
+               {
+                mult = m;
+                pre = p;
+                goto done;                                    //found a solution!
+               }
+            }
         }
-
-      r = multOutFreq / rpfd;
-
-      if((((double) int(r)) == r) && (multOutFreq <=250))      //check if this is an integer division and is in range for the divider
-        {
-          goto done;
-        } 
-
-     }
+    }
 
 
   Serial.print("Unable to achieve a PFD of ");
@@ -791,13 +823,13 @@ double LMX2595CalcPFD(double rpfd)
 
   done:
   if(r < 1) r = 1;
-  LMX2595_PLL_R_PRE = 1;          //we are not using the Pre Multiplier Divider
+  LMX2595_PLL_R_PRE = pre;        //set the Pre Multiplier Divider
   LMX2595_MULT = mult;            //set the multipier 
   LMX2595_PLL_R = r;              //we will use the post multiplier divider
   LMX2595_OSC_2X = dub;           //Reference doubler if wee need it
 
 //calculate the actual PFD set and adjust the HP and LP registers to suit
-  rpfd = (refOsc * (1 + dub) * mult) / r;
+  rpfd = (((refOsc * (1 + dub)) / pre) * mult) / r;
 
   if(rpfd <= 100.0) LMX2595_FCAL_HPFD_ADJ = 0;
   if((rpfd > 100.0) && (rpfd <= 150.0))  LMX2595_FCAL_HPFD_ADJ = 1; 
@@ -810,7 +842,7 @@ double LMX2595CalcPFD(double rpfd)
 
   Serial.print("PFD changed to ");
   Serial.print(rpfd , 6);
-  Serial.println("MHz");
+  Serial.println(" MHz");
   return rpfd;
 }
 

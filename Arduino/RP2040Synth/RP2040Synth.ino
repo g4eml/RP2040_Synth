@@ -1,6 +1,7 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2024
 
+#define VERSION 1.00
 
 #define NUMBEROFCHANNELS 10
 

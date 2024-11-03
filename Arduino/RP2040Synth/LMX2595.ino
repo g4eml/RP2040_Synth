@@ -761,29 +761,6 @@ double LMX2595CalcPFD(double rpfd)
     }
 
 
-
-
-  //  if((refOsc < rpfd) && (refOsc >=30) && (refOsc <=70))                     //try the multiplier if we are within its limits
-  //    {
-  //     dub = 0;
-  //     mult = int(rpfd / refOsc);
-  //     multOutFreq = refOsc * mult;
-      
-  //     while((multOutFreq < 180) && (mult <= 7))                                              //Multiplier output must be at least 180 MHz (Data Sheet Limit)
-  //       {
-  //         mult=mult+1;
-  //         multOutFreq = refOsc * mult;
-  //       }
-
-  //     r = multOutFreq / rpfd;
-
-  //     if((((double) int(r)) == r) && (multOutFreq <=250))      //check if this is an integer division and is in range for the divider
-  //       {
-  //         goto done;
-  //       } 
-
-  //    }
-
   // Try using the Multiplier 
 
   dub = 0;                                    //can't use doubler and Multiplier together (data sheet)
@@ -950,14 +927,6 @@ if (freq > 15000.0)                 //use the doubler between 15 and 20 GHz
       LMX2595_OUTA_MUX = 0;
       LMX2595_VCO2X_EN = 0; 
       LMX2595_CHDIV = chd - 1;
-      if(LMX2595_CHDIV == 2)
-       {
-        LMX2595_SEG1_EN = 0;
-       }
-      else
-        {
-         LMX2595_SEG1_EN = 1;   
-        }
     }
 
   if(dub == 1)

@@ -75,6 +75,11 @@ This can be done either before or after the Pico has been connected, it makes no
 
 3. Copy the .uf2 file onto the USB drive. The RP2040 will recognise the file and immediately update its firmware and reboot.
 
+4. Windows 10 and above should automatically load the necessary driver and allocate a Com Port to the RP2040.
+
+Note:- Windows 7 or 8 will not automatically load the necessary driver and device mananger may show the device under Unknown Devices as 'Board CDC' or 'Pico'.
+You can load the correct driver by running Zadig https://zadig.akeo.ie/  and allocating the USB Serial CDC driver to the device.
+ 
 ## Building your own version of the firmware (longer method and not normally required)
 
 The RP2040 is programmed using the Arduino IDE with the Earl F. Philhower, III  RP2040 core. 

@@ -283,9 +283,9 @@ void setCwIdent(void)
    }
 
   chanData[channel].fskMode |= CWIDBIT;
-  Serial.print("Enter CW Ident (max 32 characters) --->");
+  Serial.print("Enter CW Ident (max 30 characters) --->");
   cws = inputString(true);
-  cws.toCharArray(&chanData[channel].cwid[1], 32 );
+  cws.toCharArray(&chanData[channel].cwid[1], 30 );
   chanData[channel].cwidLen = cws.length();
 
   Serial.print("Enter CW speed (5 - 30 Words per Minute) ---> ");
@@ -363,10 +363,15 @@ void setjtMode(void)
 
   if(chanData[channel].jtMode != 0)
     {
+      char temp[14];
       Serial.print("Enter JT Message (Max 13 characters) --->");
       jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
-      jts.toCharArray(&chanData[channel].jtid[0], 13 );
-
+      jts.toCharArray(temp,14);                                  //copy the chars to a temporary char array (include trailing zero terminator)
+      for(int c = 0;c<13;c++)                                    //now copy the  13 chars excluding the trailing zero
+      {
+        chanData[channel].jtid[c] = temp[c];
+      }
+      
       double worsterr = jtInit();
 
       if((worsterr * 1000000.0)> 0.009)

@@ -1082,6 +1082,8 @@ void LMX2595CalcFreq(void)
   n = (double) LMX2595_PLL_N;
 
   Serial.println();
+  Serial.print("Chip type is ");
+  Serial.println(chipName[chip]);
   Serial.print("Reference Oscillator = ");
   Serial.print(refOsc,10);
   Serial.println(" MHz");
@@ -1133,6 +1135,8 @@ void LMX2595CalcFreq(void)
 
   if(chanData[channel].extMult > 1)
     {
+      Serial.print("External Multipler = X");
+      Serial.println(chanData[channel].extMult);
       Serial.print("Final Multiplied Frequency = ");
       Serial.print((vco / diva) * (double) chanData[channel].extMult, 10);
       Serial.println(" MHz"); 

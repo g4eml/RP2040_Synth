@@ -363,6 +363,9 @@ void setjtMode(void)
 
   if(chanData[channel].jtMode != 0)
     {
+      Serial.print("Enter Tone 1 Offset from Carrier Frequency (Hz) --->");
+      chanData[channel].jtTone1 = inputNumber() / (double) chanData[channel].extMult ;
+      chanData[channel].jtTone1 = chanData[channel].jtTone1 / 1000000.0;      //convert to MHz
       char temp[14];
       Serial.print("Enter JT Message (Max 13 characters) --->");
       jts = inputString(true) + "             ";                 //make sure there are at least 13 chars available
@@ -376,10 +379,15 @@ void setjtMode(void)
 
       if((worsterr * 1000000.0)> 0.009)
       {
-        Serial.println("The current settings can produce the required tones");
+        Serial.println("\nThe current Synthesiser settings can produce the required tones");
         Serial.print("with a maximum error of ");
         Serial.print(worsterr * 1000000.0);
         Serial.println(" Hz");
+      }
+      if((worsterr * 1000000.0) > (jtToneSpacing / 100))
+      {
+        Serial.println("\nWARNING! This error may be too large for accurate decoding.");
+        Serial.println("Try changing the Tone 1 Offset or the PFD for a smaller error.");
       }
     }
   Serial.println("\nDon't forget to save the settings to EEPROM if you are happy with them.");

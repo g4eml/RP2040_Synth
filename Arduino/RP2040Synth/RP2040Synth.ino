@@ -36,9 +36,10 @@ uint8_t cwidSpeed = 10;                 //CWID speed in words per minute
 uint8_t cwidInterval = 60;              //CWID Inteval in seconds.
 float cwidShift = 0;                    //CW ID FSK Shift in MHz 
 float keyShift = 0;                     //external key FSK Shift in MHz 
-char cwid[32] = " ";                    // up to 32 CWID characters
+char cwid[32] = " ";                    // up to 30 CWID characters
 uint8_t jtMode = 0;                     //JT mode
 char jtid[13] = " ";                    //JT Message
+float jtTone1 = 0;                      //JT Tone 1 Offset from Nominal Frequency (Mhz)
 uint8_t extMult = 1;                    //Multiplcation factor for external frequency multiplier. (used to calculate the correct FSK Shifts.)
 };
 
@@ -83,9 +84,9 @@ uint16_t jtToneDelay;
 double jtToneSpacing;
 uint8_t jtNumberOfTones;
 
-uint32_t jtN[65];
-uint32_t jtNum[65];
-uint32_t jtDen[65];
+uint32_t jtN[66];               //Note Element 0 is the nominal frequency. Element 1 is the Tone 1 frequency
+uint32_t jtNum[66];
+uint32_t jtDen[66];
 
 
 JTEncode jtEncode;

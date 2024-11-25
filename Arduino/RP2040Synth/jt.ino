@@ -50,11 +50,13 @@ double jtInit(void)
       break; 
     }
 
+     chipSetFrequency(nominal);
+     chipSaveJt(0);                           //save the nominal carrier frequency to JT Index 0
   for(int i = 0;i < jtNumberOfTones;i++)
    {
-    nomf = nominal + i * ((jtToneSpacing/1000000.0) / (double) chanData[channel].extMult);
+    nomf = nominal + chanData[channel].jtTone1 + i * ((jtToneSpacing/1000000.0) / (double) chanData[channel].extMult);
      chipSetFrequency(nomf);
-     chipSaveJt(i);
+     chipSaveJt(i+1);
      thisf = chipGetFrequency();
      if(abs(thisf - nomf) > worsterr )
      {
@@ -82,11 +84,11 @@ void jtTick(void)
           {
             jtActive = false;
             jtPointer =  0;
-            chipJtShift(0);
+            chipJtShift(0);                                 //Reset to nominal carrier frequency
           }
         else
         {
-         chipJtShift(jtBuffer[jtPointer++]);
+         chipJtShift(jtBuffer[jtPointer++] +1);
         }
       }
   }

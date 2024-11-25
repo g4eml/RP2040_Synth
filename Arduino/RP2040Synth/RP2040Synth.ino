@@ -1,7 +1,7 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2024
 
-#define VERSION 1.00
+#define VERSION 1.03
 
 #define NUMBEROFCHANNELS 10
 
@@ -234,6 +234,7 @@ void loop()
 
       if(Serial.available() > 0 )          //test for USB command connected
      {
+       chipExtKey(true);                    //reset to nominal carrier frequency
        mainMenu();                         //timing loop stops while the menu system is running.
        seconds = -1;                       //reset the timing after using the menu.
        milliseconds = 0;

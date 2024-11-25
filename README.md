@@ -16,6 +16,9 @@ Support for FSK CW Identification for beacon use.
 
 Supports JT data modes for Beacon Identification.  JT4G is available on all chip types. JT65B and JT65C are only available on the LMX2595. 
 
+Note:- Whilst JT4G mode is available on all chips there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
+A warning message will be displayed if the tone spacing is more than 1% in error. 
+
 Supports GPS connection for the accurate timing required for JT data modes. 
 
 Supports 10 different channels which can be selected by external switches. 

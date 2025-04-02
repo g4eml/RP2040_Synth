@@ -461,8 +461,8 @@ void LMX2595Init(void)
   numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
   maxPfd = 300.0;
   minPfd = 5;
-  maxOsc = 1400;
-  minOsc = 5;
+  maxOsc = 1401;
+  minOsc = 4;
   jt4Only = false;
   pinMode(LMX2595CEPin,OUTPUT);
   digitalWrite(LMX2595CEPin,HIGH); 

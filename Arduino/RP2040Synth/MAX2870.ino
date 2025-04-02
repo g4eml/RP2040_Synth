@@ -232,8 +232,8 @@ void Max2870Init(void)
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 50.0;                      //maximum PFD frequency
   minPfd = 0;
-  maxOsc = 200;
-  minOsc = 10;
+  maxOsc = 201;
+  minOsc = 9;
   jt4Only = true;
   pinMode(MAX2870CEPin,OUTPUT);
   digitalWrite(MAX2870CEPin,HIGH); 

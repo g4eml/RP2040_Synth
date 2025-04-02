@@ -223,8 +223,8 @@ void ADF4351Init(void)
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 35.0;
   minPfd = 0;
-  maxOsc = 250;
-  minOsc = 10;
+  maxOsc = 251;
+  minOsc = 9;
   jt4Only = true;
   pinMode(ADF4351CEPin,OUTPUT);
   digitalWrite(ADF4351CEPin,HIGH); 

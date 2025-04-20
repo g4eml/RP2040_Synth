@@ -432,7 +432,7 @@ void ADF4351SetFrequency(double direct)
   if((freq >= 550.000) && (freq < 1100.000))  ADF4351_RFDIV = 2;
   if((freq >= 275.000) && (freq < 550.000))  ADF4351_RFDIV = 3; 
   if((freq >= 137.500) && (freq < 275.000))  ADF4351_RFDIV = 4;
-  if((freq >= 68.750) && (freq < 13.7500))  ADF4351_RFDIV = 5;
+  if((freq >= 68.750) && (freq < 137.500))  ADF4351_RFDIV = 5;
   if((freq >= 34.375) && (freq < 68.750))  ADF4351_RFDIV = 6;
   
 

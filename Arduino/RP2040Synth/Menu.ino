@@ -168,7 +168,7 @@ void enterOsc(void)
   double oscFreq = 0;
   Serial.print("\nCurrent Reference Oscillator is ");
   Serial.print(refOsc , 10);
-  Serial.print(" MHz\nEnter New Reference Oscillator Frequency in MHz --> ");
+  Serial.print(" MHz\r\nEnter New Reference Oscillator Frequency in MHz --> ");
   oscFreq = inputFloat();
   if ((oscFreq >= minOsc ) && (oscFreq <= maxOsc))
     {

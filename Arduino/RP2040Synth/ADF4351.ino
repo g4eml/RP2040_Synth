@@ -226,6 +226,7 @@ void ADF4351Init(void)
   maxOsc = 251;
   minOsc = 9;
   jt4Only = true;
+  jtDisable = false;
   pinMode(ADF4351CEPin,OUTPUT);
   digitalWrite(ADF4351CEPin,HIGH); 
   pinMode(ADF4351LEPin,OUTPUT);

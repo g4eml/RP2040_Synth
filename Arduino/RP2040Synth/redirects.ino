@@ -15,6 +15,10 @@ void chipUpdate(void)
     case LMX2595:
     LMX2595Update();
     break;
+
+    case CMT2119A:
+    CMT2119AUpdate();
+    break;
   }
 }
 
@@ -32,6 +36,12 @@ void chipSetParameters(void)
 
     case LMX2595:
     LMX2595SetParameters();
+    break;
+
+    case CMT2119A:
+    Serial.println();
+    Serial.println("Variables are not available for this chip type.");
+    Serial.println();
     break;
   }
 }
@@ -51,6 +61,10 @@ void chipInit(void)
     case LMX2595:
     LMX2595Init();
     break;
+
+    case CMT2119A:
+    CMT2119AInit();
+    break;
   }
 }
 
@@ -68,6 +82,10 @@ void chipSetFrequency(double f)
 
     case LMX2595:
     LMX2595SetFrequency(f);
+    break;
+
+    case CMT2119A:
+    CMT2119ASetFrequency(f);
     break;
   }
 }
@@ -87,6 +105,10 @@ double chipGetFrequency(void)
 
     case LMX2595:
     freq = LMX2595GetFrequency();
+    break;
+
+    case CMT2119A:
+    freq = CMT2119AGetFrequency();
     break;
   }
 
@@ -108,6 +130,10 @@ void chipCalcFreq(void)
           case LMX2595:
           LMX2595CalcFreq();
           break;
+
+          case CMT2119A:
+          CMT2119ACalcFreq();
+          break;
         }
 }
   void chipDecodeRegs(void)
@@ -124,6 +150,9 @@ void chipCalcFreq(void)
 
           case LMX2595:
           LMX2595DecodeRegs();
+          break;
+
+          case CMT2119A:
           break;
         }
   }
@@ -142,6 +171,10 @@ void chipCalcFreq(void)
 
           case LMX2595:
           LMX2595SetDefault();
+          break;
+
+          case CMT2119A:
+          CMT2119ASetDefault();
           break;
         }
   }
@@ -162,6 +195,10 @@ void chipCalcFreq(void)
           case LMX2595:
           LMX2595FskKey(key);
           break;
+
+          case CMT2119A:
+          CMT2119AFskKey(key);
+          break;
         }
   }
 
@@ -181,6 +218,10 @@ void chipCalcFreq(void)
           case LMX2595:
           LMX2595ExtKey(key);
           break;
+
+          case CMT2119A:
+          CMT2119AExtKey(key);
+          break;
         }
   }
 
@@ -199,6 +240,10 @@ void chipCalcFreq(void)
 
           case LMX2595:
           LMX2595jtShift(val);
+          break;
+
+          case CMT2119A:
+          CMT2119AjtShift(val);
           break;
         }
   }
@@ -220,6 +265,10 @@ void chipCalcFreq(void)
           case LMX2595:
           LMX2595SaveFskShift();
           break;
+
+          case CMT2119A:
+          CMT2119ASaveFskShift();
+          break;
         }
   }
 
@@ -238,6 +287,10 @@ void chipCalcFreq(void)
 
           case LMX2595:
           LMX2595SaveKeyShift();
+          break;
+          
+          case CMT2119A:
+          CMT2119ASaveKeyShift();
           break;
         }
   }
@@ -259,6 +312,10 @@ void chipCalcFreq(void)
           case LMX2595:
           LMX2595SaveJt(index);
           break;
+
+          case CMT2119A:
+          CMT2119ASaveJt(index);
+          break;
         }
   }
 
@@ -278,6 +335,10 @@ void chipCalcFreq(void)
 
           case LMX2595:
           pfd = LMX2595GetPfd();
+          break;
+
+          case CMT2119A:
+          pfd = CMT2119AGetPfd();
           break;
         }
 
@@ -299,6 +360,9 @@ void chipCalcFreq(void)
 
           case LMX2595:
           rpfd = LMX2595CalcPFD(pfd);
+          break;
+
+          case CMT2119A:
           break;
         }
 

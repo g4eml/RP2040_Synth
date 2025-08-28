@@ -7,8 +7,8 @@
 
 //Global values...
 
-enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 };
-String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595"};
+enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 , CMT2119A };
+String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595", "CMT2119A"};
 
 
 //These values are saved to the eeprom for recall on statup. 
@@ -54,7 +54,8 @@ float maxPfd = 105.0;                     //maximum PFD frequency
 float minPfd = 0;                         //Minimum PFD
 float maxOsc = 100;                       //Maximum Reference Oscillater Freq
 float minOsc = 0;                         //Minimum Reference Oscillator Freq
-bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size.  
+bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size. 
+bool jtDisable = false;                   //lowest spec chips can not do JT modes due to limited frequency resolution.  
 uint8_t channel = 0;                      //currently active channel.
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency for CWID. Calculated by cwidInit()

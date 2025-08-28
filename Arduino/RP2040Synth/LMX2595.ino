@@ -464,6 +464,7 @@ void LMX2595Init(void)
   maxOsc = 1401;
   minOsc = 4;
   jt4Only = false;
+  jtDisable = false;
   pinMode(LMX2595CEPin,OUTPUT);
   digitalWrite(LMX2595CEPin,HIGH); 
   pinMode(LMX2595CSBPin,OUTPUT);

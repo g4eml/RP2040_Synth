@@ -235,6 +235,7 @@ void Max2870Init(void)
   maxOsc = 201;
   minOsc = 9;
   jt4Only = true;
+  jtDisable = false;
   pinMode(MAX2870CEPin,OUTPUT);
   digitalWrite(MAX2870CEPin,HIGH); 
   pinMode(MAX2870LEPin,OUTPUT);

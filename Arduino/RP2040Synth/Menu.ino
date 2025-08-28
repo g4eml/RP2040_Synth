@@ -236,6 +236,8 @@ void enterRegs(void)
                   char buf[16];
                   value.toCharArray(buf,16);
                   chanData[channel].reg[regno] = (uint32_t) strtoll(buf,0,16);
+                  chipDecodeRegs();
+                  chipUpdate();
                }
              Serial.print("\nR");
              Serial.print(regno);
@@ -335,6 +337,14 @@ void setCwIdent(void)
 
 void setjtMode(void)
 {
+  if(jtDisable)
+   {
+    Serial.println();
+    Serial.println("JT Modes not available on this chip type");
+    Serial.println();
+    chanData[channel].jtMode = 0;
+    return;
+   }
   String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = JT65B" , "3 = JT65C", "$$$"};
   String jtModesReduced[] = {"0 = None" , "1 = JT4G" , "$$$"};
   char resp;
@@ -463,7 +473,7 @@ void mainMenu(void)
   char resp;
   double temp;
   String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure JT Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
-  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "$$$"};
+  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "$$$"};
 
    Serial.println("");
    Serial.print("G4EML Synthesiser Controller Version ");
@@ -499,7 +509,16 @@ void mainMenu(void)
         case 'S':
         case 's':
         saveSettings();
-        Serial.println("\nSettings saved to EEPROM");
+        Serial.println("\nSettings saved to RP2040 EEPROM");
+        if(chip == CMT2119A)
+         {
+         resp = getSelection("Do you also want to save the settings to the CMT2119A EEPROM? Y or N --->");
+         if((resp == 'Y') || (resp == 'y'))
+          {
+            CMT2119A_EEPROM_BURN();
+          }
+         }
+
         break;
 
         case 'F':
@@ -515,6 +534,7 @@ void mainMenu(void)
           }
 
         chipSetFrequency(0);
+
         chipUpdate();
         Serial.println("\nFrequency Updated");
         break;
@@ -545,7 +565,7 @@ void mainMenu(void)
         if ((resp != 'Y') & (resp != 'y')) break;
         showMenu(chipList);
         resp = getSelection("Enter Chip Type -->");
-        if((resp > '0') && (resp < '4'))
+        if((resp > '0') && (resp < '5'))
         {
         chip = resp - '0';
         }
@@ -567,7 +587,6 @@ void mainMenu(void)
         case 'R':
         case 'r':
         enterRegs();
-        chipDecodeRegs();
         break;
 
         case 'O':
@@ -633,6 +652,14 @@ void enterPfd(void)
   double temp;
   bool freqOK;
   double oldpfd;
+
+  if( maxPfd == 0)
+   {
+    Serial.println();
+    Serial.println("PFD Cannot be changed on this chip type.");
+    Serial.println();
+    return;
+   }
   
   freqOK = false;
 

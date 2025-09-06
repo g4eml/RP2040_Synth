@@ -2,7 +2,7 @@
 
 ## Description
 
-A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 3 different type of synthesiser chip, the ADF4351, the Max2870 and the LMX2595.
+A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 4 different type of synthesiser chip, the ADF4351, the Max2870 the LMX2595 and the CMT2119A.
 
 ## Features
 
@@ -14,9 +14,9 @@ Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
-Supports JT data modes for Beacon Identification.  JT4G is available on all chip types. JT65B and JT65C are only available on the LMX2595. 
+Supports JT data modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. JT65B and JT65C are only available on the LMX2595. 
 
-Note:- Whilst JT4G mode is available on all chips there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
+Note:- Whilst JT4G mode is available there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
 A warning message will be displayed if the tone spacing is more than 1% in error. 
 
 Supports GPS connection for the accurate timing required for JT data modes. 
@@ -31,7 +31,7 @@ Supports use with an external frequency multiplier for the higher microwave band
 
 Direct output frequency and phase detector frequency entry. Register values are calculated automatically.  
 
-Direct data sheet parameter entry for 'fine tuning' the default settings.
+Direct data sheet parameter entry for 'fine tuning' the default settings. (Not available for CMT2119A, the available datasheet is very limited.)
 
 Direct register entry for loading a configuration from another program.
 
@@ -160,16 +160,16 @@ The LMX2595 takes a lot of current so is best supplied from the USB 5V line usin
 
 The generic wiring instructions are as follows:-
 
-| RP2040 | ADF4351 | MAX2870 | LMX2595 |
-| :---:  |  :---:  |  :---:  |   :---: |
-|5V      |   N/C   |   N/C   |    5V   |
-|3V3     |   3V3   |   3V3   |   N/C   |
-|GND     |   GND   |   GND   |   GND   |
-|GPO3    |   CE    |   CE    |   CE    |
-|GPO4    |   MUX   |   MUX   |  MUXout |
-|GPO5    |   LE    |   LE    |   CSB   |
-|GPO6    |   CLK   |   CLK   |   SCK   |
-|GPO7    |   DAT   |   DATA  |   SDI   |
+| RP2040 | ADF4351 | MAX2870 | LMX2595 | CMT2119A |
+| :---:  |  :---:  |  :---:  |   :---: |  :---: |
+|5V      |   N/C   |   N/C   |    5V   |   N/C  |
+|3V3     |   3V3   |   3V3   |   N/C   |   VDD  |
+|GND     |   GND   |   GND   |   GND   |   GND  |
+|GPO3    |   CE    |   CE    |   CE    |   N/C  |
+|GPO4    |   MUX   |   MUX   |  MUXout |   N/C  |
+|GPO5    |   LE    |   LE    |   CSB   |   N/C  |
+|GPO6    |   CLK   |   CLK   |   SCK   |  DATA  |
+|GPO7    |   DAT   |   DATA  |   SDI   |   CLK  |
 
 The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the JT modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
 
@@ -241,7 +241,7 @@ K = Configure External Key. An External Morse key can be connected and used to f
 
 G = View GPS NMEA data. This is used to test the GPS connection. when selected it will echo all GPS data to the screen. Press any key to exit this mode. 
 
-S = Save Registers to EEPROM. Saves the current Synthesiser settings to EEPROM. They will then be automatically loaded on the next power cycle. You must do this at least once. 
+S = Save Registers to EEPROM. Saves the current Synthesiser settings to EEPROM. They will then be automatically loaded on the next power cycle. You must do this at least once. On the CMT2119A you will also have the option to update the EEPROM on the chip itself. Having done this the chip should then power on and set itself to the saved frequency without needing to be connected to the RP2040. 
 
 X = Exit Menu. Exits from the menu, re-initialises the Synthesiser and starts the CW Ident. 
 

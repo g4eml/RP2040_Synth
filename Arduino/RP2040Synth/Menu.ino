@@ -312,10 +312,10 @@ void setCwIdent(void)
        Serial.print("Enter FSK Shift in Hz ---> ");
      }
 
-  chanData[channel].cwidShift = inputNumber() / (double) chanData[channel].extMult ;
+  chanData[channel].cwidShift = inputNumber();
   chanData[channel].cwidShift = chanData[channel].cwidShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + (double) chanData[channel].cwidShift);
+  chipSetFrequency(nominal + (double) chanData[channel].cwidShift / (double) chanData[channel].extMult);
   chipSaveFskShift();
   Serial.println("\nActual Final Multiplied frequencies achievable with the current PFD will be :-");
   Serial.print("Key Up Frequency = ");

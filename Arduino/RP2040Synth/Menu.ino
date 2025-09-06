@@ -374,7 +374,7 @@ void setjtMode(void)
   if(chanData[channel].jtMode != 0)
     {
       Serial.print("Enter Tone 1 Offset from Carrier Frequency (Hz) --->");
-      chanData[channel].jtTone1 = inputNumber() / (double) chanData[channel].extMult ;
+      chanData[channel].jtTone1 = inputNumber() ;
       chanData[channel].jtTone1 = chanData[channel].jtTone1 / 1000000.0;      //convert to MHz
       char temp[14];
       Serial.print("Enter JT Message (Max 13 characters) --->");

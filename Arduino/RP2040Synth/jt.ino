@@ -54,7 +54,7 @@ double jtInit(void)
      chipSaveJt(0);                           //save the nominal carrier frequency to JT Index 0
   for(int i = 0;i < jtNumberOfTones;i++)
    {
-    nomf = nominal + chanData[channel].jtTone1 + i * ((jtToneSpacing/1000000.0) / (double) chanData[channel].extMult);
+    nomf = nominal + (chanData[channel].jtTone1 / (double) chanData[channel].extMult) + i * ((jtToneSpacing/1000000.0) / (double) chanData[channel].extMult);
      chipSetFrequency(nomf);
      chipSaveJt(i+1);
      thisf = chipGetFrequency();

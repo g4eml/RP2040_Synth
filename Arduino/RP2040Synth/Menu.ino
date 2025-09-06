@@ -428,10 +428,10 @@ void setKeyMode(void)
        Serial.print("Enter FSK Shift in Hz ---> ");
      }
 
-  chanData[channel].keyShift = inputNumber() / (double) chanData[channel].extMult ;
+  chanData[channel].keyShift = inputNumber() ;
   chanData[channel].keyShift = chanData[channel].keyShift / 1000000.0;      //convert to MHz
   double nominal = chipGetFrequency();
-  chipSetFrequency(nominal + (double) chanData[channel].keyShift);
+  chipSetFrequency(nominal + (double) chanData[channel].keyShift/(double) chanData[channel].extMult);
   chipSaveKeyShift();
   Serial.println("\nActual Final Multiplied Frequencies achievable with the current PFD will be :-");
   Serial.print("Key Down Frequency = ");

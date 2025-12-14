@@ -58,20 +58,12 @@ typedef struct {
 	const int  *c2vmidx;
 	const int  *gfpmat;
 } qracode;
-// Uncomment the header file of the code which needs to be tested
-
-//#include "qra12_63_64_irr_b.h"  // irregular code (12,63) over GF(64)
-//#include "qra13_64_64_irr_e.h"  // irregular code with good performance and best UER protection at AP56
-//#include "qra13_64_64_reg_a.h"  // regular code with good UER but perf. inferior to that of code qra12_63_64_irr_b
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 int   qra_encode(const qracode *pcode, int *y, const int *x);
-float qra_mfskbesselmetric(float *pix, const float *rsq, const int m, const int N, float EsNoMetric);
-int   qra_extrinsic(const qracode *pcode, float *pex, const float *pix, int maxiter,float *qra_v2cmsg,float *qra_c2vmsg);
-void  qra_mapdecode(const qracode *pcode, int *xdec, float *pex, const float *pix);
 
 #ifdef __cplusplus
 }

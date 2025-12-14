@@ -2,10 +2,9 @@
 
 void flushInput(void)
 {
-  char dummy;
    while(Serial.available())
    {
-    dummy = Serial.read();
+     Serial.read();
    }
 }
 
@@ -179,7 +178,6 @@ void enterOsc(void)
 void enterRegs(void)
 {
   int regno = 0;
-  int64_t regval = 0;
   String resp;
   String param;
   String value;
@@ -796,7 +794,7 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
         {
           if(value.length() >0)
           {
-            if((value.toInt() >= min) && (value.toInt() <= max))
+            if(((uint32_t)value.toInt() >= min) && ((uint32_t)value.toInt() <= max))
             {
               *var = value.toInt();
             }

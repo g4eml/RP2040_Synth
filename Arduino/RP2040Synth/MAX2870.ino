@@ -227,7 +227,6 @@ void Max2870SetParameters(void)
 
 void Max2870Init(void)
 {
-  int chip = MAX2870;                  //index to the current chip type
   numberOfRegs = 6;                   //number of registers in the current chip type
   numberOfBits = 32;                   //number of bits in each register
   maxPfd = 50.0;                      //maximum PFD frequency
@@ -423,7 +422,6 @@ void Max2870SetFrequency(double direct)
   int den;
   int bestnom;
   int bestden;
-  char resp;
 
   pfd = Max2870GetPfd();
 

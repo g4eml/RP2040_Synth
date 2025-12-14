@@ -742,7 +742,6 @@ double LMX2595CalcPFD(double rpfd)
   double multInFreq = 1;
   double multOutFreq =1;
   bool dub = 0;
-  bool div = 0;
 
   //first try a simple division...
   r = refOsc / rpfd;
@@ -848,7 +847,6 @@ void LMX2595SetFrequency(double direct)
   int divide[] = {1,2,4,6,8,12,16,24,32,48,64,72,96,128,192,256,384,512,768};
   bool dub = 0;
   bool maxDivisor;
-  char resp;
 
   if((chanData[channel].fskMode) || (chanData[channel].jtMode))           //if we are using any FSK keying then we must keep the divisor to the same value to avoid glitches
   {

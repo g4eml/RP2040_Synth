@@ -11,7 +11,6 @@ int channelsymbols[85];   //Channel symbols including sync characters (Tone 0)
 void Q65Encode(const char *message, uint8_t *buffer)
 {
   char from[7];
-  char to[7];
   char grid[5];
 
   splitUpToTwo(message,from,grid);
@@ -96,8 +95,6 @@ void encode_wsjt_message(const char *call1,
     // 15 bits = GRID
     // 3 bits = type(1)
     // 1 bit packing
-    
-    uint64_t hi = 0, lo = 0;     // emulate 128 bits
 
     uint8_t b[78] = {0};
 

@@ -14,12 +14,7 @@ void Q65Encode(const char *message, uint8_t *buffer)
   char grid[5];
 
   splitUpToTwo(message,from,grid);
-  Serial.println();
-  Serial.print(from);
-  Serial.print("-");
-  Serial.print(grid);
-  Serial.println("-");
-
+  
    encode_wsjt_message("CQ",from,grid,msg);
    q65_enc_(msg, codeword);
    maptoChannelSymbols();

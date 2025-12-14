@@ -42,6 +42,7 @@
 #define qra_R     0.23077f // code rate (K/N)
 #define CODE_NAME "qra15_65_64_irr_e23"  // code name
 
+
 // table of the systematic symbols indexes in the accumulator chain
 static const int qra_acc_input_idx[qra_NC+1] = {
  13,   1,   3,   4,   8,  12,   9,  14,  10,   5, 

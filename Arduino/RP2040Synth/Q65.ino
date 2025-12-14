@@ -1,6 +1,6 @@
 extern "C" 
 {
-    #include "q65_subs.h"  // WSJT-X header for encoding
+    #include "q65_subs.h" 
 }
 
 // Example message: "CQ K1ABC FN42"  78 bits split into 13 × 6-bit integers this will be overwritten with the actual message

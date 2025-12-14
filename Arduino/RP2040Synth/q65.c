@@ -33,9 +33,6 @@ float q65_llh;
 
 int q65_init(q65_codec_ds *pCodec, 	const qracode *pqracode)
 {
-	float	R;		// code effective rate (after puncturing)
-	int		nm;		// bits per symbol
-
 	if (!pCodec)
 		return -1;		// why do you called me?
 

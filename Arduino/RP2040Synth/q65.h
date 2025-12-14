@@ -64,60 +64,49 @@ void	q65_free(q65_codec_ds *pCodec);
 
 int		q65_encode(const q65_codec_ds *pCodec, int *pOutputCodeword, const int *pInputMsg);
 
-int		q65_intrinsics(q65_codec_ds *pCodec, float *pIntrinsics, const float *pInputEnergies);
+// int		q65_intrinsics(q65_codec_ds *pCodec, float *pIntrinsics, const float *pInputEnergies);
 
-int		q65_intrinsics_fastfading(q65_codec_ds *pCodec, 
-					float *pIntrinsics,				// intrinsic symbol probabilities output
-					const float *pInputEnergies,	// received energies input
-					const int submode,				// submode idx (0=A ... 4=E)
-					const float B90Ts,				// normalized spread bandwidth (90% fractional energy)
-					const int fadingModel);			// 0=Gaussian 1=Lorentzian fade model
+// int		q65_intrinsics_fastfading(q65_codec_ds *pCodec, 
+// 					float *pIntrinsics,				// intrinsic symbol probabilities output
+// 					const float *pInputEnergies,	// received energies input
+// 					const int submode,				// submode idx (0=A ... 4=E)
+// 					const float B90Ts,				// normalized spread bandwidth (90% fractional energy)
+// 					const int fadingModel);			// 0=Gaussian 1=Lorentzian fade model
 
 
-int		q65_decode(q65_codec_ds *pCodec, 
-			   int* pDecodedCodeword, 
-			   int *pDecodedMsg, 
-			   const float *pIntrinsics, 
-			   const int *pAPMask, 
-			   const int *pAPSymbols,
-			   const int maxiters);
+// int		q65_decode(q65_codec_ds *pCodec, 
+// 			   int* pDecodedCodeword, 
+// 			   int *pDecodedMsg, 
+// 			   const float *pIntrinsics, 
+// 			   const int *pAPMask, 
+// 			   const int *pAPSymbols,
+// 			   const int maxiters);
 
-int		q65_decode_fullaplist(q65_codec_ds *codec,
-						   int *ydec,
-						   int *xdec, 
-						   const float *pIntrinsics, 
-						   const int *pCodewords, 
-						   const int nCodewords);
+// int		q65_decode_fullaplist(q65_codec_ds *codec,
+// 						   int *ydec,
+// 						   int *xdec, 
+// 						   const float *pIntrinsics, 
+// 						   const int *pCodewords, 
+// 						   const int nCodewords);
 
-int		q65_esnodb(const q65_codec_ds *pCodec,
-					float		*pEsNodB,
-					const int *ydec, 
-					const float *pInputEnergies);
+// int		q65_esnodb(const q65_codec_ds *pCodec,
+// 					float		*pEsNodB,
+// 					const int *ydec, 
+// 					const float *pInputEnergies);
 
-int		q65_esnodb_fastfading(
-					const q65_codec_ds *pCodec,
-					float		*pEsNodB,
-					const int   *ydec,
-					const float *pInputEnergies);
+// int		q65_esnodb_fastfading(
+// 					const q65_codec_ds *pCodec,
+// 					float		*pEsNodB,
+// 					const int   *ydec,
+// 					const float *pInputEnergies);
 
 
 // helper functions
 #define q65_get_message_length(pCodec)  _q65_get_message_length((pCodec)->pQraCode)
 #define q65_get_codeword_length(pCodec) _q65_get_codeword_length((pCodec)->pQraCode)
-#define q65_get_code_rate(pCodec)		_q65_get_code_rate((pCodec)->pQraCode)
-#define q65_get_alphabet_size(pCodec)	_q65_get_alphabet_size((pCodec)->pQraCode)
-#define q65_get_bits_per_symbol(pCodec) _q65_get_bits_per_symbol((pCodec)->pQraCode)
-
 
 // internally used but made public for the above defines
 int		_q65_get_message_length(const qracode *pCode);
 int		_q65_get_codeword_length(const qracode *pCode);
-float	_q65_get_code_rate(const qracode *pCode);
-static void	_q65_mask(const qracode *pcode, float *ix, const int *mask, const int *x);
-int		_q65_get_alphabet_size(const qracode *pCode);
-int		_q65_get_bits_per_symbol(const qracode *pCode);
-
-// internally used but made public for threshold optimization
-int q65_check_llh(float *llh, const int* ydec, const int nN, const int nM, const float *pIntrin);
 
 #endif // _qra65_h

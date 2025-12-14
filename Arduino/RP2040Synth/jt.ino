@@ -22,32 +22,23 @@ double jtInit(void)
       jtNumberOfTones = 4;
       jtToneSpacing = JT4G_TONE_SPACING;
       jtSymbolCount = JT4_SYMBOL_COUNT;
-      jtTime = 1;                           //JT message every even minute
+      nextjtTime = 1;                           //JT message every even minute
       chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
+      chanData[channel].jtInterval = 120;            //digi mode every 2 minute 
       nextcwidTime = 60;                    //CW ID every Odd minute
       break;
 
       case 2:
-      jtEncode.jt65_encode(chanData[channel].jtid , jtBuffer);
-      jtToneDelay = JT65_DELAY;
+      Q65Encode(chanData[channel].jtid , jtBuffer);
+      jtToneDelay = Q65_30B_DELAY;
       jtNumberOfTones = 65;
-      jtToneSpacing = JT65B_TONE_SPACING;
-      jtSymbolCount = JT65_SYMBOL_COUNT;
-      jtTime = 1;                           //JT message every even minute
-      chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
-      nextcwidTime = 60;                    //CW ID every Odd minute
+      jtToneSpacing = Q65_30B_TONE_SPACING;
+      jtSymbolCount = Q65_30B_SYMBOL_COUNT;
+      nextjtTime = 1;                           //Digi message every minute
+      chanData[channel].cwidInterval = 60;            //override CW interval when Digi mode is active
+      chanData[channel].jtInterval = 60;            //digi mode every minute  
+      nextcwidTime = 30;                    //CW ID at 30 seconds
       break;    
-
-      case 3:
-      jtEncode.jt65_encode(chanData[channel].jtid , jtBuffer);
-      jtToneDelay = JT65_DELAY;
-      jtNumberOfTones = 65;
-      jtToneSpacing = JT65C_TONE_SPACING;
-      jtSymbolCount = JT65_SYMBOL_COUNT;
-      jtTime = 1;                           //JT message every even minute
-      chanData[channel].cwidInterval = 120;            //override CW interval when Jt mode is active
-      nextcwidTime = 60;                    //CW ID every Odd minute
-      break; 
     }
 
      chipSetFrequency(nominal);

@@ -6,7 +6,7 @@ int msg[13] = {0};
 int codeword[63];  // Encoded symbols
 int channelsymbols[85];   //Channel symbols including sync characters (Tone 0)
 
-//Encodes a ^5 Standard message in the form 'CQ CALL LOC' 
+//Encodes a Q65 Standard message in the form 'CQ CALL LOC' 
 //message parameter must have call and loc seperated by space.
 
 void Q65Encode(const char *message, uint8_t *buffer)

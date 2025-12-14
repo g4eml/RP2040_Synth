@@ -24,20 +24,8 @@
 
 #include "qracodes.h"
 
-// Error codes returned by q65_decode(...) 
-#define Q65_DECODE_INVPARAMS	 -1
-#define Q65_DECODE_FAILED		 -2
-#define Q65_DECODE_CRCMISMATCH   -3
-#define Q65_DECODE_LLHLOW		 -4
-#define Q65_DECODE_UNDETERR		 -5
-
-// Verify loglikelihood after successful decoding
-#define Q65_CHECKLLH
-// Max codeword list size in q65_decode_fullaplist
-#define Q65_FULLAPLIST_SIZE	256
-
-// maximum number of weights for the fast-fading metric evaluation
-#define Q65_FASTFADING_MAXWEIGTHS 65
+//  maximum number of weights for the fast-fading metric evaluation
+ #define Q65_FASTFADING_MAXWEIGTHS 65
 
 extern float q65_llh;
 
@@ -63,42 +51,6 @@ int		q65_init(q65_codec_ds *pCodec, const qracode *pQraCode);
 void	q65_free(q65_codec_ds *pCodec);
 
 int		q65_encode(const q65_codec_ds *pCodec, int *pOutputCodeword, const int *pInputMsg);
-
-// int		q65_intrinsics(q65_codec_ds *pCodec, float *pIntrinsics, const float *pInputEnergies);
-
-// int		q65_intrinsics_fastfading(q65_codec_ds *pCodec, 
-// 					float *pIntrinsics,				// intrinsic symbol probabilities output
-// 					const float *pInputEnergies,	// received energies input
-// 					const int submode,				// submode idx (0=A ... 4=E)
-// 					const float B90Ts,				// normalized spread bandwidth (90% fractional energy)
-// 					const int fadingModel);			// 0=Gaussian 1=Lorentzian fade model
-
-
-// int		q65_decode(q65_codec_ds *pCodec, 
-// 			   int* pDecodedCodeword, 
-// 			   int *pDecodedMsg, 
-// 			   const float *pIntrinsics, 
-// 			   const int *pAPMask, 
-// 			   const int *pAPSymbols,
-// 			   const int maxiters);
-
-// int		q65_decode_fullaplist(q65_codec_ds *codec,
-// 						   int *ydec,
-// 						   int *xdec, 
-// 						   const float *pIntrinsics, 
-// 						   const int *pCodewords, 
-// 						   const int nCodewords);
-
-// int		q65_esnodb(const q65_codec_ds *pCodec,
-// 					float		*pEsNodB,
-// 					const int *ydec, 
-// 					const float *pInputEnergies);
-
-// int		q65_esnodb_fastfading(
-// 					const q65_codec_ds *pCodec,
-// 					float		*pEsNodB,
-// 					const int   *ydec,
-// 					const float *pInputEnergies);
 
 
 // helper functions

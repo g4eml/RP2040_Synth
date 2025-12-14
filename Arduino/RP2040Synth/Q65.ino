@@ -1,12 +1,13 @@
-extern "C" 
-{
-    #include "q65_subs.h" 
-}
+//Q65 top level. Calls functions extracted from the WJST-X source code. Relevent licences apply. 
 
-// Example message: "CQ K1ABC FN42"  78 bits split into 13 × 6-bit integers this will be overwritten with the actual message
-int msg[13] = {0, 0, 0, 0, 8, 4, 55, 47, 6, 40, 40, 25, 34};
+#include "src/Q65/q65_subs.h" 
+
+int msg[13] = {0};
 int codeword[63];  // Encoded symbols
 int channelsymbols[85];   //Channel symbols including sync characters (Tone 0)
+
+//Encodes a ^5 Standard message in the form 'CQ CALL LOC' 
+//message parameter must have call and loc seperated by space.
 
 void Q65Encode(const char *message, uint8_t *buffer)
 {

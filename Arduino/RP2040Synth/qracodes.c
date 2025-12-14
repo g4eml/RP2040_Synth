@@ -23,7 +23,7 @@
 #include <math.h>
 
 #include "npfwht.h"	
-#include "pdmath.h"
+//#include "pdmath.h"
 
 #include "qracodes.h"
 

@@ -92,7 +92,7 @@ void chipSetFrequency(double f)
 
 double chipGetFrequency(void)
 {
-  double freq;
+  double freq = 0;
   switch(chip)
   {
     case MAX2870:
@@ -322,7 +322,7 @@ void chipCalcFreq(void)
 
     double chipGetPfd(void)
   {
-     double pfd;
+     double pfd = 0;
       switch(chip)
         {
           case MAX2870:
@@ -347,7 +347,7 @@ void chipCalcFreq(void)
 
   double chipCalcPfd(double pfd)
   {
-     double rpfd;
+     double rpfd = 0;
       switch(chip)
         {
           case MAX2870:

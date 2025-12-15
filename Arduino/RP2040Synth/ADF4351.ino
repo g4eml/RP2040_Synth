@@ -382,8 +382,6 @@ double ADF4351GetPfd(void)
 void ADF4351SetFrequency(double direct)
 {
   bool freqOK = false;
-  char resp;
-
   double freq;
   double pfd;
   double n;

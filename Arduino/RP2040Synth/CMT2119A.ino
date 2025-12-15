@@ -43,7 +43,6 @@ void CMT2119ASetDefault(void)
 
 void CMT2119AInit(void)
 {
-  int chip = CMT2119A;                  //index to the current chip type
   numberOfRegs = 21;                   //number of registers in the current chip type
   numberOfBits = 16;                   //number of bits in each register
   maxPfd = 0;                          //maximum PFD frequency
@@ -134,8 +133,6 @@ void CMT2119ASetFrequency(double direct)
   double pfd;
   uint8_t prescale15;
   uint8_t prescale2;
-  double n;
-  char resp;
 
   pfd = CMT2119AGetPfd();
 
@@ -212,7 +209,6 @@ void CMT2119ACalcFreq(void)
  uint32_t divider;
  double vco;
  double pfd;
- double fr;
  double diva;
 
  prescale15 = chanData[channel].reg[6] & 0x01;
@@ -221,7 +217,6 @@ void CMT2119ACalcFreq(void)
  pfd = CMT2119AGetPfd();
 
  vco = (double) divider * pfd;
- fr=vco;
  diva=1;
  if(prescale2) diva = diva * 2;
  if(prescale15) diva=diva * 1.5;

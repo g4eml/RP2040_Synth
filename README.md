@@ -14,12 +14,12 @@ Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
-Supports JT data modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. JT65B and JT65C are only available on the LMX2595. 
+Supports Digi modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. Q65-30B is also available on the LMX2595. 
 
 Note:- Whilst JT4G mode is available there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
 A warning message will be displayed if the tone spacing is more than 1% in error. 
 
-Supports GPS connection for the accurate timing required for JT data modes. 
+Supports GPS connection for the accurate timing required for Digi modes. 
 
 Supports 10 different channels which can be selected by external switches. 
 
@@ -51,7 +51,7 @@ Suitable Synthesiser boards are available from Ebay, Amazon, Ali Express, SV1AFN
 
 ![lmx2595](https://github.com/g4eml/RP2040_Synth/assets/1881884/57675dc3-57eb-4d40-87e9-84847eca80ed) ![SV1AFN](https://github.com/g4eml/RP2040_Synth/assets/1881884/6c4bbb31-debc-4be2-bb3c-899d4c1da64c)
 
-If you wish to use the JT data modes you will also need a GPS module to provide the necessary accurate timing.  
+If you wish to use the Digi modes you will also need a GPS module to provide the necessary accurate timing.  
 
 ![GPS](https://github.com/user-attachments/assets/53ceb650-0525-4138-a7ff-bff1f450c409)
 
@@ -171,7 +171,7 @@ The generic wiring instructions are as follows:-
 |GPO6    |   CLK   |   CLK   |   SCK   |  DATA  |
 |GPO7    |   DAT   |   DATA  |   SDI   |   CLK  |
 
-The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the JT modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
+The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the Digi modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
 
 | RP2040 | GPS Module |
 | :---:  |    :---:   |
@@ -195,7 +195,7 @@ An external Morse Key can be connected between GP14 and Ground. This can be conf
 
 ## Firmware description
 
-By default on power up the firmware will immediately send the EEPROM saved register values to the sunthesiser chip.  If the CW ident feature is enabled the ident will begin. If the JT mode is enabled the JT sequence will begin. Note that this will initially not be correctly timed. Once the GPS aquires its satellites the timing will synchronise. 
+By default on power up the firmware will immediately send the EEPROM saved register values to the sunthesiser chip.  If the CW ident feature is enabled the ident will begin. If a Digi mode is enabled the sequence will begin. Note that this will initially not be correctly timed. Once the GPS aquires its satellites the timing will synchronise. 
 
 In normal use, for example as a Local oscillator or Beacon, that is all that is needed! 
 
@@ -233,9 +233,9 @@ V = View / Enter Variables for Registers. Allows viewing or entry of parameters 
 
 R = View / Enter Registers Directly in Hex. Allws direct entry of regiser values in Hexadecimal. Useful when transfering values calculated by another program. 
 
-I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. Ident period is only valid for a CW only configuration. If a JT mode is also enbled then the CW ident will be sent every odd minute. 
+I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. Ident period is only valid for a CW only configuration. If a digi mode is also enbled then the CW ident will be sent in between the digi idents. 
 
-J = Configure JT modes. Allows entry of a 13 character message. This would normally be the Callsign and Maidenhead locator. The JT ident will be sent every Even minute. Accurate timing requires a GPS module to be connected.
+J = Configure Digi modes. JT4G Allows entry of a 13 character free text message. This would normally be the Callsign and locator. Q65-30B is more restrictive and always requires a callsign and a 4 character locator. The Digi ident will be sent every minute. Accurate timing requires a GPS module to be connected.
 
 K = Configure External Key. An External Morse key can be connected and used to frequency shift the signal. The FSK Shift can be entered and is seperate from the CWID shift. 
 

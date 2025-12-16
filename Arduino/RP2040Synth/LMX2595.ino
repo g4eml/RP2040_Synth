@@ -502,7 +502,7 @@ void LMX2595FastSend(int32_t val1, int32_t val2)
   int f=val2 & 0xFF;
 
   digitalWrite(LMX2595CSBPin,LOW);
-  delayMicroseconds(10);
+  delayMicroseconds(1);
   SPI.transfer((byte)a);
   SPI.transfer((byte)b);
   SPI.transfer((byte)c);
@@ -511,9 +511,9 @@ void LMX2595FastSend(int32_t val1, int32_t val2)
   SPI.transfer((byte)d);
   SPI.transfer((byte)e);
   SPI.transfer((byte)f);
-  delayMicroseconds(10);
+  delayMicroseconds(1);
   digitalWrite(LMX2595CSBPin,HIGH);
-  delayMicroseconds(10); 
+  delayMicroseconds(1); 
 }
 
 
@@ -1207,12 +1207,18 @@ double LMX2595GetFrequency(void)
 void LMX2595jtShift(uint8_t val)
 {
   static uint8_t lastval;
+  static uint32_t lastN;
 
   if(val == lastval) return;
-  lastval = val;
- //for lowest spreading we only need to change the Numerator. 
+  lastval = val; 
 
-    LMX2595FastSend((43 << 16) | (jtNum[val] & 0xFFFF) ,(42 << 16) | ((jtNum[val] >> 16) & 0xFFFF));
+  if(lastN != jtN[val])
+   {
+    LMX2595FastSend((36 << 16) | (jtN[val] & 0xFFFF) ,(34 << 16) | ((jtN[val] >> 16) & 0xFFFF) );
+    lastN = jtN[val];
+   } 
+
+  LMX2595FastSend((43 << 16) | (jtNum[val] & 0xFFFF) ,(42 << 16) | ((jtNum[val] >> 16) & 0xFFFF));
 }
 
 void LMX2595FskKey(bool key)
@@ -1224,10 +1230,14 @@ void LMX2595FskKey(bool key)
 
   if(key)
     {
+      LMX2595FastSend(chanData[channel].reg[36] ,chanData[channel].reg[34]);
+      LMX2595FastSend(chanData[channel].reg[39] ,chanData[channel].reg[38]);
       LMX2595FastSend(chanData[channel].reg[43] ,chanData[channel].reg[42]);
     }
   else
-    {
+    {        
+        LMX2595FastSend((36 << 16) | (cwidKeyUpN & 0xFFFF) ,(34 << 16) | ((cwidKeyUpN >> 16) & 0xFFFF));
+        LMX2595FastSend((39 << 16) | (cwidKeyUpDen & 0xFFFF) ,(38 << 16) | ((cwidKeyUpDen >> 16) & 0xFFFF));
         LMX2595FastSend((43 << 16) | (cwidKeyUpNum & 0xFFFF) ,(42 << 16) | ((cwidKeyUpNum >> 16) & 0xFFFF));
     }
 }
@@ -1235,11 +1245,15 @@ void LMX2595FskKey(bool key)
 void LMX2595ExtKey(bool key)
 {
   if(key)
-    {
-       LMX2595FastSend(chanData[channel].reg[43] ,chanData[channel].reg[42]);
+    {      
+      LMX2595FastSend(chanData[channel].reg[36] ,chanData[channel].reg[34]);
+      LMX2595FastSend(chanData[channel].reg[39] ,chanData[channel].reg[38]);
+      LMX2595FastSend(chanData[channel].reg[43] ,chanData[channel].reg[42]);
     }
   else
     {
+      LMX2595FastSend((36 << 16) | (ExtKeyUpN & 0xFFFF) ,(34 << 16) | ((ExtKeyUpN >> 16) & 0xFFFF));
+      LMX2595FastSend((39 << 16) | (ExtKeyUpDen & 0xFFFF) ,(38 << 16) | ((ExtKeyUpDen >> 16) & 0xFFFF));
       LMX2595FastSend((43 << 16) | (ExtKeyUpNum & 0xFFFF) , (42 << 16) | ((ExtKeyUpNum >> 16) & 0xFFFF));
     }
 }

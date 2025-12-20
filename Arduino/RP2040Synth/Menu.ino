@@ -493,7 +493,7 @@ void mainMenu(void)
   char resp;
   double temp;
   String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure Digi Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
-  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "$$$"};
+  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "5 = ADF5355", "$$$"};
 
    Serial.println("");
    Serial.print("G4EML Synthesiser Controller Version ");
@@ -585,7 +585,7 @@ void mainMenu(void)
         if ((resp != 'Y') & (resp != 'y')) break;
         showMenu(chipList);
         resp = getSelection("Enter Chip Type -->");
-        if((resp > '0') && (resp < '5'))
+        if((resp > '0') && (resp < '6'))
         {
         chip = resp - '0';
         }

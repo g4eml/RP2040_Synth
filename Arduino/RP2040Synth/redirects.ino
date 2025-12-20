@@ -19,6 +19,10 @@ void chipUpdate(void)
     case CMT2119A:
     CMT2119AUpdate();
     break;
+
+    case ADF5355:
+    ADF5355Update();
+    break;
   }
 }
 
@@ -43,6 +47,10 @@ void chipSetParameters(void)
     Serial.println("Variables are not available for this chip type.");
     Serial.println();
     break;
+
+    case ADF5355:
+    ADF5355SetParameters();
+    break;
   }
 }
 
@@ -65,6 +73,10 @@ void chipInit(void)
     case CMT2119A:
     CMT2119AInit();
     break;
+
+    case ADF5355:
+    ADF5355Init();
+    break;
   }
 }
 
@@ -86,6 +98,10 @@ void chipSetFrequency(double f)
 
     case CMT2119A:
     CMT2119ASetFrequency(f);
+    break;
+
+    case ADF5355:
+    ADF5355SetFrequency(f);
     break;
   }
 }
@@ -110,6 +126,10 @@ double chipGetFrequency(void)
     case CMT2119A:
     freq = CMT2119AGetFrequency();
     break;
+
+    case ADF5355:
+    freq = ADF5355GetFrequency();
+    break;    
   }
 
   return freq;
@@ -134,6 +154,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119ACalcFreq();
           break;
+
+          case ADF5355:
+          ADF5355CalcFreq();
+          break;          
         }
 }
   void chipDecodeRegs(void)
@@ -154,6 +178,10 @@ void chipCalcFreq(void)
 
           case CMT2119A:
           break;
+
+          case ADF5355:
+          ADF5355DecodeRegs();
+          break;          
         }
   }
 
@@ -176,6 +204,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119ASetDefault();
           break;
+
+          case ADF5355:
+          ADF5355SetDefault();
+          break;          
         }
   }
 
@@ -199,6 +231,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119AFskKey(key);
           break;
+
+          case ADF5355:
+          ADF5355FskKey(key);
+          break;          
         }
   }
 
@@ -222,6 +258,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119AExtKey(key);
           break;
+
+          case ADF5355:
+          ADF5355ExtKey(key);
+          break;
         }
   }
 
@@ -244,6 +284,10 @@ void chipCalcFreq(void)
 
           case CMT2119A:
           CMT2119AjtShift(val);
+          break;
+
+          case ADF5355:
+          ADF5355jtShift(val);
           break;
         }
   }
@@ -269,6 +313,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119ASaveFskShift();
           break;
+
+          case ADF5355:
+          ADF5355SaveFskShift();
+          break;
         }
   }
 
@@ -291,6 +339,10 @@ void chipCalcFreq(void)
           
           case CMT2119A:
           CMT2119ASaveKeyShift();
+          break;
+
+          case ADF5355:
+          ADF5355SaveKeyShift();
           break;
         }
   }
@@ -316,6 +368,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           CMT2119ASaveJt(index);
           break;
+
+          case ADF5355:
+          ADF5355SaveJt(index);
+          break;
         }
   }
 
@@ -340,6 +396,10 @@ void chipCalcFreq(void)
           case CMT2119A:
           pfd = CMT2119AGetPfd();
           break;
+
+          case ADF5355:
+          pfd = ADF5355GetPfd();
+          break;
         }
 
     return pfd;
@@ -363,6 +423,10 @@ void chipCalcFreq(void)
           break;
 
           case CMT2119A:
+          break;
+
+          case ADF5355:
+          rpfd = ADF5355CalcPFD(pfd);
           break;
         }
 

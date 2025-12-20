@@ -1,14 +1,14 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2025
 
-#define VERSION 1.08
+#define VERSION 1.09
 
 #define NUMBEROFCHANNELS 10
 
 //Global values...
 
-enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 , CMT2119A };
-String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595", "CMT2119A"};
+enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 , CMT2119A , ADF5355 };
+String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595", "CMT2119A" , "ADF5355"};
 
 
 //These values are saved to the eeprom for recall on statup. 

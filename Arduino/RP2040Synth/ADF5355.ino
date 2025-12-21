@@ -315,7 +315,7 @@ ADF5355_R12_RESERVED = 0x41;
 
  void ADF5355Init(void)
  {
-   numberOfRegs = 12;                   //number of registers in the current chip type
+   numberOfRegs = 13;                   //number of registers in the current chip type
    numberOfBits = 32;                   //number of bits in each register
    maxPfd = 125.0;
    minPfd = 0;
@@ -571,6 +571,8 @@ double ADF5355GetPfd(void)
     }
    else
    {
+    ADF5355_RFBDIS = 1; 
+    ADF5355_RFAEN = 1;
      if((freq >= 3400.000) && (freq <= 6800.000))  ADF5355_RFDIV = 0;
      if((freq >= 1700.000) && (freq < 3400.000))  ADF5355_RFDIV = 1;
      if((freq >= 850.000) && (freq < 1700.000))  ADF5355_RFDIV = 2;
@@ -595,13 +597,14 @@ double ADF5355GetPfd(void)
 
     ADF5355_FRAC1 = (uint32_t) part;
 
-    n = n - (uint32_t) n;
+    n = part - (uint32_t) part;
 
 // n now has the remaining fractional part
 // now calculate the best FRAC2 and MOD2 to try to achieve a zero frequency error
 
     bestnom = 0;
     bestden = 2;
+    err = 99.00;
 
       for(den = 2; den <= 16383 ; den++)
       {
@@ -649,7 +652,7 @@ void ADF5355CalcFreq(void)
   diva = 1 << ADF5355_RFDIV;
 
   n = (double) ADF5355_INT;
-  m1 = 16777216;
+  m1 = 16777216.000;
   f1 = (double) ADF5355_FRAC1;
   m2 = (double) ADF5355_MOD2;
   f2 = (double) ADF5355_FRAC2;
@@ -665,7 +668,7 @@ void ADF5355CalcFreq(void)
 
   Serial.print("PFD = ");
   Serial.print(pfd , 10);
-  Serial.println(" MHz");
+  Serial.println(" MHz");  
 
   if(ADF5355_FBS == 1)
     {
@@ -683,13 +686,13 @@ void ADF5355CalcFreq(void)
   Serial.print(nf , 10);
   Serial.print(" ( ");
   Serial.print(int(n));
-  Serial.print(" + (()");
+  Serial.print(" + ((");
   Serial.print(int(f1));
   Serial.print(" + (");
   Serial.print(int(f2));
   Serial.print("/");
   Serial.print(int(m2));
-  Serial.print(") ");
+  Serial.print(")) ");
   Serial.print("/");
   Serial.print(int(m1));
   Serial.println(") )");;

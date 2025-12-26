@@ -343,7 +343,7 @@ void setjtMode(void)
     chanData[channel].jtMode = 0;
     return;
    }
-  String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = Q65_30B" , "$$$"};
+  String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = Q65_15A" , "3 = Q65_15B" , "4 = Q65_15C", "5 = Q65_30A" , "6 = Q65_30B" , "7 = Q65_30C", "8 = Q65_30D", "$$$"};
   String jtModesReduced[] = {"0 = None" , "1 = JT4G" , "$$$"};
   char resp;
   char maxresp;
@@ -356,7 +356,7 @@ void setjtMode(void)
   else
     {
       showMenu(jtModes);
-      maxresp = '2';
+      maxresp = '8';
     }
   resp = getSelection("Select Digi Mode --->");
   if((resp >='0') && (resp <= maxresp))

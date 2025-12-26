@@ -76,9 +76,9 @@ void saveSettings(void);
 
 #define JT4G_TONE_SPACING        315         // 72 * 4.37 Hz
 #define JT4_DELAY                229         // Delay value for JT4
-#define Q65_30B_TONE_SPACING        6.6666       // 6.6666 Hz for Mode B
-#define Q65_30B_DELAY               300         // Delay in ms for Q65 30
-#define Q65_30B_SYMBOL_COUNT     85          //85 symbols
+#define Q65_TONE_SPACING        3.33333       // 3.3333 Hz for Mode 30A
+#define Q65_DELAY               150         // Delay in ms for Q65 15
+#define Q65_SYMBOL_COUNT     85          //85 symbols
 
 
 uint8_t jtBuffer[256];

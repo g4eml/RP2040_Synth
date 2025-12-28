@@ -724,7 +724,7 @@ bool paramBool(String param , String name, bool* var , String value)
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -733,11 +733,11 @@ bool paramBool(String param , String name, bool* var , String value)
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -746,7 +746,7 @@ bool paramByte(String param , String name, byte* var , String value , byte min ,
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -755,11 +755,11 @@ bool paramByte(String param , String name, byte* var , String value , byte min ,
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -768,7 +768,7 @@ bool paramUint(String param , String name, unsigned int* var , String value , ui
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -777,11 +777,11 @@ bool paramUint(String param , String name, unsigned int* var , String value , ui
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+//          Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -790,7 +790,7 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
 {
   bool ret = false;
 
-         if(param == name)
+        if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -799,11 +799,11 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }

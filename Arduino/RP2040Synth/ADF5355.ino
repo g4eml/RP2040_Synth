@@ -93,7 +93,7 @@ unsigned int ADF5355_R12_RESERVED;  //fixed pattern 0x 041 in bits 15 - 4
     //ADF5355 Register bits. Default settings give output at 435.100 MHz with 10MHz PFD.
 //REG 0
 ADF5355_AUTOCAL = 1;
-ADF5355_PRESCALER = 1;
+ADF5355_PRESCALER = 0;
 ADF5355_INT = 348;
 
 //REG 1
@@ -110,7 +110,7 @@ ADF5355_PA = 0;
 ADF5355_PHASE =0;
 
 //REG 4
-ADF5355_MUX = 0;
+ADF5355_MUX = 6;
 ADF5355_DBR = 0;
 ADF5355_RDIV2 = 0;
 ADF5355_R = 1;
@@ -133,7 +133,7 @@ ADF5355_R6_RESERVED = 0x0A;
 ADF5355_FBS = 1;
 ADF5355_RFDIV = 3;
 ADF5355_CPBL = 1;
-ADF5355_MTLD = 1;
+ADF5355_MTLD = 0;
 ADF5355_RFBDIS = 1;
 ADF5355_RFAEN = 1;
 ADF5355_RFPWR = 3;
@@ -150,14 +150,14 @@ ADF5355_LDM = 0;
 ADF5355_R8_RESERVED = 0x102D042; 
 
 //REG9
-ADF5355_VCOBD = 5;
-ADF5355_TIMEOUT = 512;
-ADF5355_ALTIMEOUT = 31;
-ADF5355_SYNTIMEOUT = 31;
+ADF5355_VCOBD = 53;
+ADF5355_TIMEOUT = 209;
+ADF5355_ALTIMEOUT = 30;
+ADF5355_SYNTIMEOUT = 12;
 
 //REG10
 ADF5355_R10_RESERVED = 0x00300;  
-ADF5355_ADCCLK = 25;
+ADF5355_ADCCLK = 255;
 ADF5355_ADCCONV = 1;
 ADF5355_ADCEN = 1;
 
@@ -191,6 +191,7 @@ ADF5355_R12_RESERVED = 0x41;
          Serial.println();
          Serial.println("Enter 'Name' to view current Parameter value.");
          Serial.println("Enter 'Name = Value' to set Parameter value.");
+         Serial.println("Enter '*' to display all variable values");
          Serial.println("Enter blank line to exit");
          Serial.println("Valid Parameter Names (See Data Sheet) are:-");
          Serial.println("Reg0 = AUTOCAL PRESCALER INT");
@@ -326,7 +327,7 @@ ADF5355_R12_RESERVED = 0x41;
    pinMode(ADF5355CEPin,OUTPUT);
    digitalWrite(ADF5355CEPin,HIGH); 
    pinMode(ADF5355LEPin,OUTPUT);
-   digitalWrite(ADF5355LEPin,HIGH);
+   digitalWrite(ADF5355LEPin,LOW);
    SPI.setRX(ADF5355MUXPin);
    SPI.setTX(ADF5355DATPin);
    SPI.setSCK(ADF5355CKPin);
@@ -349,6 +350,7 @@ ADF5355_R12_RESERVED = 0x41;
    SPI.transfer((uint8_t)d);
    delayMicroseconds(10);
    digitalWrite(ADF5355LEPin,HIGH);
+   digitalWrite(ADF5355LEPin,LOW);
    delayMicroseconds(10);  
  }
 
@@ -439,6 +441,11 @@ ADF5355_R12_RESERVED = 0x41;
 
  void ADF5355Update(void)
  {
+  digitalWrite(ADF5355CEPin,LOW);
+  delayMicroseconds(10);
+  digitalWrite(ADF5355CEPin,HIGH);
+  delayMicroseconds(10);
+
    ADF5355Send(chanData[channel].reg[12]);
    ADF5355Send(chanData[channel].reg[11]);
    ADF5355Send(chanData[channel].reg[10]);
@@ -497,6 +504,9 @@ double ADF5355CalcPFD(double rpfd)
   Serial.print("PFD changed to ");
   Serial.print((refOsc * (1+dub)) / r , 6);
   Serial.println("MHz");
+
+  ADF5355CalcDelays();       //recalculate the delay vales with the new PFD. 
+  Serial.println("Delay Parameters and dividers recalculated for new PFD");
   return ((refOsc * (1+dub)) / r);
 }
 
@@ -781,6 +791,37 @@ double ADF5355GetFrequency(void)
   {
     return vco / diva;
   }
+
+}
+
+//calculate the timeout and delay registers which are all related to the PFD frequency
+void ADF5355CalcDelays(void)
+{
+  double pfd;
+  double pfdhz;
+  uint16_t VCO_Band_Div;
+  uint16_t ALC_Wait = 30;
+  uint16_t Synth_Lock_Timeout = 12;
+  uint16_t Timeout;
+  uint16_t ADC_Clock_Div;
+
+//calculations from datasheet Page 35
+
+  pfd = ADF5355GetPfd();
+  pfdhz = pfd * 1000000.000;
+  VCO_Band_Div = ceil(pfdhz/2400000);
+  if(VCO_Band_Div > 255) VCO_Band_Div = 255;
+  Timeout = ceil((pfd * 50.000)/ALC_Wait);
+  if(Timeout > 1023) Timeout = 1023;
+
+  ADC_Clock_Div = ceil(((pfdhz/100000)-2)/4);
+  if(ADC_Clock_Div > 255) ADC_Clock_Div = 255;
+
+  ADF5355_VCOBD = VCO_Band_Div;
+  ADF5355_TIMEOUT = Timeout;
+  ADF5355_ALTIMEOUT = ALC_Wait;
+  ADF5355_SYNTIMEOUT = Synth_Lock_Timeout;
+  ADF5355_ADCCLK = ADC_Clock_Div;
 
 }
 

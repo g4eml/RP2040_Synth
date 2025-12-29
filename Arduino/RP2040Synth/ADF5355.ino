@@ -142,7 +142,7 @@ ADF5355_RFPWR = 3;
 ADF5355_R7_RESERVED = 4;  
 ADF5355_LES = 1;
 ADF5355_LDCC = 0;
-ADF5355_LOLM = 1;
+ADF5355_LOLM = 0;
 ADF5355_FRACNLDP = 3;
 ADF5355_LDM = 0;
 
@@ -462,6 +462,12 @@ ADF5355_R12_RESERVED = 0x41;
    ADF5355Send(chanData[channel].reg[0]);
  }
 
+void ADF5355FUpdate(uint32_t r2,uint32_t r1,uint32_t r0)
+{
+   ADF5355Send(r2);
+   ADF5355Send(r1);
+   ADF5355Send(r0 & 0xFFDFFFFF);
+}
 
 double ADF5355CalcPFD(double rpfd)
 {
@@ -533,6 +539,16 @@ double ADF5355GetPfd(void)
    int den;
    int bestnom;
    int bestden;
+   bool maxDivisor;
+   
+     if((chanData[channel].fskMode) || (chanData[channel].jtMode))           //if we are using any FSK keying then we must keep the divisor to the same value to avoid glitches
+  {
+    maxDivisor = true;
+  }
+  else
+  {
+    maxDivisor = false;
+  }
 
    pfd = ADF5355GetPfd();
 
@@ -616,7 +632,9 @@ double ADF5355GetPfd(void)
     bestden = 2;
     err = 99.00;
 
-      for(den = 2; den <= 16383 ; den++)
+     if(maxDivisor) den = 16383; else den = 2;                      //if we are using any form of FSK then we should keep the MOD2 to a fixed value. 
+
+      for(; den <= 16383 ; den++)
       {
        nom = int((den * n) + 0.0000000001);
        if(nom < 1) continue;
@@ -832,9 +850,7 @@ void ADF5355CalcDelays(void)
   if(val == lastval) return;
   lastval = val;
 
-   ADF5355Send((chanData[channel].reg[2] & 0x0F) | ( jtDen[val] << 4));
-   ADF5355Send((chanData[channel].reg[1] & 0xF000000F) | ( jtNum[val] << 4));
-   ADF5355Send((chanData[channel].reg[0] & 0xFFF0000F) | ( jtN[val] << 4));
+   ADF5355FUpdate((chanData[channel].reg[2] & 0x0F) | ( jtDen[val] << 4) , (chanData[channel].reg[1] & 0xF000000F) | ( jtNum[val] << 4) , (chanData[channel].reg[0] & 0xFFF0000F) | ( jtN[val] << 4) );
 }
 
 
@@ -847,15 +863,11 @@ void ADF5355CalcDelays(void)
 
   if(key)
     {
-      ADF5355Send(chanData[channel].reg[2]);
-      ADF5355Send(chanData[channel].reg[1]);
-      ADF5355Send(chanData[channel].reg[0]);
+      ADF5355FUpdate(chanData[channel].reg[2] , chanData[channel].reg[1] , chanData[channel].reg[0] );
     }
   else
     {
-     ADF5355Send((chanData[channel].reg[2] & 0x0F) | ( cwidKeyUpDen << 4));
-     ADF5355Send((chanData[channel].reg[1] & 0xF000000F) | ( cwidKeyUpNum << 4));
-     ADF5355Send((chanData[channel].reg[0] & 0xFFF0000F) | ( cwidKeyUpN << 4));
+      ADF5355FUpdate((chanData[channel].reg[2] & 0x0F) | ( cwidKeyUpDen << 4) , (chanData[channel].reg[1] & 0xF000000F) | ( cwidKeyUpNum << 4) , (chanData[channel].reg[0] & 0xFFF0000F) | ( cwidKeyUpN << 4));
     }
 }
 
@@ -863,15 +875,11 @@ void ADF5355ExtKey(bool key)
 {
   if(key)
     {
-      ADF5355Send(chanData[channel].reg[2]);
-      ADF5355Send(chanData[channel].reg[1]);
-      ADF5355Send(chanData[channel].reg[0]);
+      ADF5355FUpdate(chanData[channel].reg[2] , chanData[channel].reg[1] , chanData[channel].reg[0] );
     }
   else
     {
-     ADF5355Send((chanData[channel].reg[2] & 0x0F) | (ExtKeyUpDen << 4));
-     ADF5355Send((chanData[channel].reg[1] & 0xF000000F) | (ExtKeyUpNum << 4));
-     ADF5355Send((chanData[channel].reg[0] & 0xFFF0000F) | (ExtKeyUpN << 4));
+     ADF5355FUpdate((chanData[channel].reg[2] & 0x0F) | ( ExtKeyUpDen << 4) , (chanData[channel].reg[1] & 0xF000000F) | ( ExtKeyUpNum << 4) , (chanData[channel].reg[0] & 0xFFF0000F) | ( ExtKeyUpN << 4));
     }
 }
 

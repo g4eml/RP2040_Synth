@@ -343,7 +343,7 @@ void setjtMode(void)
     chanData[channel].jtMode = 0;
     return;
    }
-  String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = Q65_30B" , "$$$"};
+  String jtModes[] = {"0 = None" , "1 = JT4G" , "2 = Q65_15A" , "3 = Q65_15B" , "4 = Q65_15C", "5 = Q65_30A" , "6 = Q65_30B" , "7 = Q65_30C", "8 = Q65_30D", "$$$"};
   String jtModesReduced[] = {"0 = None" , "1 = JT4G" , "$$$"};
   char resp;
   char maxresp;
@@ -356,7 +356,7 @@ void setjtMode(void)
   else
     {
       showMenu(jtModes);
-      maxresp = '2';
+      maxresp = '8';
     }
   resp = getSelection("Select Digi Mode --->");
   if((resp >='0') && (resp <= maxresp))
@@ -493,7 +493,7 @@ void mainMenu(void)
   char resp;
   double temp;
   String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure Digi Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
-  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "$$$"};
+  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "5 = ADF5355", "$$$"};
 
    Serial.println("");
    Serial.print("G4EML Synthesiser Controller Version ");
@@ -585,7 +585,7 @@ void mainMenu(void)
         if ((resp != 'Y') & (resp != 'y')) break;
         showMenu(chipList);
         resp = getSelection("Enter Chip Type -->");
-        if((resp > '0') && (resp < '5'))
+        if((resp > '0') && (resp < '6'))
         {
         chip = resp - '0';
         }
@@ -724,7 +724,7 @@ bool paramBool(String param , String name, bool* var , String value)
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -733,11 +733,11 @@ bool paramBool(String param , String name, bool* var , String value)
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -746,7 +746,7 @@ bool paramByte(String param , String name, byte* var , String value , byte min ,
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -755,11 +755,11 @@ bool paramByte(String param , String name, byte* var , String value , byte min ,
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -768,7 +768,7 @@ bool paramUint(String param , String name, unsigned int* var , String value , ui
 {
   bool ret = false;
 
-         if(param == name)
+         if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -777,11 +777,11 @@ bool paramUint(String param , String name, unsigned int* var , String value , ui
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+//          Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }
@@ -790,7 +790,7 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
 {
   bool ret = false;
 
-         if(param == name)
+        if((param == name) | (param == "*"))
         {
           if(value.length() >0)
           {
@@ -799,11 +799,11 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
               *var = value.toInt();
             }
           }
-          Serial.print("\n");
-          Serial.print(param);
+ //         Serial.print("\n");
+          Serial.print(name);
           Serial.print(" = ");
           Serial.println(*var);
-          ret = true;
+          if (param != "*") ret = true;
         }
   return ret;
 }

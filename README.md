@@ -2,7 +2,7 @@
 
 ## Description
 
-A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 4 different type of synthesiser chip, the ADF4351, the Max2870 the LMX2595 and the CMT2119A.
+A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 4 different type of synthesiser chip, the ADF4351, the Max2870, the LMX2595 the CMT2119A and the ADF5355.
 
 ## Features
 
@@ -14,7 +14,7 @@ Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
-Supports Digi modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. Q65-30B is also available on the LMX2595. 
+Supports Digi modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. Q65 is also available on the LMX2595 and ADF5355. 
 
 Note:- Whilst JT4G mode is available there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
 A warning message will be displayed if the tone spacing is more than 1% in error. 
@@ -160,16 +160,16 @@ The LMX2595 takes a lot of current so is best supplied from the USB 5V line usin
 
 The generic wiring instructions are as follows:-
 
-| RP2040 | ADF4351 | MAX2870 | LMX2595 | CMT2119A |
-| :---:  |  :---:  |  :---:  |   :---: |  :---: |
-|5V      |   N/C   |   N/C   |    5V   |   N/C  |
-|3V3     |   3V3   |   3V3   |   N/C   |   VDD  |
-|GND     |   GND   |   GND   |   GND   |   GND  |
-|GPO3    |   CE    |   CE    |   CE    |   N/C  |
-|GPO4    |   MUX   |   MUX   |  MUXout |   N/C  |
-|GPO5    |   LE    |   LE    |   CSB   |   N/C  |
-|GPO6    |   CLK   |   CLK   |   SCK   |  DATA  |
-|GPO7    |   DAT   |   DATA  |   SDI   |   CLK  |
+| RP2040 | ADF4351 | MAX2870 | LMX2595 | CMT2119A | ADF5355 |
+| :---:  |  :---:  |  :---:  |   :---: |  :---:   | :---:   |
+|5V      |   N/C   |   N/C   |    5V   |   N/C    |   5V    |
+|3V3     |   3V3   |   3V3   |   N/C   |   VDD    |  N/C    |
+|GND     |   GND   |   GND   |   GND   |   GND    |  GND    |
+|GPO3    |   CE    |   CE    |   CE    |   N/C    |   CE    |
+|GPO4    |   MUX   |   MUX   |  MUXout |   N/C    |   MUX   |
+|GPO5    |   LE    |   LE    |   CSB   |   N/C    |   LE    |
+|GPO6    |   CLK   |   CLK   |   SCK   |  DATA    |   CLK   | 
+|GPO7    |   DAT   |   DATA  |   SDI   |   CLK    |   DAT   |
 
 The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the Digi modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
 
@@ -235,7 +235,7 @@ R = View / Enter Registers Directly in Hex. Allws direct entry of regiser values
 
 I = Configure CW Ident. Alows entry of CW Ident, CW Speed, Ident Period and FSK Shift.  A shift of -800Hz is a typical value. Ident period is only valid for a CW only configuration. If a digi mode is also enbled then the CW ident will be sent in between the digi idents. 
 
-J = Configure Digi modes. JT4G Allows entry of a 13 character free text message. This would normally be the Callsign and locator. Q65-30B is more restrictive and always requires a callsign and a 4 character locator. The Digi ident will be sent every minute. Accurate timing requires a GPS module to be connected.
+J = Configure Digi modes. JT4G Allows entry of a 13 character free text message. This would normally be the Callsign and locator. Q65 is more restrictive and always requires a callsign and a 4 character locator. The Digi ident will be sent every minute. Accurate timing requires a GPS module to be connected.
 
 K = Configure External Key. An External Morse key can be connected and used to frequency shift the signal. The FSK Shift can be entered and is seperate from the CWID shift. 
 

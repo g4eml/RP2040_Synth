@@ -134,7 +134,14 @@ void showMenu(String *list)
  if(selChan == 255)
   {
     Serial.print(" (Externally Selected) = ");
-    channel = readChannelInputs();
+    uint8_t newchannel = readChannelInputs();
+    if(newchannel != channel)
+    {
+    channel = newchannel;
+    chipUpdate();
+    initChannel();      
+    }
+
   }
 else
   {
@@ -155,7 +162,17 @@ char getSelection(String p)
   Serial.println();
   Serial.print(p);
 
-  while(Serial.available() == 0);
+  while(Serial.available() == 0)
+  {
+     if(selChan == 255)
+      {
+        uint8_t newchannel = readChannelInputs();
+        if(newchannel != channel)
+       { 
+       return 0;     
+       }
+      }
+  }
   resp = Serial.read();
   Serial.println(resp);
 

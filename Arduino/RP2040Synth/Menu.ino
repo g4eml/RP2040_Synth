@@ -508,8 +508,9 @@ void viewNMEA(void)
 void mainMenu(void)
 {
   char resp;
+  uint8_t currentchan;
   double temp;
-  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure Digi Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
+  String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number", "L = List all Channels" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure Digi Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
   String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "5 = ADF5355", "$$$"};
 
    Serial.println("");
@@ -541,6 +542,26 @@ void mainMenu(void)
          } 
         initChannel();
         chipUpdate();
+        break;
+
+        case 'L':
+        case 'l':
+        currentchan = channel;
+        Serial.println();
+        for(int i=0;i<NUMBEROFCHANNELS;i++)
+         {
+          channel = i;
+          initChannel();
+          chipUpdate();
+          Serial.print("Channel ");
+          Serial.print(i);
+          Serial.print( " = ");
+          Serial.print(chipGetFrequency(),10);        
+          Serial.println(" MHz");
+         }
+         channel = currentchan;
+         initChannel();
+         chipUpdate();
         break;
 
         case 'S':

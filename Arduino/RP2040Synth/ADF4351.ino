@@ -410,13 +410,13 @@ void ADF4351SetFrequency(double direct)
       freq = inputFloat();        
       }
 
-      if((freq > 34.375) && (freq <= 4400.000))
+      if((freq > 34.375) && (freq <= 4500.000))
         {
           freqOK = true;
         }
       else
         {
-          Serial.println("Synthesiser Frequency must be between 34.375 and 4400 MHz");
+          Serial.println("Synthesiser Frequency must be between 34.375 and 4500 MHz");
         }
     }
    }
@@ -426,7 +426,7 @@ void ADF4351SetFrequency(double direct)
    }
 
 //Calculate the required output divider
-  if((freq >= 2200.000) && (freq <= 4400.000))  ADF4351_RFDIV = 0;
+  if(freq >= 2200.000)  ADF4351_RFDIV = 0;
   if((freq >= 1100.000) && (freq < 2200.000))  ADF4351_RFDIV = 1;
   if((freq >= 550.000) && (freq < 1100.000))  ADF4351_RFDIV = 2;
   if((freq >= 275.000) && (freq < 550.000))  ADF4351_RFDIV = 3; 

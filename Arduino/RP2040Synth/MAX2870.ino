@@ -440,13 +440,13 @@ void Max2870SetFrequency(double direct)
       Serial.print("\nEnter Required Frequency in MHz -->");
       freq = inputFloat();        
       }
-      if((freq > 23.500) && (freq <= 6000.000))
+      if((freq > 23.500) && (freq <= 6500.000))
         {
           freqOK = true;
         }
       else
         {
-          Serial.println("Synthesiser Frequency must be between 23.5 and 6000 MHz");
+          Serial.println("Synthesiser Frequency must be between 23.5 and 6500 MHz");
         }
     }
   }
@@ -455,7 +455,7 @@ void Max2870SetFrequency(double direct)
     freq = direct;
   }
 //Calculate the required output divider
-  if((freq >= 3000.000) && (freq <= 6000.000))  Max2870_DIVA = 0;
+  if(freq >= 3000.000) Max2870_DIVA = 0;
   if((freq >= 1500.000) && (freq < 3000.000))  Max2870_DIVA = 1;
   if((freq >= 750.000) && (freq < 1500.000))  Max2870_DIVA = 2;
   if((freq >= 375.000) && (freq < 750.000))  Max2870_DIVA = 3; 

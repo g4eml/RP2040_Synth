@@ -20,7 +20,6 @@ int32_t inputNumber(void)
     {
       while(Serial.available() == 0);
       ch = Serial.read();
-      Serial.print(ch);
       switch(ch)
         {
           case 13:
@@ -29,11 +28,13 @@ int32_t inputNumber(void)
           break;
           
           case '0' ... '9':
+          Serial.print(ch);
           if(n == -1) n = 0;
           n = (n * 10) + (ch - '0');
           break;
 
           case '-':
+          Serial.print(ch);
           minus = true;
           break;
 
@@ -174,7 +175,9 @@ char getSelection(String p)
       }
   }
   resp = Serial.read();
-  Serial.println(resp);
+   if(resp > 31) Serial.println(resp);
+  delay(100);
+  flushInput();
 
   return resp;
 }
@@ -695,7 +698,7 @@ void mainMenu(void)
         enterPfd();
         break;
 
-        default:
+        case '?':
         showMenu(menuList);
       }
 

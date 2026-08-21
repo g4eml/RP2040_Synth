@@ -57,6 +57,7 @@ double inputFloat(void)
   bool done = false;
   String s;
   char ch;
+  put_pixel(RED);
   flushInput();
   s = "";
     while(!done)
@@ -79,7 +80,7 @@ double inputFloat(void)
         }
       }
     }
-
+  put_pixel(BLUE);
   return s.toDouble();
 }
 
@@ -88,6 +89,7 @@ String inputString(bool uppercase)
   bool done = false;
   char ch;
   String s;
+  put_pixel(RED);
   flushInput();
   s = "";
     while(!done)
@@ -117,6 +119,7 @@ String inputString(bool uppercase)
         }
       }
     }
+  put_pixel(BLUE);
   return s;
 }
 
@@ -127,7 +130,7 @@ void showMenu(String *list)
 
  Serial.print("\n");
  Serial.print("Chip type is ");
- Serial.println(chipName[chip]);
+ Serial.println(chipTypeName(chip));
  Serial.print("Ref Osc =  ");
  Serial.print(refOsc , 10);
  Serial.println(" MHz");
@@ -159,7 +162,7 @@ else
 char getSelection(String p)
 {
  char resp;
-
+  put_pixel(RED);
   Serial.println();
   Serial.print(p);
 
@@ -179,6 +182,7 @@ char getSelection(String p)
   delay(100);
   flushInput();
 
+  put_pixel(BLUE);
   return resp;
 }
 
@@ -189,7 +193,7 @@ void enterOsc(void)
   Serial.print(refOsc , 10);
   Serial.print(" MHz\r\nEnter New Reference Oscillator Frequency in MHz --> ");
   oscFreq = inputFloat();
-  if ((oscFreq >= minOsc ) && (oscFreq <= maxOsc))
+  if ((oscFreq >= activeChip->minOsc) && (oscFreq <= activeChip->maxOsc))
     {
       refOsc = oscFreq;
     }
@@ -222,7 +226,7 @@ void enterRegs(void)
         Serial.println("Enter blank line to exit");
         Serial.println("Valid Register Numbers (See Chip Data Sheet) are:-");
         Serial.print("R0 to R");
-        Serial.println(numberOfRegs -1);
+        Serial.println(activeChip->numberOfRegs -1);
         Serial.println();
       }
     
@@ -247,7 +251,7 @@ void enterRegs(void)
            param = param.substring(1);   //remove the R character
            param.trim();
            regno = param.toInt();
-           if(regno < numberOfRegs)
+           if(regno < activeChip->numberOfRegs)
              {
              if(value.length() >0)
                {
@@ -268,7 +272,7 @@ void enterRegs(void)
       if(param[0] == '*')
         {
           Serial.println();
-          for(int i = 0 ;i < numberOfRegs; i++)
+          for(int i = 0 ;i < activeChip->numberOfRegs; i++)
           {
              Serial.print("R");
              Serial.print(i);
@@ -355,7 +359,7 @@ void setCwIdent(void)
 
 void setjtMode(void)
 {
-  if(jtDisable)
+  if(activeChip->jtDisable)
    {
     Serial.println();
     Serial.println("Digi Modes not available on this chip type");
@@ -368,7 +372,7 @@ void setjtMode(void)
   char resp;
   char maxresp;
   String jts;
-  if(jt4Only)
+  if(activeChip->jt4Only)
     {
       showMenu(jtModesReduced);
       maxresp = '1';
@@ -514,7 +518,15 @@ void mainMenu(void)
   uint8_t currentchan;
   double temp;
   String menuList[] = {"T = Select Chip Type" , "O = Set Reference Oscillator Frequency" , "N = Set Channel Number", "L = List all Channels" ,"     ", "D = Set Default Register Values for chip"  , "P = Enter PFD Frequency" ,"M = Set External Multiplier", "F = Enter Output Frequency" , "C = Calculate and display frequency from current settings" , "V = View / Enter Variables for Registers", "R = View / Enter Registers Directly in Hex" , "I = Configure CW Ident" ,"J = Configure Digi Mode" , "K = Configure External Key", "G = View GPS NMEA data", "S = Save to EEPROM" , "X = Exit Menu" , "$$$"};
-  String chipList[] = {"1 = MAX2870" , "2 = ADF4351" , "3 = LMX2595" , "4 = CMT2119A", "5 = ADF5355", "$$$"};
+
+  //Built from chipTypeName() and sized from NUM_CHIP_TYPES, so a new chip type
+  //only needs adding to ChipList.h (see that file) to appear here too.
+  String chipList[NUM_CHIP_TYPES];
+  for(int n = 1 ; n < NUM_CHIP_TYPES ; n++)
+   {
+     chipList[n-1] = String(n) + " = " + chipTypeName(n);
+   }
+  chipList[NUM_CHIP_TYPES - 1] = "$$$";
 
    Serial.println("");
    Serial.print("G4EML Synthesiser Controller Version ");
@@ -524,7 +536,6 @@ void mainMenu(void)
    do
     {
       resp = getSelection("Enter Command (? for menu) -->");
-
       switch(resp)
       {
         case 'N':
@@ -571,12 +582,12 @@ void mainMenu(void)
         case 's':
         saveSettings();
         Serial.println("\nSettings saved to RP2040 EEPROM");
-        if(chip == CMT2119A)
+        if(activeChip->hasEepromBurn())
          {
-         resp = getSelection("Do you also want to save the settings to the CMT2119A EEPROM? Y or N --->");
+         resp = getSelection("Do you also want to save the settings to the chip's own EEPROM? Y or N --->");
          if((resp == 'Y') || (resp == 'y'))
           {
-            CMT2119A_EEPROM_BURN();
+            activeChip->eepromBurn();
           }
          }
 
@@ -626,12 +637,14 @@ void mainMenu(void)
         if ((resp != 'Y') & (resp != 'y')) break;
         showMenu(chipList);
         resp = getSelection("Enter Chip Type -->");
-        if((resp > '0') && (resp < '6'))
+        //Note: chip selection is entered as a single digit, so this scheme supports
+        //at most 9 chip types (NUM_CHIP_TYPES <= 10 including NONE).
+        if((resp > '0') && (resp < ('0' + NUM_CHIP_TYPES)))
         {
         chip = resp - '0';
         }
         Serial.print("Chip type is now ");
-        Serial.println(chipName[chip]);
+        Serial.println(chipTypeName(chip));
         channel = 0;
         selChan = 0;
         chanData[channel].fskMode = 0;
@@ -714,7 +727,7 @@ void enterPfd(void)
   bool freqOK;
   double oldpfd;
 
-  if( maxPfd == 0)
+  if( activeChip->maxPfd == 0)
    {
     Serial.println();
     Serial.println("PFD Cannot be changed on this chip type.");
@@ -736,17 +749,17 @@ void enterPfd(void)
        Serial.printf("\nEnter required PFD in MHz -->");
        pfd = inputFloat();
        if(pfd == 0) return;
-      if((pfd <= maxPfd) && (pfd >= minPfd))
+      if((pfd <= activeChip->maxPfd) && (pfd >= activeChip->minPfd))
         {
           freqOK = true;
         }
       else
         {
           Serial.print("\nPFD must be between ");
-          Serial.print(minPfd);
+          Serial.print(activeChip->minPfd);
           Serial.print(" MHz");
           Serial.print(" and ");
-          Serial.print(maxPfd);
+          Serial.print(activeChip->maxPfd);
           Serial.println(" MHz");
         }    
     }

@@ -30,18 +30,26 @@ static const uint16_t CMT2119ook[21] =
 0x2000,
 };
 
-void CMT2119ASetDefault(void)
+#include "SynthChip.h"
+
+class CMT2119AChip : public SynthChip
+{
+public:
+
+CMT2119AChip() { name = "CMT2119A"; }
+
+void setDefault(void) override
 {
   for(int i = 0;i<21;i++)
   {
     chanData[channel].reg[i] = CMT2119ook[i];
   }
-  CMT2119ASetFrequency(0);
-  CMT2119AUpdate();
+  setFrequency(0);
+  update();
 }
 
 
-void CMT2119AInit(void)
+void init(void) override
 {
   numberOfRegs = 21;                   //number of registers in the current chip type
   numberOfBits = 16;                   //number of bits in each register
@@ -69,7 +77,7 @@ void CMT2119A_RESET(void)
 
 
 
-void CMT2119AUpdate(void)
+void update(void) override
 {
 TWI_reset(); //step 1
 TWI_WRREG(0x3d, 0x01); //step 2 send SOFT_RST
@@ -119,13 +127,13 @@ delay(2);
 }
 
 
-double CMT2119AGetPfd(void)
+double getPfd(void) override
 {
   double pfd = refOsc / 131072.0 ;
   return pfd;
 }
 
-void CMT2119ASetFrequency(double direct)
+void setFrequency(double direct) override
 {
   bool freqOK = false;
 
@@ -134,7 +142,7 @@ void CMT2119ASetFrequency(double direct)
   uint8_t prescale15;
   uint8_t prescale2;
 
-  pfd = CMT2119AGetPfd();
+  pfd = getPfd();
 
   freqOK = false;
   if(direct ==0)
@@ -202,7 +210,7 @@ chanData[channel].reg[9] = 0;
 }
 
 
-void CMT2119ACalcFreq(void)
+void calcFreq(void) override
 {
  uint8_t prescale15;
  uint8_t prescale2;
@@ -214,7 +222,7 @@ void CMT2119ACalcFreq(void)
  prescale15 = chanData[channel].reg[6] & 0x01;
  prescale2 = (chanData[channel].reg[1] & 0x0400) >> 10;
  divider = ((chanData[channel].reg[8] & 0xFF00) << 8) + chanData[channel].reg[7]; 
- pfd = CMT2119AGetPfd();
+ pfd = getPfd();
 
  vco = (double) divider * pfd;
  diva=1;
@@ -224,7 +232,7 @@ void CMT2119ACalcFreq(void)
 
   Serial.println();
   Serial.print("Chip type is ");
-  Serial.println(chipName[chip]);
+  Serial.println(name);
   Serial.print("Reference Oscillator = ");
   Serial.print(refOsc,10);
   Serial.println(" MHz");
@@ -255,7 +263,7 @@ void CMT2119ACalcFreq(void)
     }
 }
 
-double CMT2119AGetFrequency(void)
+double getFrequency(void) override
 {
  uint8_t prescale15;
  uint8_t prescale2;
@@ -267,7 +275,7 @@ double CMT2119AGetFrequency(void)
  prescale15 = chanData[channel].reg[6] & 0x01;
  prescale2 = (chanData[channel].reg[1] & 0x0400) >> 10;
  divider = ((chanData[channel].reg[8] & 0xFF00) << 8) + chanData[channel].reg[7]; 
- pfd = CMT2119AGetPfd();
+ pfd = getPfd();
 
  vco = (double) divider * pfd;
  diva=1;
@@ -277,7 +285,7 @@ double CMT2119AGetFrequency(void)
  return vco/diva;
 }
 
- void CMT2119AjtShift(uint8_t val)
+ void jtShift(uint8_t val) override
 {
    static uint8_t lastval;
   
@@ -286,7 +294,7 @@ double CMT2119AGetFrequency(void)
    CMT2119AUpdateFreqOnly(jtN[val],jtNum[val]);
 }
 
-  void CMT2119AFskKey(bool key)
+  void fskKey(bool key) override
 {
   static bool lastkey;
   
@@ -303,7 +311,7 @@ double CMT2119AGetFrequency(void)
     }
 }
 
-  void CMT2119AExtKey(bool key)
+  void extKey(bool key) override
 {
 if(key)
     {
@@ -315,19 +323,19 @@ if(key)
     }
 }
 
-void CMT2119ASaveFskShift(void)
+void saveFskShift(void) override
 {
   cwidKeyUpN = chanData[channel].reg[7];
   cwidKeyUpNum = chanData[channel].reg[8];
 }
 
-void CMT2119ASaveKeyShift(void)
+void saveKeyShift(void) override
 {
   ExtKeyUpN = chanData[channel].reg[7];
   ExtKeyUpNum = chanData[channel].reg[8];
 }
 
-void CMT2119ASaveJt(uint8_t index)
+void saveJt(uint8_t index) override
 {
   jtN[index] = chanData[channel].reg[7];
   jtNum[index] = chanData[channel].reg[8];
@@ -491,7 +499,7 @@ void TWI_EEPROM_END(void)
 
 //Burn the Chips built in EEPROM. Sequence copied originally from official programmer and then trimmed. 
 
-void CMT2119A_EEPROM_BURN(void)
+void eepromBurn(void) override
 {
   Serial.println("Burn and Verify Start");
   TWI_reset();
@@ -521,3 +529,7 @@ void CMT2119A_EEPROM_BURN(void)
   CMT2119A_RESET();
   digitalWrite(TWIDAT,HIGH);
 }
+
+};
+
+CMT2119AChip cmt2119aChip;             //the single instance of this chip driver

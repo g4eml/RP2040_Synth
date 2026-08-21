@@ -6,7 +6,13 @@
 #define ADF5355CKPin 6         //GPO 6 Connect to ADF5355 CLK Pin
 #define ADF5355DATPin 7         //GPO 7 Connect to ADF5355 DAT Pin
 
+#include "SynthChip.h"
 
+class ADF5355Chip : public SynthChip
+{
+public:
+
+ADF5355Chip() { name = "ADF5355"; }
 
 //ADF5355 Register bits.
 //REG 0
@@ -88,7 +94,7 @@ unsigned int ADF5355_R12_RESERVED;  //fixed pattern 0x 041 in bits 15 - 4
 
 
 
- void ADF5355SetDefault(void)
+ void setDefault(void) override
  {
     //ADF5355 Register bits. Default settings give output at 435.100 MHz with 10MHz PFD.
 //REG 0
@@ -168,13 +174,13 @@ ADF5355_R11_RESERVED = 0x0061300;
 ADF5355_RESYNC_CLOCK = 1;
 ADF5355_R12_RESERVED = 0x41;
 
-   ADF5355SetFrequency(0);
+   setFrequency(0);
    ADF5355EncodeRegs();
-   ADF5355Update();
+   update();
 
  }
 
- void ADF5355SetParameters(void)
+ void setParameters(void) override
  {
    String resp;
    String param;
@@ -308,13 +314,13 @@ ADF5355_R12_RESERVED = 0x41;
 
      handled:
      ADF5355EncodeRegs();
-     ADF5355Update();
+     update();
 
    }
  }
 
 
- void ADF5355Init(void)
+ void init(void) override
  {
    numberOfRegs = 13;                   //number of registers in the current chip type
    numberOfBits = 32;                   //number of bits in each register
@@ -372,7 +378,7 @@ ADF5355_R12_RESERVED = 0x41;
    chanData[channel].reg[12] = (ADF5355_RESYNC_CLOCK << 16) | (ADF5355_R12_RESERVED << 4) | 12;
  }
 
- void ADF5355DecodeRegs(void)
+ void decodeRegs(void) override
  {
    ADF5355_AUTOCAL = (chanData[channel].reg[0] >> 21) & 0x01;
    ADF5355_PRESCALER = (chanData[channel].reg[0] >> 20) & 0x01;
@@ -439,7 +445,7 @@ ADF5355_R12_RESERVED = 0x41;
    ADF5355_R12_RESERVED = (chanData[channel].reg[12] >> 4) & 0xFFF;  
  }
 
- void ADF5355Update(void)
+ void update(void) override
  {
   digitalWrite(ADF5355CEPin,LOW);
   delayMicroseconds(10);
@@ -469,7 +475,7 @@ void ADF5355FUpdate(uint32_t r2,uint32_t r1,uint32_t r0)
    ADF5355Send(r0 & 0xFFDFFFFF);
 }
 
-double ADF5355CalcPFD(double rpfd)
+double calcPfd(double rpfd) override
 {
   double r = 0;
   bool dub = 0;
@@ -499,7 +505,7 @@ double ADF5355CalcPFD(double rpfd)
   Serial.println(" MHz");
   Serial.println("PFD has not been changed");
   
-   return ADF5355GetPfd();
+   return getPfd();
 
   done:
   if(r < 1) r = 1;
@@ -517,7 +523,7 @@ double ADF5355CalcPFD(double rpfd)
 }
 
 
-double ADF5355GetPfd(void)
+double getPfd(void) override
 {
   double pfd = refOsc;
   double r = (double) ADF5355_R; 
@@ -527,7 +533,7 @@ double ADF5355GetPfd(void)
   return pfd;
 }
 
- void ADF5355SetFrequency(double direct)
+ void setFrequency(double direct) override
  {
    bool freqOK = false;
    double freq;
@@ -550,7 +556,7 @@ double ADF5355GetPfd(void)
     maxDivisor = false;
   }
 
-   pfd = ADF5355GetPfd();
+   pfd = getPfd();
 
    freqOK = false;
    if(direct ==0)
@@ -664,7 +670,7 @@ double ADF5355GetPfd(void)
  }
 
 
-void ADF5355CalcFreq(void)
+void calcFreq(void) override
 {
   double pfd;
   double vco;
@@ -687,12 +693,12 @@ void ADF5355CalcFreq(void)
 
   Serial.println();
   Serial.print("Chip type is ");
-  Serial.println(chipName[chip]);
+  Serial.println(name);
   Serial.print("Reference Oscillator = ");
   Serial.print(refOsc,10);
   Serial.println(" MHz");
 
-  pfd = ADF5355GetPfd();
+  pfd = getPfd();
 
   Serial.print("PFD = ");
   Serial.print(pfd , 10);
@@ -767,7 +773,7 @@ void ADF5355CalcFreq(void)
 
 }
   
-double ADF5355GetFrequency(void)
+double getFrequency(void) override
 {
   double pfd;
   double vco;
@@ -788,7 +794,7 @@ double ADF5355GetFrequency(void)
   m2 = (double) ADF5355_MOD2;
   f2 = (double) ADF5355_FRAC2;
 
-  pfd = ADF5355GetPfd();
+  pfd = getPfd();
 
   if(ADF5355_FBS == 1)
     {
@@ -825,7 +831,7 @@ void ADF5355CalcDelays(void)
 
 //calculations from datasheet Page 35
 
-  pfd = ADF5355GetPfd();
+  pfd = getPfd();
   pfdhz = pfd * 1000000.000;
   VCO_Band_Div = ceil(pfdhz/2400000);
   if(VCO_Band_Div > 255) VCO_Band_Div = 255;
@@ -843,7 +849,7 @@ void ADF5355CalcDelays(void)
 
 }
 
-  void ADF5355jtShift(uint8_t val)
+  void jtShift(uint8_t val) override
 {
   static uint8_t lastval;
   
@@ -854,7 +860,7 @@ void ADF5355CalcDelays(void)
 }
 
 
-  void ADF5355FskKey(bool key)
+  void fskKey(bool key) override
 {
   static bool lastkey;
   
@@ -871,7 +877,7 @@ void ADF5355CalcDelays(void)
     }
 }
 
-void ADF5355ExtKey(bool key)
+void extKey(bool key) override
 {
   if(key)
     {
@@ -883,23 +889,27 @@ void ADF5355ExtKey(bool key)
     }
 }
 
-void ADF5355SaveFskShift(void)
+void saveFskShift(void) override
 {
   cwidKeyUpN = ADF5355_INT;
   cwidKeyUpDen = ADF5355_FRAC2 << 14 | ADF5355_MOD2;
   cwidKeyUpNum = ADF5355_FRAC1;
 }
 
-void ADF5355SaveKeyShift(void)
+void saveKeyShift(void) override
 {
   ExtKeyUpN = ADF5355_INT;
   ExtKeyUpDen = ADF5355_FRAC2 << 14 | ADF5355_MOD2;
   ExtKeyUpNum =  ADF5355_FRAC1;
 }
 
-void ADF5355SaveJt(uint8_t index)
+void saveJt(uint8_t index) override
 {
   jtN[index] = ADF5355_INT;
   jtDen[index] = ADF5355_FRAC2 << 14 | ADF5355_MOD2;
   jtNum[index] = ADF5355_FRAC1;
 }
+
+};
+
+ADF5355Chip adf5355Chip;             //the single instance of this chip driver

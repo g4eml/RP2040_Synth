@@ -1,14 +1,33 @@
 // Synthesiser controller using RP2040
 // Colin Durbridge G4EML 2025
 
-#define VERSION 1.12
+#include "SynthChip.h"
+#include "ChipList.h"
+
+#define VERSION 2.00
 
 #define NUMBEROFCHANNELS 10
 
 //Global values...
 
-enum chipType { NONE, MAX2870 , ADF4351 , LMX2595 , CMT2119A , ADF5355 };
-String chipName[] = {"None","MAX2870", "ADF4351" , "LMX2595", "CMT2119A" , "ADF5355"};
+//enum chipType and NUM_CHIP_TYPES are both generated from CHIP_LIST in ChipList.h -
+//to add a new chip type, edit that list, not this one.
+enum chipType
+{
+  NONE,
+  #define CHIP_ENTRY(name, instance) name,
+  CHIP_LIST
+  #undef CHIP_ENTRY
+  NUM_CHIP_TYPES        //always 1 past the last valid chip type; also equals the number of chip types including NONE
+};
+
+//Each chip's display name is set in its own constructor (see e.g. MAX2870.ino) and
+//retrieved via chipTypeName(index) in redirects.ino - there is no separate name list to update.
+
+//Pointer to the SynthChip object for the currently selected chip type.
+//Set (and kept in sync with "chip") by chipInit() in redirects.ino.
+//To add a new chip type see the notes at the top of SynthChip.h.
+SynthChip* activeChip = nullptr;
 
 
 //These values are saved to the eeprom for recall on statup. 
@@ -49,14 +68,10 @@ struct chanstruct chanData[NUMBEROFCHANNELS];
 
 //End of saved values
 
-int numberOfRegs = 6;                     //number of registers in the current chip type
-int numberOfBits = 32;                    //number of bits in each register
-float maxPfd = 105.0;                     //maximum PFD frequency
-float minPfd = 0;                         //Minimum PFD
-float maxOsc = 100;                       //Maximum Reference Oscillater Freq
-float minOsc = 0;                         //Minimum Reference Oscillator Freq
-bool jt4Only = true;                      //lower spec chips only support JT4 due to limited fractional register size. 
-bool jtDisable = false;                   //lowest spec chips can not do JT modes due to limited frequency resolution.  
+//Note: numberOfRegs, maxPfd, minPfd, maxOsc, minOsc, jt4Only and jtDisable used to be
+//duplicated here as globals, kept in sync with the selected chip by chipInit(). They are
+//now read directly from activeChip (e.g. activeChip->numberOfRegs) wherever needed, so
+//there is only one copy of this data - the one on the chip object itself.
 uint8_t channel = 0;                      //currently active channel.
 
 uint32_t cwidKeyUpN = 1;                  //key up value for the PLL N used to shift the frequency for CWID. Calculated by cwidInit()
@@ -72,6 +87,8 @@ void saveSettings(void);
 #include <EEPROM.h>
 #include <SPI.h>
 #include <JTEncode.h>
+#include "Pio_WS2812.pio.h"               //LED on the Rp2040-Zero
+
 
 
 #define JT4G_TONE_SPACING        315         // 72 * 4.37 Hz
@@ -124,6 +141,8 @@ bool gpsActive = false;
 
 void setup() 
 {
+  setup_Pio_WS2812(16);                 //Setup LEd on Rp2040-Zero
+  put_pixel(GREEN);
   Serial.begin();                       //USB serial port
   Serial1.setRX(GPSRXPin);              //Configure the GPIO pins for the GPS module
   Serial1.setTX(GPSTXPin);
@@ -162,7 +181,7 @@ void setup()
 void loop() 
 {
   Serial.print("\n");
-  Serial.print(chipName[chip]);
+  Serial.print(chipTypeName(chip));
   Serial.println(" Synthesiser programmed, Sleeping");
 
   chipUpdate();
@@ -238,8 +257,11 @@ void loop()
 
       if(Serial.available() > 0 )          //test for USB command connected
      {
+       put_pixel(BLUE);                   //BLUE = menu active
        chipExtKey(true);                    //reset to nominal carrier frequency
        mainMenu();                         //timing loop stops while the menu system is running.
+       delay(10);
+       put_pixel(GREEN);                    // Menu Exited
        seconds = -1;                       //reset the timing after using the menu.
        milliseconds = 0;
        initChannel();  

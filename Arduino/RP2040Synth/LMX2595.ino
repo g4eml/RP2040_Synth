@@ -6,6 +6,13 @@
 #define LMX2595SCKPin 6         //GPO 6 Connect to LMX2595  SCK Pin 
 #define LMX2595SDIPin 7         //GPO 7 Connect to LMX2595  SDI Pin
 
+#include "SynthChip.h"
+
+class LMX2595Chip : public SynthChip
+{
+public:
+
+LMX2595Chip() { name = "LMX2595"; }
 
 //LMX2595 Register Parameters.
 
@@ -133,7 +140,7 @@ byte LMX2595_VCO_CAPCTRL_STRT;
 
 
 
-void LMX2595SetDefault(void)
+void setDefault(void) override
 {
 //Reg 0
 LMX2595_RAMP_EN = 0;
@@ -256,13 +263,13 @@ LMX2595_VCO_CAPCTRL_STRT = 0;
 
 
 
-  LMX2595SetFrequency(0);
+  setFrequency(0);
 
   LMX2595EncodeRegs();
-  LMX2595Update();
+  update();
 }
 
-void LMX2595SetParameters(void)
+void setParameters(void) override
 {
   String resp;
   String param;
@@ -450,12 +457,12 @@ void LMX2595SetParameters(void)
 
     handled:
     LMX2595EncodeRegs();
-    LMX2595Update();
+    update();
 
   }
 }
 
-void LMX2595Init(void)
+void init(void) override
 {
   numberOfRegs = 79;                   //number of registers in the current chip type (ramping and readback registers 79 - 112 not used. )
   numberOfBits = 24;                   //number of bits in each register. Top 8 bits are register address low 16 bits are data. 
@@ -622,7 +629,7 @@ void LMX2595EncodeRegs(void)
   chanData[channel].reg[78] = (chanData[channel].reg[78]) | (LMX2595_RAMP_THRESH32 << 11) | (LMX2595_QUICK_RECAL_EN << 9) | (LMX2595_VCO_CAPCTRL_STRT << 1) | (0b1); 
 }
 
-void LMX2595DecodeRegs(void)
+void decodeRegs(void) override
 {
 //Reg 0
 LMX2595_RAMP_EN = (chanData[channel].reg[0] >> 15) & 0x01;
@@ -745,7 +752,7 @@ LMX2595_VCO_CAPCTRL_STRT = (chanData[channel].reg[78] >> 1) & 0xFF;
 
 }
 
-void LMX2595Update(void)
+void update(void) override
 {
   LMX2595Send(0x2);           //Reg 0 + reset bit
   LMX2595Send(0x0);           //Reg 0 no reset
@@ -758,7 +765,7 @@ void LMX2595Update(void)
 }
 
 
-double LMX2595CalcPFD(double rpfd)
+double calcPfd(double rpfd) override
 {
   double r = 1;
   double mult = 1;
@@ -820,7 +827,7 @@ double LMX2595CalcPFD(double rpfd)
   Serial.println(" MHz");
   Serial.println("PFD has not been changed");
 
-  return LMX2595GetPfd();
+  return getPfd();
 
   done:
   if(r < 1) r = 1;
@@ -848,7 +855,7 @@ double LMX2595CalcPFD(double rpfd)
 }
 
 
-double LMX2595GetPfd(void)
+double getPfd(void) override
 {
   double pfd = refOsc;
   double r = (double) LMX2595_PLL_R * LMX2595_PLL_R_PRE ;
@@ -857,7 +864,7 @@ double LMX2595GetPfd(void)
   return pfd;
 }
 
-void LMX2595SetFrequency(double direct)
+void setFrequency(double direct) override
 {
   bool freqOK = false;
   double pfd;
@@ -881,7 +888,7 @@ void LMX2595SetFrequency(double direct)
     maxDivisor = false;
   }
 
-  pfd = LMX2595GetPfd();
+  pfd = getPfd();
 
   freqOK = false;
   if(direct == 0)
@@ -1081,7 +1088,7 @@ if(! maxDivisor)
   LMX2595EncodeRegs();
 }
 
-void LMX2595CalcFreq(void)
+void calcFreq(void) override
 {
   double pfd;
   double vco;
@@ -1106,12 +1113,12 @@ void LMX2595CalcFreq(void)
 
   Serial.println();
   Serial.print("Chip type is ");
-  Serial.println(chipName[chip]);
+  Serial.println(name);
   Serial.print("Reference Oscillator = ");
   Serial.print(refOsc,10);
   Serial.println(" MHz");
 
-  pfd = LMX2595GetPfd();
+  pfd = getPfd();
 
   Serial.print("PFD = ");
   Serial.print(pfd , 10);
@@ -1166,7 +1173,7 @@ void LMX2595CalcFreq(void)
     }
 }
 
-double LMX2595GetFrequency(void)
+double getFrequency(void) override
 {
   double pfd;
   double vco;
@@ -1188,7 +1195,7 @@ double LMX2595GetFrequency(void)
 
   n = (double) LMX2595_PLL_N;
 
-  pfd = LMX2595GetPfd();
+  pfd = getPfd();
 
   fr = (double) LMX2595_PLL_NUM / (double) LMX2595_PLL_DEN;
 
@@ -1204,7 +1211,7 @@ double LMX2595GetFrequency(void)
   return vco / diva;
 }
 
-void LMX2595jtShift(uint8_t val)
+void jtShift(uint8_t val) override
 {
   static uint8_t lastval;
   static uint32_t lastN;
@@ -1221,7 +1228,7 @@ void LMX2595jtShift(uint8_t val)
   LMX2595FastSend((43 << 16) | (jtNum[val] & 0xFFFF) ,(42 << 16) | ((jtNum[val] >> 16) & 0xFFFF));
 }
 
-void LMX2595FskKey(bool key)
+void fskKey(bool key) override
 {
   static bool lastkey;
   
@@ -1242,7 +1249,7 @@ void LMX2595FskKey(bool key)
     }
 }
 
-void LMX2595ExtKey(bool key)
+void extKey(bool key) override
 {
   if(key)
     {      
@@ -1258,23 +1265,27 @@ void LMX2595ExtKey(bool key)
     }
 }
 
-void LMX2595SaveFskShift(void)
+void saveFskShift(void) override
 {
   cwidKeyUpN = LMX2595_PLL_N;
   cwidKeyUpDen = LMX2595_PLL_DEN;
   cwidKeyUpNum = LMX2595_PLL_NUM;
 }
 
-void LMX2595SaveKeyShift(void)
+void saveKeyShift(void) override
 {
   ExtKeyUpN = LMX2595_PLL_N;
   ExtKeyUpDen = LMX2595_PLL_DEN;
   ExtKeyUpNum = LMX2595_PLL_NUM;
 }
 
-void LMX2595SaveJt(uint8_t index)
+void saveJt(uint8_t index) override
 {
   jtN[index] = LMX2595_PLL_N;
   jtDen[index] = LMX2595_PLL_DEN;
   jtNum[index] = LMX2595_PLL_NUM;
 }
+
+};
+
+LMX2595Chip lmx2595Chip;             //the single instance of this chip driver

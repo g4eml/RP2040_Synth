@@ -12,12 +12,11 @@
 // change the meaning of settings already saved by units in the field. New
 // chip types must always be appended at the end.
 //
-// To add a new chip type:
-//   1. Write its SynthChip-derived class (see SynthChip.h) and instantiate
-//      one global object of it, e.g. "MyChipClass myChipInstance;".
-//   2. Add one line below: CHIP_ENTRY(EnumName, myChipInstance)
-// That's it - the enum value, chipTable[] entry, and chip count are all
-// generated automatically from this one line.
+// To add a new chip type: see the full instructions at the top of SynthChip.h
+// (short version: write the class, instantiate it, add one line below, copy
+// both files into both sketch folders, and - for the touchscreen project only -
+// add a button to ConfigScreen.ino). The enum value, chipTable[] entry, and
+// chip count are all generated automatically from this one list.
 
 #ifndef CHIPLIST_H
 #define CHIPLIST_H

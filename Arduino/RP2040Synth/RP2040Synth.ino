@@ -173,6 +173,10 @@ void setup()
           channel = selChan;          //fix the channel number. 
         } 
     }
+  else
+    {
+      changeChip();                 //blank/invalid EEPROM - force reset of all channels to valid defaults.
+    }
    chipInit();
    initChannel();
    seconds = -1;

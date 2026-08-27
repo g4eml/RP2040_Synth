@@ -261,11 +261,10 @@ LMX2595_RAMP_THRESH32 = 0;
 LMX2595_QUICK_RECAL_EN = 0;
 LMX2595_VCO_CAPCTRL_STRT = 0;
 
+  //See the note in MAX2870.ino setDefault() - setFrequency(0) here would
+  //hang any non-interactive caller waiting for serial input.
 
-
-  setFrequency(0);
-
-  LMX2595EncodeRegs();
+  encodeRegs();
   update();
 }
 
@@ -456,7 +455,7 @@ void setParameters(void) override
       if(paramByte(param , "VCO_CAPCTRL_STRT" , &LMX2595_VCO_CAPCTRL_STRT , value , 0 , 255)) goto handled;
 
     handled:
-    LMX2595EncodeRegs();
+    encodeRegs();
     update();
 
   }
@@ -524,7 +523,7 @@ void LMX2595FastSend(int32_t val1, int32_t val2)
 }
 
 
-void LMX2595EncodeRegs(void)
+void encodeRegs(void) override
 {
   // first we initialise the address field of all the registers. 
   for(int r = 0 ;r < numberOfRegs ; r++)
@@ -1085,7 +1084,7 @@ if(! maxDivisor)
         break;
   }
 
-  LMX2595EncodeRegs();
+  encodeRegs();
 }
 
 void calcFreq(void) override
@@ -1284,6 +1283,24 @@ void saveJt(uint8_t index) override
   jtN[index] = LMX2595_PLL_N;
   jtDen[index] = LMX2595_PLL_DEN;
   jtNum[index] = LMX2595_PLL_NUM;
+}
+
+//--- RF output power/enable control, used by the touchscreen UI ---
+uint8_t getPower(void) override { return LMX2595_OUTA_PWR; }
+void setPower(uint8_t p) override
+{
+  if(p>63) p=63;
+  LMX2595_OUTA_PWR = p;
+  encodeRegs();
+  update();
+}
+bool getOutput(void) override { return !LMX2595_OUTA_PD; }
+void enableOutput(bool o) override
+{
+  digitalWrite(LMX2595CEPin,o);
+  LMX2595_OUTA_PD = !o;
+  encodeRegs();
+  update();
 }
 
 };

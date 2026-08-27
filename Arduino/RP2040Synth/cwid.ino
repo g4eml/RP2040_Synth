@@ -18,6 +18,7 @@ void cwidInit(void)
   nextcwidTime = 0;           //CW ID always starts at the beginning of each even minute
   chanData[channel].cwid[0] = 255;             // add an initial 1 second of silence. 
   chanData[channel].cwid[chanData[channel].cwidLen + 1] = 255;    // and also at the end if the ident
+  chanData[channel].cwid[chanData[channel].cwidLen + 2] = 0;    // add terminating null
   cwidEncode(0);
 
 // calculate the required f/d value for the CWID FSK Offset

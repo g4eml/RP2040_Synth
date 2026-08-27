@@ -44,7 +44,9 @@ void setDefault(void) override
   {
     chanData[channel].reg[i] = CMT2119ook[i];
   }
-  setFrequency(0);
+  //See the note in MAX2870.ino setDefault() - setFrequency(0) here would
+  //hang any non-interactive caller waiting for serial input. The default
+  //register table above already encodes a valid default frequency.
   update();
 }
 
@@ -529,6 +531,14 @@ void eepromBurn(void) override
   CMT2119A_RESET();
   digitalWrite(TWIDAT,HIGH);
 }
+
+//--- RF output power/enable control, used by the touchscreen UI ---
+//The CMT2119A's output power is set by HopeRF's proprietary RFPDK tool when the
+//EEPROM image (CMT2119ook[] above) is generated - there is no documented on-line
+//register for it, so it can't be adjusted here. Report both as unsupported so the
+//UI can grey out the controls instead of showing values that don't do anything.
+bool hasPowerControl(void) override { return false; }
+bool hasOutputControl(void) override { return false; }
 
 };
 

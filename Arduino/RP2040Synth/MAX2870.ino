@@ -120,9 +120,15 @@ void setDefault(void) override
   Max2870_LD = 1;
   Max2870_MUX_MSB = 0;
 
-  setFrequency(0);
+  //Note: this used to call setFrequency(0) here, which (for this chip) means
+  //"prompt interactively over serial for a frequency". That's fine when
+  //setDefault() is called from the interactive serial menu ('D'), but hangs
+  //any non-interactive caller (blank-EEPROM startup, or the touchscreen
+  //project's chip-select buttons) waiting for serial input that will never
+  //arrive. The default register values set above already give a valid
+  //default frequency, so there is nothing to prompt for here.
 
-  Max2870EncodeRegs();
+  encodeRegs();
   update();
 }
 
@@ -225,7 +231,7 @@ void setParameters(void) override
 
 
     handled:
-    Max2870EncodeRegs();
+    encodeRegs();
     update();
 
   }
@@ -271,7 +277,7 @@ void Max2870Send(int32_t val)
 }
 
 
-void Max2870EncodeRegs(void)
+void encodeRegs(void) override
 {
   chanData[channel].reg[0] = (Max2870_INT << 31) | (Max2870_N << 15) | (Max2870_FRAC << 3);
   chanData[channel].reg[1] = (Max2870_CPOC << 31) | (Max2870_CPL << 29) | (Max2870_CPT << 27) | (Max2870_P << 15) | (Max2870_M << 3) | 1 ;
@@ -507,7 +513,7 @@ void setFrequency(double direct) override
   Max2870_M = bestden;
   Max2870_FRAC = bestnom;
 
-  Max2870EncodeRegs();
+  encodeRegs();
 }
 
 
@@ -712,6 +718,23 @@ void saveJt(uint8_t index) override
   jtN[index] = Max2870_N;
   jtDen[index] = Max2870_M;
   jtNum[index] = Max2870_FRAC;
+}
+
+//--- RF output power/enable control, used by the touchscreen UI ---
+uint8_t getPower(void) override { return Max2870_APWR; }
+void setPower(uint8_t p) override
+{
+  if(p>3) p=3;
+  Max2870_APWR = p;
+  encodeRegs();
+  update();
+}
+bool getOutput(void) override { return Max2870_RFA_EN; }
+void enableOutput(bool o) override
+{
+  Max2870_RFA_EN = o;
+  encodeRegs();
+  update();
 }
 
 };

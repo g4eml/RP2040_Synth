@@ -106,3 +106,32 @@ double chipCalcPfd(double pfd)
 {
   return activeChip->calcPfd(pfd);
 }
+
+void chipEncodeRegs(void)
+{
+  activeChip->encodeRegs();
+}
+
+//The remaining functions are only used by the touchscreen (LCD) version of this
+//project, but live here so that the chip driver files can be shared unmodified
+//between both versions - see the note on hasPowerControl()/hasOutputControl() in
+//SynthChip.h for why not every chip supports them.
+uint8_t chipGetPower(void)
+{
+  return activeChip->getPower();
+}
+
+void chipSetPower(uint8_t p)
+{
+  activeChip->setPower(p);
+}
+
+bool chipGetOutput(void)
+{
+  return activeChip->getOutput();
+}
+
+void chipEnableOutput(bool o)
+{
+  activeChip->enableOutput(o);
+}

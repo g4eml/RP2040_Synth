@@ -114,8 +114,9 @@ void setDefault(void) override
   //REG 5
   ADF4351_LD = 1;
 
-  setFrequency(0);
-  ADF4351EncodeRegs();
+  //See the note in MAX2870.ino's setDefault() - setFrequency(0) here would
+  //hang any non-interactive caller waiting for serial input.
+  encodeRegs();
   update();
 
 }
@@ -216,7 +217,7 @@ void setParameters(void) override
 
 
     handled:
-    ADF4351EncodeRegs();
+    encodeRegs();
     update();
 
   }
@@ -263,7 +264,7 @@ void ADF4351Send(int32_t val)
 }
 
 
-void ADF4351EncodeRegs(void)
+void encodeRegs(void) override
 {
   chanData[channel].reg[0] = (ADF4351_INT << 15) | (ADF4351_FRAC << 3);
   chanData[channel].reg[1] = (ADF4351_PH << 28) | (ADF4351_PR << 27) | (ADF4351_P << 15) | (ADF4351_M << 3) | 1 ;
@@ -480,7 +481,7 @@ void setFrequency(double direct) override
   ADF4351_M = bestden;
   ADF4351_FRAC = bestnom;
 
-  ADF4351EncodeRegs();
+  encodeRegs();
 }
 
 
@@ -654,6 +655,23 @@ void saveJt(uint8_t index) override
   jtN[index] = ADF4351_INT;
   jtDen[index] = ADF4351_M;
   jtNum[index] = ADF4351_FRAC;
+}
+
+//--- RF output power/enable control, used by the touchscreen UI ---
+uint8_t getPower(void) override { return ADF4351_RFPWR; }
+void setPower(uint8_t p) override
+{
+  if(p>3) p=3;
+  ADF4351_RFPWR = p;
+  encodeRegs();
+  update();
+}
+bool getOutput(void) override { return ADF4351_RFEN; }
+void enableOutput(bool o) override
+{
+  ADF4351_RFEN = o;
+  encodeRegs();
+  update();
 }
 
 };

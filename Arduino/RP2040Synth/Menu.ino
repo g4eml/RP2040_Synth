@@ -57,7 +57,9 @@ double inputFloat(void)
   bool done = false;
   String s;
   char ch;
+  #if !defined(LCDVERSION)          //no WS2812 LED on the touchscreen board
   put_pixel(RED);
+  #endif
   flushInput();
   s = "";
     while(!done)
@@ -80,7 +82,9 @@ double inputFloat(void)
         }
       }
     }
+  #if !defined(LCDVERSION)
   put_pixel(BLUE);
+  #endif
   return s.toDouble();
 }
 
@@ -89,7 +93,9 @@ String inputString(bool uppercase)
   bool done = false;
   char ch;
   String s;
+  #if !defined(LCDVERSION)          //no WS2812 LED on the touchscreen board
   put_pixel(RED);
+  #endif
   flushInput();
   s = "";
     while(!done)
@@ -119,7 +125,9 @@ String inputString(bool uppercase)
         }
       }
     }
+  #if !defined(LCDVERSION)
   put_pixel(BLUE);
+  #endif
   return s;
 }
 
@@ -162,7 +170,9 @@ else
 char getSelection(String p)
 {
  char resp;
+  #if !defined(LCDVERSION)          //no WS2812 LED on the touchscreen board
   put_pixel(RED);
+  #endif
   Serial.println();
   Serial.print(p);
 
@@ -182,7 +192,9 @@ char getSelection(String p)
   delay(100);
   flushInput();
 
+  #if !defined(LCDVERSION)
   put_pixel(BLUE);
+  #endif
   return resp;
 }
 
@@ -645,17 +657,8 @@ void mainMenu(void)
         }
         Serial.print("Chip type is now ");
         Serial.println(chipTypeName(chip));
-        channel = 0;
-        selChan = 0;
-        chanData[channel].fskMode = 0;
-        chanData[channel].jtMode = 0;
-        chipInit();
+        changeChip();
         enterOsc();
-        chipSetDefault();
-        for(int c=1 ; c < NUMBEROFCHANNELS;c++)
-          {
-            chanData[c] = chanData[0];
-          }
         break;
 
         case 'R':
@@ -864,3 +867,21 @@ bool paramUint32(String param , String name, uint32_t * var , String value , uin
 
 
 
+
+//Resets all channels to default and re-initialises for the currently selected "chip".
+//Called after "chip" is changed, whether from the serial menu ('T') or, in the LCD
+//project, the touchscreen config screen.
+void changeChip(void)
+{
+  channel = 0;
+  selChan = 0;
+  chanData[channel].fskMode = 0;
+  chanData[channel].jtMode = 0;
+  chipInit();
+  chipSetDefault();
+  chipEncodeRegs();
+  for(int c=1 ; c < NUMBEROFCHANNELS;c++)
+    {
+      chanData[c] = chanData[0];
+    }
+}

@@ -174,8 +174,9 @@ ADF5355_R11_RESERVED = 0x0061300;
 ADF5355_RESYNC_CLOCK = 1;
 ADF5355_R12_RESERVED = 0x41;
 
-   setFrequency(0);
-   ADF5355EncodeRegs();
+   //See the note in MAX2870.ino setDefault() - setFrequency(0) here would
+   //hang any non-interactive caller waiting for serial input.
+   encodeRegs();
    update();
 
  }
@@ -313,7 +314,7 @@ ADF5355_R12_RESERVED = 0x41;
 
 
      handled:
-     ADF5355EncodeRegs();
+     encodeRegs();
      update();
 
    }
@@ -361,7 +362,7 @@ ADF5355_R12_RESERVED = 0x41;
  }
 
 
- void ADF5355EncodeRegs(void)
+ void encodeRegs(void) override
  {
    chanData[channel].reg[0] = (ADF5355_AUTOCAL << 21) | (ADF5355_PRESCALER << 20) | (ADF5355_INT << 4);
    chanData[channel].reg[1] = (ADF5355_FRAC1 << 4) | 1 ;
@@ -666,7 +667,7 @@ double getPfd(void) override
    ADF5355_MOD2 = bestden;
    ADF5355_FRAC2 = bestnom;
 
-   ADF5355EncodeRegs();
+   encodeRegs();
  }
 
 
@@ -908,6 +909,24 @@ void saveJt(uint8_t index) override
   jtN[index] = ADF5355_INT;
   jtDen[index] = ADF5355_FRAC2 << 14 | ADF5355_MOD2;
   jtNum[index] = ADF5355_FRAC1;
+}
+
+//--- RF output power/enable control, used by the touchscreen UI ---
+uint8_t getPower(void) override { return ADF5355_RFPWR; }
+void setPower(uint8_t p) override
+{
+  if(p>3) p=3;
+  ADF5355_RFPWR = p;
+  encodeRegs();
+  update();
+}
+bool getOutput(void) override { return ADF5355_RFAEN; }
+void enableOutput(bool o) override
+{
+  ADF5355_RFAEN = o;
+  ADF5355_RFBDIS = !o;
+  encodeRegs();
+  update();
 }
 
 };

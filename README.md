@@ -2,7 +2,7 @@
 
 ## Description
 
-A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 4 different type of synthesiser chip, the ADF4351, the Max2870, the LMX2595 the CMT2119A and the ADF5355.
+A Fractional N synthesiser controller based on the RP2040 processor.  This currently supports 6 different type of synthesiser chip, the ADF4351, the MAX2870, the LMX2595, the CMT2119A, the ADF5355 and the LMX2582.
 
 ## Features
 
@@ -14,7 +14,7 @@ Settings are saved to EEPROM for automatic load on power on.
 
 Support for FSK CW Identification for beacon use.
 
-Supports Digi modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870 and LMX2595. Q65 is also available on the LMX2595 and ADF5355. 
+Supports Digi modes for Beacon Identification.  JT4G is available on the ADF4351, Max2870, LMX2582 and LMX2595. Q65 is also available on the LMX2595, LMX2582 and ADF5355. 
 
 Note:- Whilst JT4G mode is available there may be some limitations. The ADF4351 and MAX2870 chips have a limited frequency resolution and may not be able to accurately set the required tone frequencies especially when an external multiplication chain is used. 
 A warning message will be displayed if the tone spacing is more than 1% in error. 
@@ -160,16 +160,16 @@ The LMX2595 takes a lot of current so is best supplied from the USB 5V line usin
 
 The generic wiring instructions are as follows:-
 
-| RP2040 | ADF4351 | MAX2870 | LMX2595 | CMT2119A | ADF5355 |
-| :---:  |  :---:  |  :---:  |   :---: |  :---:   | :---:   |
-|5V      |   N/C   |   N/C   |    5V   |   N/C    |   5V    |
-|3V3     |   3V3   |   3V3   |   N/C   |   VDD    |  N/C    |
-|GND     |   GND   |   GND   |   GND   |   GND    |  GND    |
-|GPO3    |   CE    |   CE    |   CE    |   N/C    |   CE    |
-|GPO4    |   MUX   |   MUX   |  MUXout |   N/C    |   MUX   |
-|GPO5    |   LE    |   LE    |   CSB   |   N/C    |   LE    |
-|GPO6    |   CLK   |   CLK   |   SCK   |  DATA    |   CLK   | 
-|GPO7    |   DAT   |   DATA  |   SDI   |   CLK    |   DAT   |
+| RP2040 | ADF4351 | MAX2870 | LMX2595 | CMT2119A | ADF5355 | LMX2582 |
+| :---:  |  :---:  |  :---:  |   :---: |  :---:   | :---:   |  :---:  |
+|5V      |   N/C   |   N/C   |    5V   |   N/C    |   5V    |   5V    |
+|3V3     |   3V3   |   3V3   |   N/C   |   VDD    |  N/C    |  N/C    |
+|GND     |   GND   |   GND   |   GND   |   GND    |  GND    |  GND    |
+|GPO3    |   CE    |   CE    |   CE    |   N/C    |   CE    |   CE    |
+|GPO4    |   MUX   |   MUX   |  MUXout |   N/C    |   MUX   |  MUXout |
+|GPO5    |   LE    |   LE    |   CSB   |   N/C    |   LE    |   CSB   |
+|GPO6    |   CLK   |   CLK   |   SCK   |  DATA    |   CLK   |   SCK   | 
+|GPO7    |   DAT   |   DATA  |   SDI   |   CLK    |   DAT   |   SDI   |
 
 The firmware also supports the optional connection of a GPS module. This is used to accurately set the time, which is needed for the Digi modes. It is not needed for Local Oscillator or a CW only beacon. Any GPS module with a 3V3 output can be used. It needs to output NMEA data at 9600 Baud. One of the low cost NEO6M modules was used for development. 
 

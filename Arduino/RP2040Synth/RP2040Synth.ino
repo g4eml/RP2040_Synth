@@ -4,7 +4,7 @@
 #include "SynthChip.h"
 #include "ChipList.h"
 
-#define VERSION 2.00
+#define VERSION 2.10
 
 #define NUMBEROFCHANNELS 10
 
